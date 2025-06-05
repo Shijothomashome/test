@@ -1,35 +1,51 @@
 import categoryModel from "../models/categoryModel.js";
+import mongoose from "mongoose";
+
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, parentCategory, image } = req.body;
 
     // Validate ID
-    if (!id) {
-      return res.status(400).json({ message: "Category ID is required." });
-    }
-
-    // Validate name if provided
-    if (name && (typeof name !== "string" || !name.trim())) {
-      return res
-        .status(400)
-        .json({ message: "Category name must be a valid string." });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid category ID." });
     }
 
     // Check if category exists
     const category = await categoryModel.findById(id);
-    if (!category) {
+    if (!category || category.isDeleted) {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // Optional: check if parentCategory exists
+    // Validate name
+    if (name && (typeof name !== "string" || !name.trim())) {
+      return res.status(400).json({ message: "Category name must be a non-empty string." });
+    }
+
+    // Check if name already exists (excluding current category)
+    if (name?.trim()) {
+      const existingName = await categoryModel.findOne({
+        name: name.trim(),
+        _id: { $ne: id },
+        isDeleted: false,
+      });
+      if (existingName) {
+        return res.status(409).json({ message: "Category name already exists." });
+      }
+    }
+
+    // Validate and check parentCategory
     if (parentCategory) {
+      if (!mongoose.Types.ObjectId.isValid(parentCategory)) {
+        return res.status(400).json({ message: "Invalid parent category ID." });
+      }
       const parentExists = await categoryModel.findById(parentCategory);
-      if (!parentExists) {
+      if (!parentExists || parentExists.isDeleted) {
         return res.status(404).json({ message: "Parent category not found." });
       }
     }
 
+    // Prepare update object
     const updatedData = {
       ...(name && { name: name.trim() }),
       ...(parentCategory && { parentCategory }),

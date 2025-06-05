@@ -5,6 +5,6 @@ import updateToggleStatus from "../category/updateTogglestatus.js";
 const router = express.Router();
 
 router.post("/create", createCategory);
-router.put('/',updateCategory)
+router.put('/:id',updateCategory)
 router.patch('/:id/toggle-status',updateToggleStatus)
 export default router;
