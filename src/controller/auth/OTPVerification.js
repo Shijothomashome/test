@@ -48,7 +48,7 @@ export const OTP_SEND = async (req, res) => {
             if (['reset-password', 'login-email'].includes(purpose) && !user) {
                 return res.status(400).json({ success: false, message: `User not found for ${purpose.split("-").join(" ")}` });
             }
-            if (['reset-password', 'login-email'].includes(purpose) && user && !user.isEmailVerified) {
+            if (['reset-password', 'login-email'].includes(purpose) && user && (!user.isEmailVerified && !user.isVerified)) {
                 return res.status(400).json({ success: false, message: 'Email is not verified' });
             }
             if (user && user.isBlocked) {
@@ -170,12 +170,16 @@ export const OTP_VERIFY = async (req, res) => {
         //     }
         //     await user.save();
         // }
-
+        const purposeMessages = {
+            'reset-password': 'Password reset token generated successfully',
+            'verify-email': 'Email verified successfully',
+            'verify-phone': 'Phone verified successfully',
+            'login-email': 'Logged in with email successfully',
+            'login-phone': 'Logged in with phone successfully',
+        };
         return res.status(200).json({
             success: true,
-            message: purpose === 'reset-password'
-                ? 'Password reset token generated successfully'
-                : `${purpose === 'verify-email' ? 'Email' : 'Phone'} verified successfully`,
+            message: purposeMessages[purpose] || 'Action completed successfully',
             verification_id: otpRecord._id,
             // reset_token: user?.tokens?.reset_token?.value || undefined,
         });
