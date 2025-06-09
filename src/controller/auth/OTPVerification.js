@@ -45,10 +45,10 @@ export const OTP_SEND = async (req, res) => {
         // Send OTP according to contact method
         let otp, result;
         if (email) {
-            if (purpose === 'reset-password' && !user) {
-                return res.status(400).json({ success: false, message: 'User not found for password reset' });
+            if (['reset-password', 'login-email'].includes(purpose) && !user) {
+                return res.status(400).json({ success: false, message: `User not found for ${purpose.split("-").join(" ")}` });
             }
-            if (user && !user.isEmailVerified && purpose !== 'reset-password') {
+            if (['reset-password', 'login-email'].includes(purpose) && user && !user.isEmailVerified) {
                 return res.status(400).json({ success: false, message: 'Email is not verified' });
             }
             if (user && user.isBlocked) {
@@ -64,10 +64,10 @@ export const OTP_SEND = async (req, res) => {
             }
             otp = result.otp;
         } else {
-            if (purpose === 'reset-password' && !user) {
-                return res.status(400).json({ success: false, message: 'User not found for password reset' });
+            if (['reset-password', 'login-phone'].includes(purpose) && !user) {
+                return res.status(400).json({ success: false, message: `User not found for  ${purpose.split("-").join(" ")}` });
             }
-            if (user && !user.isPhoneVerified && purpose !== 'reset-password') {
+            if (['reset-password', 'login-phone'].includes(purpose) && user && !user.isPhoneVerified) {
                 return res.status(400).json({ success: false, message: 'Phone is not verified' });
             }
             if (user && user.isBlocked) {
@@ -91,6 +91,7 @@ export const OTP_SEND = async (req, res) => {
             otp,
             purpose,
             isUsed: false,
+            isVerified: false,
             expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
         });
 
@@ -149,7 +150,7 @@ export const OTP_VERIFY = async (req, res) => {
         }
 
         // Mark OTP as used
-        otpRecord.isUsed = true;
+        otpRecord.isVerified = true;
         await otpRecord.save();
 
         // // Update user verification or create reset token

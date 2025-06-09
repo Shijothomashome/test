@@ -1,16 +1,18 @@
 // src/controllers/CustomerAuth.js
+import mongoose from "mongoose";
 import { JWT_SECRET } from "../../config/index.js";
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-
 export const CustomerRegister = async (req, res) => {
+  const session = await mongoose.startSession();
   try {
+    session.startTransaction();
+
     const { name, email, password, phone, addressList, verification_ids = {} } = req.body;
 
-    // Basic validation
     if (!name || (!email && !phone) || !password) {
       return res.status(400).json({
         success: false,
@@ -18,7 +20,6 @@ export const CustomerRegister = async (req, res) => {
       });
     }
 
-    // Check if user already exists
     const existingUser = await userModel.findOne({
       $or: [
         email ? { email } : null,
@@ -33,14 +34,13 @@ export const CustomerRegister = async (req, res) => {
       });
     }
 
-    // Optional: verify OTPs if verification_ids are provided
     const emailVerified = email && verification_ids.email
       ? await otpQueueModel.findOne({
         _id: verification_ids.email,
         contact: email,
         purpose: 'verify-email',
-        isUsed: true,
-
+        isUsed: false,
+        isVerified: true,
       })
       : null;
 
@@ -49,9 +49,20 @@ export const CustomerRegister = async (req, res) => {
         _id: verification_ids.phone,
         contact: phone,
         purpose: 'verify-phone',
-        isUsed: true,
+        isUsed: false,
+        isVerified: true,
       })
       : null;
+
+    if (phoneVerified) {
+      phoneVerified.isUsed = true;
+      await phoneVerified.save({ session });
+    }
+
+    if (emailVerified) {
+      emailVerified.isUsed = true;
+      await emailVerified.save({ session });
+    }
 
     if (verification_ids.email && !emailVerified) {
       return res.status(400).json({
@@ -67,11 +78,9 @@ export const CustomerRegister = async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
-    const user = await userModel.create({
+    const user = await userModel.create([{
       name,
       email,
       phone,
@@ -80,16 +89,21 @@ export const CustomerRegister = async (req, res) => {
       role: 'customer',
       isEmailVerified: !!emailVerified,
       isPhoneVerified: !!phoneVerified,
-    });
+    }], { session });
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      userId: user._id,
+      userId: user[0]._id,
     });
 
   } catch (err) {
-    console.error("CustomerRegister error:", err);
+    await session.abortTransaction();
+    session.endSession(); // always end session
+    console.error('Transaction aborted:', err.message);
     return res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -97,6 +111,7 @@ export const CustomerRegister = async (req, res) => {
     });
   }
 };
+
 
 
 export const CustomerLogin = async (req, res) => {
@@ -195,7 +210,11 @@ export const CustomerLogin = async (req, res) => {
 };
 
 export const CustomerPasswordReset = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
+    session.startTransaction();
+
     const { email, phone, verification_id, new_password } = req.body;
 
     if ((!email && !phone) || !verification_id || !new_password) {
@@ -258,7 +277,8 @@ export const CustomerPasswordReset = async (req, res) => {
       _id: verification_id,
       contact,
       purpose: 'reset-password',
-      isUsed: true,
+      isUsed: false,
+      isVerified: true,
     });
 
     if (!verifiedOtpRecord) {
@@ -267,6 +287,8 @@ export const CustomerPasswordReset = async (req, res) => {
         message: "Invalid or unverified OTP for password reset",
       });
     }
+    verifiedOtpRecord.isUsed = true;
+    await verifiedOtpRecord.save({ session });
     if (hashedPassword === user.password) {
       return res.status(400).json({
         success: false,
@@ -279,13 +301,16 @@ export const CustomerPasswordReset = async (req, res) => {
 
     // user.tokens.reset_token = undefined;
 
-    await user.save();
+    await user.save({ session });
+    await session.commitTransaction();
 
     return res.status(200).json({
       success: true,
       message: "Password reset successfully",
     });
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession(); // always end session
     console.error("CustomerPasswordReset error:", err);
     return res.status(500).json({
       success: false,
@@ -294,3 +319,93 @@ export const CustomerPasswordReset = async (req, res) => {
     });
   }
 };
+
+export const OtpLogin = async (req, res) => {
+  const { verification_id, purpose } = req.body;
+  try {
+    if (!verification_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification ID is required',
+      });
+    }
+    if (!purpose || !['login-email', 'login-phone'].includes(purpose)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or missing purpose',
+      });
+    }
+
+    const otpRecord = await otpQueueModel.findOne({
+      _id: verification_id,
+      purpose,
+      isUsed: false,
+      isVerified: true,
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or unverified OTP',
+      });
+    }
+
+    const user = await userModel.findById(otpRecord.to)
+      .select('-password -tokens') // Exclude sensitive fields;
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: 'User is blocked',
+      });
+    }
+
+    if (user.isDeleted) {
+      return res.status(410).json({
+        success: false,
+        message: 'User account has been deleted',
+      });
+    }
+
+    // Mark OTP as used
+    otpRecord.isUsed = true;
+    await otpRecord.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Send cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // true in prod
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      user,
+    });
+  } catch (err) {
+    console.error("OtpLogin error:", err);
+    return res.status(500).json({
+      success: false,
+      message: 'Login failed',
+      error: err.message,
+    });
+  }
+
+}

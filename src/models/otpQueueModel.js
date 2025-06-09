@@ -16,11 +16,15 @@ const otpQueueSchema = new mongoose.Schema(
     },
     purpose: {
       type: String,
-      enum: ['login', 'register', 'reset-password', 'verify-email', 'verify-phone'],
+      enum: ['login-email', 'login-phone', 'reset-password', 'verify-email', 'verify-phone'],
       required: true,
-      default: 'login',
+      default: 'login-email',
     },
     isUsed: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
       type: Boolean,
       default: false,
     },
