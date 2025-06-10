@@ -4,13 +4,6 @@ const createCategory = async (req, res) => {
   try {
     const { name, parentCategory, image } = req.body;
 
-    // Validate name
-    if (!name || typeof name !== "string" || !name.trim()) {
-      return res.status(400).json({
-        message: " name is required and must be a valid string.",
-      });
-    }
-
     // Check for duplicate category name
     const existingName = await categoryModel.findOne({
       name: name.trim(),
