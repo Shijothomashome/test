@@ -1,10 +1,10 @@
 // src/controllers/CustomerAuth.js
 import mongoose from "mongoose";
-import { JWT_SECRET } from "../../config/index.js";
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { tokenGenerator } from "../../middleware/tokenGenerator.js";
+import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
 
 export const CustomerRegister = async (req, res) => {
   const session = await mongoose.startSession();
@@ -177,20 +177,25 @@ export const CustomerLogin = async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate refresh + access tokens
+    const { accessToken, refreshToken } = tokenGenerator(user._id, user.role);
 
-    // Send cookie
-    res.cookie('token', token, {
+    // Set cookies
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: false, // true in prod
+      secure: false, // change to true in production
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 10 * 60 * 1000 // 10 mins
     });
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false, // change to true in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: REGENERATE_ACCESS_TOKEN_PATH
+    });
+
 
     // Remove sensitive info before sending user object
     const { password: pw, ...userData } = user.toObject();
@@ -378,20 +383,26 @@ export const OtpLogin = async (req, res) => {
     otpRecord.isUsed = true;
     await otpRecord.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate refresh + access tokens
+    const { accessToken, refreshToken } = tokenGenerator(user._id, user.role);
 
-    // Send cookie
-    res.cookie('token', token, {
+    // Set cookies
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: false, // true in prod
+      secure: false, // change to true in production
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 10 * 60 * 1000 // 10 mins
     });
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false, // change to true in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,// 7 days
+      path: REGENERATE_ACCESS_TOKEN_PATH
+
+    });
+
 
 
     return res.status(200).json({

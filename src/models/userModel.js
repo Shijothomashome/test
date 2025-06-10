@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema({
     },
 
     addressList: [addressSchema],
-
+    googleAccessToken: { type: String }, // Store Google access token for future use
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
     isDeleted: { type: Boolean, default: false },

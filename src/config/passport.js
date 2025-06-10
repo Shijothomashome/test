@@ -30,6 +30,7 @@ passport.use(
             loginMethod: 'google',
             isVerified: true,
             role: 'customer',
+            googleAccessToken: accessToken, // Store access token for future use
           });
         }else{
           // Update user if they already exist
@@ -38,6 +39,7 @@ passport.use(
           user.profilePic = profile.photos?.[0]?.value || user.profilePic; // Keep existing pic if not available
           user.loginMethod = 'google';
           user.isVerified = true; // Ensure the user is marked as verified
+          user.googleAccessToken = accessToken; // Update access token
           await user.save();  
         }
 

@@ -1,0 +1,44 @@
+import { accessTokenGenerator } from "../../middleware/tokenGenerator.js";
+import { refreshTokenVerification } from "../../middleware/tokenVerification.js";
+import userModel from "../../models/userModel.js";
+
+export const regenerateAccessToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies?.refresh_token;
+
+        if (!refreshToken) {
+            return res.status(401).json({ success: false, message: "No refresh token provided" });
+        }
+
+        // ✅ Step 1: Verify refresh token
+        const verificationResult = refreshTokenVerification(refreshToken);
+
+        if (!verificationResult.valid) {
+            return res.status(403).json({ success: false, message: "Invalid refresh token" });
+        }
+
+        const userId = verificationResult.decoded.id;
+
+        // ✅ Step 2: Find user
+        const user = await userModel.findById(userId);
+        if (!user || user.isBlocked || user.isDeleted) {
+            return res.status(403).json({ success: false, message: "User access denied" });
+        }
+
+        // ✅ Step 3: Generate new access token based refreshToken
+        const newAccessToken = accessTokenGenerator(refreshToken);
+
+        // ✅ Step 4: Set cookie
+        res.cookie("access_token", newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 15 * 60 * 1000 // 15 minutes
+        });
+
+        return res.status(200).json({ success: true, message: "Access token regenerated successfully" });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+};

@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
+
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 export const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
@@ -22,3 +25,4 @@ export const APP_LOGO = process.env.APP_LOGO;
 
 export const OTP_PURPOSES = ['login-email', 'login-phone', 'reset-password', 'verify-email', 'verify-phone'];
 export const OTP_EXPIRY_MINUTES = 7;
+export const REGENERATE_ACCESS_TOKEN_PATH="/api/v1/auth/regenerate-accessToken"

@@ -1,17 +1,21 @@
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config/index.js';
 import userModel from '../models/userModel.js';
+import { tokenVerification } from './tokenVerification.js';
 
 export const authenticate = (roles = []) => async (req, res, next) => {
-    const token = req.cookies?.token;
+    const token = req.cookies?.access_token;
 
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Unauthorized: No token' });
+        return res.status(401).json({ success: false, message: 'Unauthorized: No access token' });
+    }
+
+    const verificationResult = tokenVerification(token);
+
+    if (!verificationResult.valid) {
+        return res.status(401).json({ success: false, message: verificationResult.error || 'Invalid token' });
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await userModel.findById(decoded.id);
+        const user = await userModel.findById(verificationResult.decoded.id);
 
         if (!user || user.isBlocked || user.isDeleted) {
             return res.status(403).json({ success: false, message: 'Access denied' });
@@ -24,6 +28,6 @@ export const authenticate = (roles = []) => async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        res.status(401).json({ success: false, message: 'Invalid token' });
+        return res.status(500).json({ success: false, message: 'Authentication error', error: err.message });
     }
 };

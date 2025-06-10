@@ -1,8 +1,4 @@
 import express from 'express';
-import passport from 'passport';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config/index.js';
-import { authenticate } from '../middleware/authenticate.js';
 
 import userRoutes from './userRoutes.js';
 import productRoutes from './productRoutes.js';
