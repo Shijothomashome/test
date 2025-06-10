@@ -1,9 +1,8 @@
-import categoryModel from "../models/categoryModel.js";
-
+import categoryModel from "../../models/categoryModel.js";
+import { uploadToS3 } from "../../utilities/s3Bucket.js";
 const createCategory = async (req, res) => {
   try {
     const { name, parentCategory, image } = req.body;
-
     // Check for duplicate category name
     const existingName = await categoryModel.findOne({
       name: name.trim(),
@@ -21,11 +20,14 @@ const createCategory = async (req, res) => {
       }
       parent = parentCategory;
     }
-
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = await uploadToS3(req.file, "category");
+    }
     const newCategory = new categoryModel({
       name: name.trim(),
       parentCategory: parent,
-      image: image || null,
+      image: imageUrl,
     });
 
     const savedCategory = await newCategory.save();

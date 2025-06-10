@@ -1,5 +1,5 @@
 
-import categoryModel from "../models/categoryModel.js";
+import categoryModel from "../../models/categoryModel.js";
 const getAllCategories = async (req, res) => {
   try {
     const {

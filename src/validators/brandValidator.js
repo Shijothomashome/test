@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 
 //CREATE Brand Schema
-export const createBrandSchema = Joi.object({
+ const createBrandSchema = Joi.object({
   name: Joi.string()
     .trim()
     .min(1)
@@ -47,3 +47,4 @@ export const createBrandSchema = Joi.object({
       'string.base': `"deletionReason" must be a string`,
     }),
 });
+export default createBrandSchema

@@ -16,5 +16,5 @@
     };
   };
   
-  module.exports = validatorMiddleware;
+export default  validatorMiddleware;
   

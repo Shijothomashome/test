@@ -1,5 +1,6 @@
-import categoryModel from "../models/categoryModel.js";
+import categoryModel from "../../models/categoryModel.js";
 import mongoose from "mongoose";
+import { uploadToS3 } from "../../utilities/s3Bucket.js";
 
 const updateCategory = async (req, res) => {
   try {
