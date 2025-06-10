@@ -17,7 +17,7 @@ router.post(
 );
 
 // Update category
-router.put("/:id", categoryControllers.updateCategory);
+router.put("/:id",upload.single("image"),categoryControllers.updateCategory);
 
 // Toggle category active status
 router.patch("/:id/toggle-status", categoryControllers.updateToggleStatus);
