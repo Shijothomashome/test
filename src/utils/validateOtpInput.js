@@ -2,20 +2,24 @@ import { OTP_PURPOSES } from "../config/index.js";
 
 export const validateOtpInput = ({ email, phone, purpose, user_id }) => {
     if (!OTP_PURPOSES.includes(purpose)) {
-        return 'Invalid purpose. Allowed values are: ' + OTP_PURPOSES.join(', ');
+        return `Invalid purpose "${purpose}". Allowed values are: ${OTP_PURPOSES.join(', ')}`;
     }
-    if (purpose === 'verify-email' && !email) {
-        return 'Email is required for email verification';
+
+    if (['verify-email', 'login-email'].includes(purpose) && !email) {
+        return `Email is required for purpose: "${purpose}"`;
     }
-    if (purpose === 'verify-phone' && !phone) {
-        return 'Phone is required for phone verification';
+
+    if (['verify-phone', 'login-phone'].includes(purpose) && !phone) {
+        return `Phone is required for purpose: "${purpose}"`;
     }
+
     if (purpose === 'reset-password' && !email && !phone) {
-        return 'Email or phone is required for password reset';
+        return `Email or phone is required for purpose: "${purpose}"`;
     }
 
     if (email && phone) {
         return 'Provide either email or phone, not both';
     }
+
     return null;
 };

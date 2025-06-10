@@ -19,7 +19,7 @@ passport.use(
         console.log('Google accessToken:', accessToken);
         console.log('Google refreshToken:', refreshToken);
         console.log('Google profile:', profile);
-        let user = await userModel.findOne({ googleId: profile.id });
+        let user = await userModel.findOne({ email: profile.emails?.[0]?.value});
 
         if (!user) {
           user = await userModel.create({
@@ -31,6 +31,14 @@ passport.use(
             isVerified: true,
             role: 'customer',
           });
+        }else{
+          // Update user if they already exist
+          user.name = profile.displayName;
+          user.googleId = profile.id;
+          user.profilePic = profile.photos?.[0]?.value || user.profilePic; // Keep existing pic if not available
+          user.loginMethod = 'google';
+          user.isVerified = true; // Ensure the user is marked as verified
+          await user.save();  
         }
 
         return done(null, user);

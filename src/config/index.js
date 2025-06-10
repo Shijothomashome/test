@@ -20,5 +20,5 @@ export const APP_DESCRIPTION = process.env.APP_DESCRIPTION;
 export const APP_LOGO = process.env.APP_LOGO;
 
 
-export const OTP_PURPOSES = ['verify-email', 'verify-phone', 'reset-password'];
+export const OTP_PURPOSES = ['login-email', 'login-phone', 'reset-password', 'verify-email', 'verify-phone'];
 export const OTP_EXPIRY_MINUTES = 7;
