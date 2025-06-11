@@ -8,6 +8,7 @@ import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -30,6 +31,8 @@ app.use(morgan("dev"));
 
 // Serve static files (HTML, images)
 app.use(express.static(path.join(__dirname, "public")));
+
+
 
 // Root path => show the static homepage
 app.get("/", (req, res) => {
