@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2"; 
 
 const attributeSchema = new mongoose.Schema(
   {
@@ -14,5 +15,7 @@ const attributeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+attributeSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("Attribute", attributeSchema);

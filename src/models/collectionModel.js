@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";  // Importing mongoose-paginate-v2 for pagination support
+
 const { Schema } = mongoose;
 
 const collectionRuleSchema = new Schema({
@@ -156,6 +158,9 @@ collectionSchema.methods.updateProductsCount = async function () {
   });
   await this.save();
 };
+
+// Add the plugin to your schema before creating the model
+collectionSchema.plugin(mongoosePaginate);
 
 const Collection = mongoose.model("Collection", collectionSchema);
 

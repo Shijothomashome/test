@@ -410,6 +410,7 @@
 // export default mongoose.model("Product", productSchema);
 
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2"; 
 import variantSchema from "./productVariantModel.js";
 
 const productSchema = new mongoose.Schema(
@@ -514,5 +515,7 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ name: "text", description: "text", tags: "text" });
+
+productSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("Product", productSchema);
