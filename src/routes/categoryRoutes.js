@@ -11,19 +11,33 @@ const router = express.Router();
 // Create new category
 router.post(
   "/",
-  // middlewares.validatorMiddleware(categoryValidatorSchema.createCategorySchema),
   upload.single("image"),
+  middlewares.validatorMiddleware(categoryValidatorSchema.createCategorySchema),
+
   categoryControllers.createCategory
 );
 
 // Update category
-router.put("/:id",upload.single("image"),categoryControllers.updateCategory);
+router.put(
+  "/:id",
+  upload.single("image"),
+  middlewares.validatorMiddleware(categoryValidatorSchema.updateCategorySchema),
+  categoryControllers.updateCategory
+);
 
 // Toggle category active status
-router.patch("/:id/toggle-status", categoryControllers.updateToggleStatus);
+router.patch(
+  "/:id/toggle-status",
+  middlewares.validatorMiddleware(categoryValidatorSchema.toggleCategorySchema),
+  categoryControllers.updateToggleStatus
+);
 
 // Delete category
-router.delete("/:id", categoryControllers.deleteCategory);
+router.delete(
+  "/:id",
+  middlewares.validatorMiddleware(categoryValidatorSchema.deleteCategorySchema),
+  categoryControllers.deleteCategory
+);
 
 // Get all categories
 router.get("/", categoryControllers.getAllCategories);
