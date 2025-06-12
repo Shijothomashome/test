@@ -8,7 +8,7 @@ const isValidObjectId = (value, helpers) => {
   return value;
 };
 
-const createCategorySchema = Joi.object({
+const createCategorySchemas = Joi.object({
   name: Joi.string().trim().required().messages({
     'string.empty': 'Category name cannot be empty',
     'any.required': 'Category name is required'
@@ -23,5 +23,5 @@ const createCategorySchema = Joi.object({
 
 
 export default {
-    createCategorySchema,
+    createCategorySchemas,
 }

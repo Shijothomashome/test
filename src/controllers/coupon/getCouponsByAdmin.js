@@ -1,4 +1,4 @@
-import couponModel from "../models/couponModel.js";
+import couponModel from "../../models/couponModel.js";
 
 
 
