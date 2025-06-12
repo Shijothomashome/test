@@ -1,7 +1,7 @@
 import wishlistModel from "../../models/wishlistModel.js";
 import User from "../../models/userModel.js";
 import mongoose from "mongoose";
-
+import productModel from "../../models/productModel.js";
 const createWishlist = async (req, res) => {
   try {
     const userId = "68497b8c9b334bd04e5b107f";
@@ -18,13 +18,17 @@ const createWishlist = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+    const product = await productModel.findById(userId);
+    if (!product) {
+      return res.status(404).json({ message: "product not found" });
+    }
 
     let userWishlist = await wishlistModel.findOne({ userId });
 
     // Check if item already exists
     const existingIndex = userWishlist?.items.findIndex(
       (item) =>
-        // item.productId.toString() === productId &&
+        item.productId.toString() === productId &&
         item.variantId.toString() === variantId
     );
 
