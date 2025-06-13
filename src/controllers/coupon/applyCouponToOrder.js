@@ -1,12 +1,20 @@
 // src/controllers/userCouponController.js
 import mongoose from "mongoose";
-import CouponUsage from "../models/couponUsageModel.js";
-import { validateCoupon } from "../services/couponService.js";
+import CouponUsage from "../../models/couponUsageModel.js";
+import { validateCoupon } from "../../services/couponService.js";
 
 export const applyCouponToOrder = async (req, res) => {
   try {
     const { code, cartValue, userId, orderId, isFirstOrder } = req.body;
+    
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid order ID." })
+      }
     const { coupon, discountAmount, finalPrice } = await validateCoupon({ code, cartValue, userId, isFirstOrder });
+
+   
 
     await CouponUsage.create({
       couponId: coupon._id, 
