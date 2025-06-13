@@ -1,6 +1,6 @@
 import Offer from '../../models/offerModel.js';
 
-export const getAllOffersForUser = async (req, res) => {
+const getAllOffersForUser = async (req, res) => {
   try {
     const now = new Date();
     const offer = await Offer.find({
@@ -13,3 +13,5 @@ export const getAllOffersForUser = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export default getAllOffersForUser;

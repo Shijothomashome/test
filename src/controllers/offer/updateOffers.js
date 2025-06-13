@@ -1,6 +1,6 @@
 import Offer from '../../models/offerModel.js';
 
-export const updateOffers = async (req, res) => {
+const updateOffers = async (req, res) => {
     try{
         const updated = await Offer.findByIdAndUpdate(
             req.params.id,
@@ -13,3 +13,4 @@ export const updateOffers = async (req, res) => {
         res.status(400).json({error: err.message});
     }
 }
+export default updateOffers;

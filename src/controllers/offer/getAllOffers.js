@@ -1,7 +1,7 @@
 import Offer from '../../models/offerModel.js';
 
 
-export const getAllOffers = async (req, res) => {
+const getAllOffers = async (req, res) => {
     try{
         const {isActive, valid} = req.query;
         const query = {};
@@ -18,3 +18,5 @@ export const getAllOffers = async (req, res) => {
         res.satus(400).json({error: err.message})
     }
 }
+
+export default getAllOffers;

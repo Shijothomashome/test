@@ -1,6 +1,16 @@
-export { createOffer } from './createOffer.js';
-export { getAllOffers } from './getAllOffer.js';
-export { getOfferById } from './getOfferById.js';
-export { updateOffers } from './updateOffers.js';
-export { deleteOffer } from './deleteOffer.js';
-// export {getAllOffersForUser} from './getAllOffersForUser.js'
+import createOffer from './createOffer.js';
+import deleteOffer from './deleteOffer.js';
+import getAllOffers from './getAllOffers.js';
+import getOfferById from './getOfferById.js';   
+import updateOffers from './updateOffers.js';
+import getAllOffersForUser from './getAllOffersForUser.js';
+
+
+export default {
+    createOffer,
+    deleteOffer,
+    getAllOffers,
+    getOfferById,
+    updateOffers,
+    getAllOffersForUser
+}

@@ -1,6 +1,6 @@
 import Offer from '../../models/offerModel.js';
 
-export const getOfferById = async (req, res) => {
+const getOfferById = async (req, res) => {
     try{
         const offer = await Offer.findById(req.params.id);
         if(!offer)res.status(404).json({error: "offer not found"});
@@ -8,4 +8,6 @@ export const getOfferById = async (req, res) => {
     }catch(err){
         res.status(400).json({error: err.message});
     }
-}
+};
+
+export default getOfferById;
