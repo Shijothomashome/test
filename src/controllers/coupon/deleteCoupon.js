@@ -1,10 +1,17 @@
-import couponModel from "../models/couponModel.js";
+import mongoose from "mongoose";
+import couponModel from "../../models/couponModel.js";
 
 
 
 export const deleteCoupon = async (req, res) => {
   try {
     const couponId = req.params.id;
+
+       if (!mongoose.Types.ObjectId.isValid(couponId)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid coupon ID." })
+      }
 
     const coupon = await couponModel.findById(couponId);
 
