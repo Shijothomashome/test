@@ -6,6 +6,7 @@ import productRoutes from './productRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import brandRoutes from './brandRoutes.js';
 import couponRoutes from './couponRoutes.js'
+import wishlistRoutes from './wishlistRoutes.js';
 import offerRoutes from './offerRoutes.js'
 import authRoutes from './authRoutes.js';
 
@@ -16,5 +17,7 @@ router.use("/categories", categoryRoutes);
 router.use("/brands", brandRoutes);
 router.use("/coupons", couponRoutes)
 router.use('/offers', offerRoutes);
+router.use("/wishlist",wishlistRoutes);
+
 
 export default router;
