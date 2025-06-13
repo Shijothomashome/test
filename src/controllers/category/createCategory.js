@@ -1,5 +1,6 @@
 import categoryModel from "../../models/categoryModel.js";
-import { uploadToS3 } from "../../utilities/s3Bucket.js";
+import uploadToS3 from "../../utils/s3Utils.js"
+
 const createCategory = async (req, res) => {
   try {
     const { name, parentCategory} = req.body;

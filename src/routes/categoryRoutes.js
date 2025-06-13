@@ -2,7 +2,7 @@ import express from "express";
 import middlewares from "../middlewares/index.js";
 import categoryControllers from "../controllers/category/index.js";
 import categoryValidatorSchema from "../validators/index.js";
-import upload from "../middlewares/multer.js";
+import upload from "../config/multerConfig.js";
 
 const router = express.Router();
 

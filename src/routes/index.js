@@ -7,12 +7,14 @@ import categoryRoutes from './categoryRoutes.js';
 import brandRoutes from './brandRoutes.js';
 import couponRoutes from './couponRoutes.js'
 import offerRoutes from './offerRoutes.js'
+import authRoutes from './authRoutes.js';
 
+router.use('/auth', authRoutes);
 router.use("/users", userRoutes);
 router.use("/products", productRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/brands", brandRoutes);
-router.use("/coupons",couponRoutes)
+router.use("/coupons", couponRoutes)
 router.use('/offers', offerRoutes);
 
 export default router;

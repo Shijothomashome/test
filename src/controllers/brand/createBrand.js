@@ -1,5 +1,5 @@
 import brandModel from "../../models/brandModel.js";
-import { uploadToS3 } from "../../utilities/s3Bucket.js";
+import uploadToS3 from "../../utils/s3Utils.js";
 
 export const createBrand = async (req, res) => {
   try {

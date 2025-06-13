@@ -51,9 +51,11 @@ const userSchema = new mongoose.Schema({
     loginMethod: {
         type: String,
         enum: ["email", "google", "phone"],
-        required: true,
+        // required: true,
     },
 
+    isEmailVerified: { type: Boolean, default: false },
+    isPhoneVerified: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
 
@@ -64,12 +66,19 @@ const userSchema = new mongoose.Schema({
     },
 
     addressList: [addressSchema],
-
+    googleAccessToken: { type: String }, // Store Google access token for future use
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
-    deletionReason: { type: String }
+    deletionReason: { type: String },
+
+    // tokens: {
+    //     reset_token: {
+    //         value: String,
+    //         expiresAt: Date,
+    //     },
+    // }
 });
 
 export default mongoose.model("User", userSchema);

@@ -2,7 +2,7 @@ import express from "express";
 import brandController from "../controllers/brand/index.js";
 import brandValidatorSchemas from "../validators/brandValidatorSchemas.js"
 import validatorMiddleware from "../middlewares/validatorMiddleware.js";
-import upload from "../middlewares/multer.js";
+import upload from "../config/multerConfig.js";
 const router = express.Router();
 
 
