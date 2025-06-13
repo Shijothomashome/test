@@ -78,7 +78,7 @@ const baseCollectionSchema = {
   metafields: Joi.array().items(metafieldSchema),
   status: Joi.string().valid("active", "archived"),
   visibility: Joi.string().valid("visible", "hidden"),
-  shop_id: objectId
+  // shop_id: objectId
 };
 
 // Create collection schema
@@ -86,7 +86,7 @@ export const createCollectionSchema = Joi.object({
   ...baseCollectionSchema,
   title: baseCollectionSchema.title.required(),
   handle: baseCollectionSchema.handle.required(),
-  shop_id: baseCollectionSchema.shop_id.required()
+  // shop_id: baseCollectionSchema.shop_id.required()
 });
 
 // Update collection schema

@@ -8,7 +8,8 @@ import brandRoutes from './brandRoutes.js';
 import productAttributeRoutes from './productAttributeRoutes.js';
 import productsRoutes from './productRoutes.js';
 import collectionRoutes from './collectionRoutes.js';
-
+import couponRoutes from './couponRoutes.js'
+import uploadRoutes from './uploadsRoutes.js';
 
 router.use("/users", userRoutes);
 router.use("/products", productRoutes);
@@ -17,5 +18,7 @@ router.use("/brands", brandRoutes);
 router.use("/product/attributes", productAttributeRoutes);
 router.use("/products", productsRoutes);
 router.use("/collections" , collectionRoutes)
+router.use("/coupon",couponRoutes)
+router.use("/images", uploadRoutes);
 
 export default router;

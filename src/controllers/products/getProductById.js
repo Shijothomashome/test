@@ -3,6 +3,7 @@ import Product from "../../models/productModel.js";
 // import { generateSlug } from "../../helpers/generateSlug";
 // import { generateSKU } from "../../helpers/generateSKU";
 import { handleError } from "../../helpers/handleError.js";
+import mongoose from "mongoose";
 
 //! Get single product by ID or slug
 //* @desc    Get a single product by ID or slug
@@ -16,6 +17,7 @@ import { handleError } from "../../helpers/handleError.js";
 // This endpoint also supports fetching products with variants and attributes.
 
 export const getProductById = async (req, res) => {
+  console.log("Fetching product by ID or slug...");
   try {
     const { id } = req.params;
     let product;

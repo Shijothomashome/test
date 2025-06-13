@@ -127,7 +127,7 @@ const collectionSchema = new Schema(
     shop_id: {
       type: Schema.Types.ObjectId,
       ref: "Shop",
-      required: true,
+      // required: true,
     },
   },
   {

@@ -1,14 +1,11 @@
 import Attribute from "../../models/productAttributeModel.js";
 
-// @desc    Create new attribute
-// @route   POST /api/v1/attributes
-// @access  Private/Admin
 export const createAttribute = async (req, res) => {
   try {
-    const { name, isGlobal } = req.body;
+    const { name, isGlobal, categories, values } = req.body;
 
-    // Check if attribute already exists
-    const existingAttribute = await Attribute.findOne({ name });
+    // Check if attribute already exists (case insensitive)
+    const existingAttribute = await Attribute.findOne({ name: name.toLowerCase().trim() });
     if (existingAttribute) {
       return res.status(400).json({
         success: false,
@@ -17,14 +14,21 @@ export const createAttribute = async (req, res) => {
     }
 
     // Global attributes shouldn't have categories
-    if (isGlobal && req.body.categories && req.body.categories.length > 0) {
+    if (isGlobal && categories && categories.length > 0) {
       return res.status(400).json({
         success: false,
         message: 'Global attributes cannot be assigned to specific categories'
       });
     }
 
-    const attribute = new Attribute(req.body);
+    const attribute = new Attribute({
+      name,
+      isGlobal,
+      categories: isGlobal ? [] : categories,
+      values,
+      isVariantAttribute: req.body.isVariantAttribute || true
+    });
+
     await attribute.save();
 
     res.status(201).json({

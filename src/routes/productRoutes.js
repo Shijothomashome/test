@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 import express from "express";
 import {
@@ -15,53 +15,52 @@ import {
   searchProducts,
   updateProduct,
 } from "../controllers/products/index.js";
-import { 
-  generateVariants, 
-  getProductVariants, 
-  updateVariant, 
-  updateVariantGroup, 
+import {
+  getProductVariants,
+  updateVariant,
+  updateVariantGroup,
   updateVariants,
-  addVariants
+  addVariants,
+  generateVariants,
 } from "../controllers/variants/index.js";
 import { validate } from "../middlewares/validate.js";
 import {
   createProductSchema,
   updateProductSchema,
-  generateVariantsSchema,
   variantUpdateSchema,
   variantGroupUpdateSchema,
   productSearchSchema,
-  productListSchema
-} from "../validations/productValidation.js";
+  productListSchema,
+} from "../validators/productValidation.js";
 import variantSchema from "../models/productVariantModel.js";
 
 const router = express.Router();
 
 // Product CRUD routes
-router.route("/")
+router
+  .route("/")
   .post(validate(createProductSchema), createProduct)
   .get(validate(productListSchema, { query: true }), getProducts);
 
-router.route("/search")
+router
+  .route("/search")
   .get(validate(productSearchSchema, { query: true }), searchProducts);
 
-router.route("/:id")
-  .get(getProductById)
-  .put(validate(updateProductSchema), updateProduct)
-  .delete(deleteProduct);
-
 // Variant management routes
-router.route("/:id/variants")
+router
+  .route("/:id/variants")
   .get(getProductVariants)
   .post(validate(variantSchema), addVariants)
   .put(validate(Joi.array().items(variantUpdateSchema)), updateVariants);
 
-router.post("/:id/generate-variants", validate(generateVariantsSchema), generateVariants);
+router.route("/generate-variants").post, generateVariants;
 
-router.route("/:productId/variants/:variantId")
+router
+  .route("/:productId/variants/:variantId")
   .put(validate(variantUpdateSchema), updateVariant);
 
-router.route("/:productId/variant-groups/:groupValue")
+router
+  .route("/:productId/variant-groups/:groupValue")
   .put(validate(variantGroupUpdateSchema), updateVariantGroup);
 
 // Product discovery routes
@@ -71,5 +70,11 @@ router.route("/:productId/recommended").get(getRecommendedProducts);
 router.route("/:productId/similar").get(getSimilarProducts);
 // router.route("/best-selling").get(getBestSellingProducts);
 router.route("/featured").get(getFeaturedProducts);
+
+router
+  .route("/:id")
+  .get(getProductById)
+  .put(validate(updateProductSchema), updateProduct)
+  .delete(deleteProduct);
 
 export default router;

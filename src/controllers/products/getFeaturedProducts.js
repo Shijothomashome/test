@@ -14,6 +14,7 @@ import { handleError } from "../../helpers/handleError.js";
 // It populates the category and brand fields for each product.
 
 export const getFeaturedProducts = async (req, res) => {
+  console.log("Fetching featured products...");
   try {
     const { limit = 10 } = req.query;
 

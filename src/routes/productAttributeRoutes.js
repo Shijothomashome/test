@@ -11,7 +11,7 @@ import {
   createAttributeSchema,
   updateAttributeSchema,
   getAttributesSchema
-} from "../validations/attributeValidation.js";
+} from "../validators/attributeValidation.js";
 
 const router = express.Router();
 

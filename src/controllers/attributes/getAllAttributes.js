@@ -1,24 +1,28 @@
 import Attribute from "../../models/productAttributeModel.js";
-// import { validateAttributeInput } from "../validations/attributeValidation.js";
 
-// @desc    Get all attributes
-// @route   GET /api/v1/attributes
-// @access  Public
 export const getAllAttributes = async (req, res) => {
   try {
-    const { isDeleted } = req.query;
+    const { isDeleted, page = 1, limit = 10 } = req.query;
     
     const filter = {};
     if (isDeleted === 'true') filter.isDeleted = true;
     if (isDeleted === 'false') filter.isDeleted = false;
 
-    const attributes = await Attribute.find(filter)
-      .populate('categories', 'name slug');
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      sort: { createdAt: -1 },
+      populate: { path: 'categories', select: 'name slug' }
+    };
+
+    const attributes = await Attribute.paginate(filter, options);
 
     res.json({
       success: true,
-      count: attributes.length,
-      data: attributes
+      count: attributes.totalDocs,
+      totalPages: attributes.totalPages,
+      currentPage: attributes.page,
+      data: attributes.docs
     });
   } catch (error) {
     res.status(500).json({

@@ -5,7 +5,7 @@ import {
   getCollectionById,
   getCollectionProducts,
   getCollections,
-  reorderCollectionProducts,
+  // reorderCollectionProducts,
   updateCollection,
   updateCollectionProducts,
 } from "../controllers/collection/index.js";
@@ -16,7 +16,7 @@ import {
   updateCollectionProductsSchema,
   reorderProductsSchema,
   collectionListSchema
-} from "../validations/collectionValidation.js";
+} from "../validators/collectionValidation.js";
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.route("/:id")
 router.route("/:id/products")
   .put(validate(updateCollectionProductsSchema), updateCollectionProducts);
 
-router.route("/:id/reorder")
-  .put(validate(reorderProductsSchema), reorderCollectionProducts);
+// router.route("/:id/reorder")
+//   .put(validate(reorderProductsSchema), reorderCollectionProducts);
 
 export default router;

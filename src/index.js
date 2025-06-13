@@ -43,6 +43,7 @@ app.get("/", (req, res) => {
 app.use(API_PREFIX, apiRouter);
 
 
+
 // Connect DB and start server
 await connectDB();
 

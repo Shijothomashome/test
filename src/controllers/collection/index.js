@@ -7,5 +7,5 @@ export { updateCollection } from "./updateCollection.js";
 export { deleteCollection } from "./deleteCollection.js";
 export { getCollectionProducts } from "./getCollectionProducts.js";
 export { updateCollectionProducts } from "./updateCollectionProducts.js";
-export { reorderCollectionProducts } from "./reorderCollectionProducts.js";
+// export { reorderCollectionProducts } from "./reorderCollectionProducts.js";
 export { updateProductCollections} from "./updateProductCollections.js"

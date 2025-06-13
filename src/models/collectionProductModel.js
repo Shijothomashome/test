@@ -1,6 +1,6 @@
 // models/collectionProductModel.js
 import mongoose from "mongoose";
-
+import mongoosePaginate from "mongoose-paginate-v2"; 
 const collectionProductSchema = new mongoose.Schema(
   {
     collection: {
@@ -32,5 +32,8 @@ collectionProductSchema.index(
   { collection: 1, product: 1 },
   { unique: true }
 );
+
+collectionProductSchema.plugin(mongoosePaginate);
+
 
 export default mongoose.model("CollectionProduct", collectionProductSchema);
