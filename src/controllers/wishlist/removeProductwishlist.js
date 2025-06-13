@@ -3,13 +3,13 @@ import userModel from "../../models/userModel.js";
 import productModel from "../../models/productModel.js";
 const removeWishlistItem = async (req, res) => {
   try {
-    const userId = "";
+    const userId =req.user._id;
     const { productId, variantId } = req.body;
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
-    const product = await productModel.findById(userId);
+    const product = await productModel.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "product not found" });
     }

@@ -2,7 +2,7 @@ import Wishlist from "../../models/wishlistModel.js";
 import userModel from "../../models/userModel.js";
 const getWishlist = async (req, res) => {
   try {
-    const userId = "68497b8c9b334bd04e5b107f";
+    const userId =req.user._id;
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "user not found" });
