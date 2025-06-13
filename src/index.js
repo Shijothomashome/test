@@ -11,6 +11,7 @@ import apiRouter from "./routes/index.js";
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
+import helmet from "helmet";
 // Load .env
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use(cors({
     origin: true,
     credentials: true, // for cookies in browser
 }));
+app.use(helmet()); // enables all standard protections
 app.use(express.json());
 app.use(cookieParser()); // ✅ Needed for reading cookies
 app.use(morgan("dev"));
