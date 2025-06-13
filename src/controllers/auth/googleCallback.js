@@ -1,7 +1,6 @@
 import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
 import tokenGenerator from "../../utils/tokenGeneratorUtils.js"
 
-
 const googleCallback = (req, res) => {
     console.log('Google login successful:', req.user, req.session)
     // Generate refresh + access tokens

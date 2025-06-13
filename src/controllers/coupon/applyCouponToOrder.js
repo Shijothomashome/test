@@ -1,7 +1,7 @@
 // src/controllers/userCouponController.js
 import mongoose from "mongoose";
 import CouponUsage from "../../models/couponUsageModel.js";
-import { validateCoupon } from "../../services/couponService.js";
+import validateCoupon from "../../utils/validateCouponUtils.js";
 
 export const applyCouponToOrder = async (req, res) => {
   try {

@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import Coupon from "../models/couponModel.js";
 import CouponUsage from "../models/couponUsageModel.js";
 
-
-export async function validateCoupon({ code, cartValue, userId, isFirstOrder = false }) {
+const validateCoupon = async function ({ code, cartValue, userId, isFirstOrder = false }) {
   const uppercaseCode = code.trim().toUpperCase();
   const now = new Date();
 
@@ -62,3 +61,5 @@ export async function validateCoupon({ code, cartValue, userId, isFirstOrder = f
     finalPrice: cartValue - discountAmount,
   };
 }
+
+export default validateCoupon;

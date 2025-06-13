@@ -1,9 +1,23 @@
-export { default as User } from "./userModel.js";
-export { default as Product } from "./productModel.js";
-export { default as Category } from "./categoryModel.js";
-export { default as Brand } from "./brandModel.js";
-export { default as ProductAttribute } from "./productAttributeModel.js"; 
-export { default as Cart } from "./cartModel.js";
-export { default as Wishlist } from "./wishlistModel.js";
-export { default as Offer } from "./offerModel.js";
-export { default as Coupon } from "./couponModel.js";
+import User from "./userModel.js";
+import Product from "./productModel.js";
+import Category from "./categoryModel.js";
+import Brand from "./brandModel.js";
+import ProductAttribute from "./productAttributeModel.js";
+import Cart from "./cartModel.js";
+import Wishlist from "./wishlistModel.js";
+import Offer from "./offerModel.js";
+import Coupon from "./couponModel.js";
+import CouponUsage from "./couponUsageModel.js";
+
+export default {
+    User,
+    Product,
+    Category,
+    Brand,
+    ProductAttribute,
+    Cart,
+    Wishlist,
+    Offer,
+    Coupon,
+    CouponUsage
+};

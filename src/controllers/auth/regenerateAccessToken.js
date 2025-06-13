@@ -2,7 +2,7 @@ import accessTokenGenerator from "../../utils/tokenGeneratorUtils.js"
 import refreshTokenVerification from "../../utils/tokenVerificationUtils.js"
 import userModel from "../../models/userModel.js";
 
-export const regenerateAccessToken = async (req, res) => {
+const regenerateAccessToken = async (req, res) => {
     try {
         const refreshToken = req.cookies?.refresh_token;
 
@@ -42,3 +42,5 @@ export const regenerateAccessToken = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 };
+
+export default regenerateAccessToken;

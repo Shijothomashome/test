@@ -29,7 +29,7 @@ const addressSchema = Joi.object({
 });
 
 // User registration schema
-export const userSchema = Joi.object({
+const userSchema = Joi.object({
   name: Joi.string().required().messages({
     'any.required': 'Name is required',
     'string.empty': 'Name cannot be empty',
@@ -57,7 +57,7 @@ export const userSchema = Joi.object({
 });
 
 // Password reset schema
-export const passwordResetSchema = Joi.object({
+const passwordResetSchema = Joi.object({
   email: Joi.string().email().optional(),
   phone: Joi.string()
     .pattern(/^\+?[1-9]\d{1,14}$/)
@@ -67,7 +67,13 @@ export const passwordResetSchema = Joi.object({
 }).xor('email', 'phone');
 
 // Login schema
-export const loginSchema = Joi.object({
+const loginSchema = Joi.object({
   credential: Joi.string().required(),
   password: Joi.string().min(6).required(),
 });
+
+export default {
+  userSchema,
+  passwordResetSchema,
+  loginSchema
+}
