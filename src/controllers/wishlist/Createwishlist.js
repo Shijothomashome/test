@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import productModel from "../../models/productModel.js";
 const createWishlist = async (req, res) => {
   try {
-    const userId = "68497b8c9b334bd04e5b107f";
+    const userId =req.user._id;
     const { productId, variantId } = req.body;
 
     if (
@@ -18,7 +18,7 @@ const createWishlist = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-    const product = await productModel.findById(userId);
+    const product = await productModel.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "product not found" });
     }
@@ -34,10 +34,10 @@ const createWishlist = async (req, res) => {
 
     if (userWishlist) {
       if (existingIndex !== -1) {
-        // ❌ If product exists, remove it
+        //  If product exists, remove it
         userWishlist.items.splice(existingIndex, 1);
       } else {
-        // ✅ If product doesn't exist, add it
+        //  If product doesn't exist, add it
         userWishlist.items.push({ productId, variantId });
       }
 
