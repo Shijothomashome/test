@@ -12,6 +12,8 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
 import helmet from "helmet";
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger/swaggerConfig.js';
 // Load .env
 dotenv.config();
 
@@ -66,7 +68,7 @@ app.use(passport.session()); // only needed if using persistent login
 
 // === ROUTES ===
 app.use(API_PREFIX, apiRouter);
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // === STATIC ===
 app.use(express.static(path.join(__dirname, "public")));
 
