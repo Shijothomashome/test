@@ -8,11 +8,9 @@ import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -41,8 +39,6 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use(API_PREFIX, apiRouter);
-
-//---
 
 // Connect DB and start server
 await connectDB();
