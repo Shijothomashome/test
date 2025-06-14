@@ -22,7 +22,7 @@ export const APP_NAME = process.env.APP_NAME;
 export const APP_DESCRIPTION = process.env.APP_DESCRIPTION;
 export const APP_LOGO = process.env.APP_LOGO;
 
-
+export const APP_FRONTEND_SUCCESS_CALL_BACK = process.env.APP_FRONTEND_SUCCESS_CALL_BACK;
 export const OTP_PURPOSES = ['login-email', 'login-phone', 'reset-password', 'verify-email', 'verify-phone'];
 export const OTP_EXPIRY_MINUTES = 7;
-export const REGENERATE_ACCESS_TOKEN_PATH="/api/v1/auth/regenerate-accessToken"
+export const REGENERATE_ACCESS_TOKEN_PATH = "/api/v1/auth/regenerate-accessToken"
