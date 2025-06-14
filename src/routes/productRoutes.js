@@ -53,7 +53,7 @@ router
   .post(validate(variantSchema), addVariants)
   .put(validate(Joi.array().items(variantUpdateSchema)), updateVariants);
 
-router.route("/generate-variants").post, generateVariants;
+// router.route("/generate-variants").post, generateVariants;
 
 router
   .route("/:productId/variants/:variantId")

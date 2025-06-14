@@ -1,358 +1,3 @@
-// import Joi from 'joi';
-// import mongoose from 'mongoose';
-
-// const objectId = Joi.string().custom((value, helpers) => {
-//   if (!mongoose.Types.ObjectId.isValid(value)) {
-//     return helpers.error('any.invalid');
-//   }
-//   return value;
-// }, 'ObjectId validation');
-
-// // Base variant schema
-// const variantSchema = Joi.object({
-//   sku: Joi.string().trim(),
-//   barcode: Joi.string().trim(),
-//   attributes: Joi.array().items(
-//     Joi.object({
-//       attribute: objectId.required(),
-//       value: Joi.string().trim().required()
-//     })
-//   ).min(1),
-//   variantGroup: Joi.string().trim(),
-//   price: Joi.object({
-//     mrp: Joi.number().min(0).required(),
-//     sellingPrice: Joi.number().min(0).required(),
-//     costPrice: Joi.number().min(0)
-//   }).required(),
-//   inventory: Joi.object({
-//     stock: Joi.number().integer().min(0).required(),
-//     lowStockThreshold: Joi.number().integer().min(0).default(5),
-//     backOrder: Joi.boolean().default(false),
-//     trackInventory: Joi.boolean().default(true)
-//   }).required(),
-//   images: Joi.array().items(Joi.string().uri()),
-//   isActive: Joi.boolean().default(true),
-//   isPublished: Joi.boolean().default(true)
-// });
-
-// // Base product schema
-// const baseProductSchema = {
-//   name: Joi.string().trim().min(2).max(100),
-//   description: Joi.string().trim().max(2000),
-//   shortDescription: Joi.string().trim().max(500),
-//   category: objectId.required(),
-//   brand: objectId,
-//   collection_id: objectId,
-//   tags: Joi.array().items(Joi.string().trim().max(50)),
-//   thumbnail: Joi.string().uri(),
-//   images: Joi.array().items(Joi.string().uri()),
-//   variantAttributes: Joi.array().items(objectId),
-//   variantGroupBy: objectId,
-//   variantGeneration: Joi.object({
-//     autoGenerate: Joi.boolean().default(true),
-//     priceStrategy: Joi.string().valid('uniform', 'custom').default('uniform'),
-//     basePrice: Joi.number().min(0),
-//     initialStock: Joi.number().integer().min(0).default(0)
-//   }),
-//   hasVariants: Joi.boolean().default(false),
-//   variants: Joi.array().items(variantSchema),
-//   basePrice: Joi.object({
-//     mrp: Joi.number().min(0),
-//     sellingPrice: Joi.number().min(0),
-//     costPrice: Joi.number().min(0)
-//   }),
-//   baseInventory: Joi.object({
-//     stock: Joi.number().integer().min(0),
-//     lowStockThreshold: Joi.number().integer().min(0).default(5),
-//     backorder: Joi.boolean().default(false),
-//     trackInventory: Joi.boolean().default(true)
-//   }),
-//   shippingClass: Joi.string().valid(
-//     'Standard', 'Fragile', 'Oversized', 'Heavy',
-//     'Express', 'Cold Storage', 'Digital', 'Custom'
-//   ).default('Standard'),
-//   taxable: Joi.boolean().default(true),
-//   taxCode: Joi.string().trim(),
-//   seo: Joi.object({
-//     title: Joi.string().trim().max(100),
-//     description: Joi.string().trim().max(200),
-//     keywords: Joi.array().items(Joi.string().trim().max(50))
-//   }),
-//   isActive: Joi.boolean().default(false),
-//   isFeatured: Joi.boolean().default(false),
-//   publishedAt: Joi.date()
-// };
-
-// // Create product schema
-// export const createProductSchema = Joi.object({
-//   ...baseProductSchema,
-//   name: baseProductSchema.name.required()
-// });
-
-// // Update product schema
-// export const updateProductSchema = Joi.object({
-//   ...baseProductSchema
-// }).min(1);
-
-// // Variant generation schema
-// export const generateVariantsSchema = Joi.object({
-//   variantAttributes: Joi.array().items(objectId).min(1).required(),
-//   variantGroupBy: objectId,
-//   variantGeneration: Joi.object({
-//     basePrice: Joi.number().min(0).required(),
-//     initialStock: Joi.number().integer().min(0).default(0)
-//   })
-// });
-
-// // Variant update schema
-// export const variantUpdateSchema = Joi.object({
-//   price: Joi.object({
-//     mrp: Joi.number().min(0),
-//     sellingPrice: Joi.number().min(0),
-//     costPrice: Joi.number().min(0)
-//   }),
-//   inventory: Joi.object({
-//     stock: Joi.number().integer().min(0),
-//     lowStockThreshold: Joi.number().integer().min(0)
-//   }),
-//   isActive: Joi.boolean(),
-//   isPublished: Joi.boolean()
-// }).min(1);
-
-// // Variant group update schema
-// export const variantGroupUpdateSchema = variantUpdateSchema;
-
-// // Product search schema
-// export const productSearchSchema = Joi.object({
-//   query: Joi.string().trim().required(),
-//   category: objectId,
-//   minPrice: Joi.number().min(0),
-//   maxPrice: Joi.number().min(0),
-//   limit: Joi.number().integer().min(1).max(100).default(10)
-// });
-
-// // Product list schema
-// export const productListSchema = Joi.object({
-//   category: objectId,
-//   brand: objectId,
-//   collection_id: objectId,
-//   isFeatured: Joi.boolean(),
-//   isActive: Joi.boolean(),
-//   page: Joi.number().integer().min(1).default(1),
-//   limit: Joi.number().integer().min(1).max(100).default(10),
-//   sort: Joi.string().valid('price-asc', 'price-desc', 'newest', 'popular')
-// });
-
-// import Joi from 'joi';
-// import mongoose from 'mongoose';
-
-// const objectId = Joi.string().custom((value, helpers) => {
-//   if (!mongoose.Types.ObjectId.isValid(value)) {
-//     return helpers.error('any.invalid');
-//   }
-//   return value;
-// }, 'ObjectId validation');
-
-// // Price rule schema
-// const priceRuleSchema = Joi.object({
-//   condition: Joi.string().required(),
-//   adjustment: Joi.string().required(),
-//   adjustmentType: Joi.string().valid('fixed', 'percentage').required()
-// });
-
-// // Stock rule schema
-// const stockRuleSchema = Joi.object({
-//   condition: Joi.string().required(),
-//   stock: Joi.number().integer().min(0).required()
-// });
-
-// // Variant generation schema
-// const variantGenerationSchema = Joi.object({
-//   autoGenerate: Joi.boolean().default(true),
-//   priceStrategy: Joi.string().valid('uniform', 'tiered', 'custom', 'matrix').default('uniform'),
-//   basePrice: Joi.number().min(0),
-//   priceIncrement: Joi.number().min(0),
-//   priceRules: Joi.array().items(priceRuleSchema),
-//   priceMatrix: Joi.object().pattern(/./, Joi.object()),
-//   initialStock: Joi.number().integer().min(0).default(0),
-//   stockRules: Joi.array().items(stockRuleSchema)
-// }).when('.autoGenerate', {
-//   is: true,
-//   then: Joi.object({
-//     priceStrategy: Joi.required(),
-//     basePrice: Joi.required()
-//   })
-// });
-
-// // Base variant schema
-// const variantSchema = Joi.object({
-//   sku: Joi.string().trim(),
-//   barcode: Joi.string().trim(),
-//   attributes: Joi.array().items(
-//     Joi.object({
-//       attribute: objectId.required(),
-//       value: Joi.string().trim().required()
-//     })
-//   ).min(1),
-//   variantGroup: Joi.string().trim(),
-//   price: Joi.object({
-//     mrp: Joi.number().min(0).required(),
-//     sellingPrice: Joi.number().min(0).required(),
-//     costPrice: Joi.number().min(0)
-//   }).required(),
-//   inventory: Joi.object({
-//     stock: Joi.number().integer().min(0).required(),
-//     lowStockThreshold: Joi.number().integer().min(0).default(5),
-//     backOrder: Joi.boolean().default(false),
-//     trackInventory: Joi.boolean().default(true)
-//   }).required(),
-//   images: Joi.array().items(Joi.string().uri()),
-//   weight: Joi.number().min(0),
-//   dimensions: Joi.object({
-//     length: Joi.number().min(0),
-//     width: Joi.number().min(0),
-//     height: Joi.number().min(0)
-//   }),
-//   isActive: Joi.boolean().default(true),
-//   customLabel: Joi.string().trim(),
-//   isPublished: Joi.boolean().default(true)
-// });
-
-// // Base product schema
-// const baseProductSchema = {
-//   name: Joi.string().trim().min(2).max(100),
-//   description: Joi.string().trim().max(2000),
-//   shortDescription: Joi.string().trim().max(500),
-//   category: objectId.required(),
-//   brand: objectId,
-//   collection_id: objectId,
-//   tags: Joi.array().items(Joi.string().trim().max(50)),
-//   thumbnail: Joi.string().uri(),
-//   images: Joi.array().items(Joi.string().uri()),
-//   variantAttributes: Joi.array().items(objectId),
-//   variantGroupBy: objectId,
-//   variantGeneration: variantGenerationSchema,
-//   hasVariants: Joi.boolean().default(false),
-//   variants: Joi.array().items(variantSchema),
-//   basePrice: Joi.object({
-//     mrp: Joi.number().min(0),
-//     sellingPrice: Joi.number().min(0),
-//     costPrice: Joi.number().min(0)
-//   }),
-//   baseInventory: Joi.object({
-//     stock: Joi.number().integer().min(0),
-//     lowStockThreshold: Joi.number().integer().min(0).default(5),
-//     backorder: Joi.boolean().default(false),
-//     trackInventory: Joi.boolean().default(true)
-//   }),
-//   minPrice: Joi.number().min(0),
-//   maxPrice: Joi.number().min(0),
-//   isFreeShipping: Joi.boolean().default(false),
-//   shippingClass: Joi.string().valid(
-//     'Standard', 'Fragile', 'Oversized', 'Heavy',
-//     'Express', 'Cold Storage', 'Digital', 'Custom'
-//   ).default('Standard'),
-//   taxable: Joi.boolean().default(true),
-//   taxCode: Joi.string().trim(),
-//   seo: Joi.object({
-//     title: Joi.string().trim().max(100),
-//     description: Joi.string().trim().max(200),
-//     keywords: Joi.array().items(Joi.string().trim().max(50))
-//   }),
-//   isActive: Joi.boolean().default(false),
-//   isFeatured: Joi.boolean().default(false),
-//   publishedAt: Joi.date(),
-//   isDeleted: Joi.boolean().default(false),
-//   deletedAt: Joi.date(),
-//   deletionReason: Joi.string()
-// };
-
-// // Create product schema
-// export const createProductSchema = Joi.object({
-//   ...baseProductSchema,
-//   name: baseProductSchema.name.required()
-// }).when('.hasVariants', {
-//   is: true,
-//   then: Joi.object({
-//     variants: Joi.array().min(1)
-//   }).when('.variantGeneration.autoGenerate', {
-//     is: false,
-//     then: Joi.object({
-//       variants: Joi.required()
-//     })
-//   })
-// });
-
-// // Update product schema
-// export const updateProductSchema = Joi.object({
-//   ...baseProductSchema
-// }).min(1);
-
-// // Variant generation schema
-// export const generateVariantsSchema = Joi.object({
-//   variantAttributes: Joi.array().items(objectId).min(1).required(),
-//   variantGroupBy: objectId,
-//   variantGeneration: Joi.object({
-//     autoGenerate: Joi.boolean().default(true),
-//     priceStrategy: Joi.string().valid('uniform', 'tiered', 'custom', 'matrix').required(),
-//     basePrice: Joi.number().min(0).required(),
-//     priceIncrement: Joi.number().min(0),
-//     priceRules: Joi.array().items(priceRuleSchema),
-//     initialStock: Joi.number().integer().min(0).default(0)
-//   }).required()
-// });
-
-// // Variant update schema
-// export const variantUpdateSchema = Joi.object({
-//   price: Joi.object({
-//     mrp: Joi.number().min(0),
-//     sellingPrice: Joi.number().min(0),
-//     costPrice: Joi.number().min(0)
-//   }),
-//   inventory: Joi.object({
-//     stock: Joi.number().integer().min(0),
-//     lowStockThreshold: Joi.number().integer().min(0)
-//   }),
-//   isActive: Joi.boolean(),
-//   isPublished: Joi.boolean(),
-//   customLabel: Joi.string().trim(),
-//   weight: Joi.number().min(0),
-//   dimensions: Joi.object({
-//     length: Joi.number().min(0),
-//     width: Joi.number().min(0),
-//     height: Joi.number().min(0)
-//   })
-// }).min(1);
-
-// // Variant group update schema
-// export const variantGroupUpdateSchema = variantUpdateSchema;
-
-// // Product search schema
-// export const productSearchSchema = Joi.object({
-//   query: Joi.string().trim().required(),
-//   category: objectId,
-//   brand: objectId,
-//   minPrice: Joi.number().min(0),
-//   maxPrice: Joi.number().min(0),
-//   hasVariants: Joi.boolean(),
-//   isActive: Joi.boolean(),
-//   limit: Joi.number().integer().min(1).max(100).default(10),
-//   page: Joi.number().integer().min(1).default(1)
-// });
-
-// // Product list schema
-// export const productListSchema = Joi.object({
-//   category: objectId,
-//   brand: objectId,
-//   collection_id: objectId,
-//   isFeatured: Joi.boolean(),
-//   isActive: Joi.boolean(),
-//   hasVariants: Joi.boolean(),
-//   page: Joi.number().integer().min(1).default(1),
-//   limit: Joi.number().integer().min(1).max(100).default(10),
-//   sort: Joi.string().valid('price-asc', 'price-desc', 'newest', 'popular', 'name-asc', 'name-desc')
-// });
-
 // this code snippet defines the validation schemas for product and variant data using Joi, 
 // a powerful schema description language and data validator for JavaScript. 
 // It includes validation for product attributes, variant generation, pricing rules, stock rules, 
@@ -1007,12 +652,19 @@ export const productListSchema = Joi.object({
   brand: objectId.messages({
     "any.invalid": "Brand ID is invalid",
   }),
-  collection_id: objectId.messages({
-    "any.invalid": "Collection ID is invalid",
+  minPrice: Joi.number().min(0).precision(2).messages({
+    "number.base": "Minimum price must be a number",
+    "number.min": "Minimum price cannot be negative",
+    "number.precision": "Minimum price can have maximum 2 decimal places",
   }),
-  isFeatured: Joi.boolean(),
-  isActive: Joi.boolean(),
-  hasVariants: Joi.boolean(),
+  maxPrice: Joi.number().min(0).precision(2).messages({
+    "number.base": "Maximum price must be a number",
+    "number.min": "Maximum price cannot be negative",
+    "number.precision": "Maximum price can have maximum 2 decimal places",
+  }),
+  search: Joi.string().trim().messages({
+    "string.empty": "Search query cannot be empty",
+  }),
   page: Joi.number().integer().min(1).default(1).messages({
     "number.base": "Page must be a number",
     "number.integer": "Page must be an integer",
@@ -1026,16 +678,16 @@ export const productListSchema = Joi.object({
   }),
   sort: Joi.string()
     .valid(
-      "price-asc",
-      "price-desc",
-      "newest",
-      "popular",
-      "name-asc",
-      "name-desc"
+      "-createdAt",
+      "createdAt",
+      "-price",
+      "price",
+      "-name",
+      "name"
     )
+    .default("-createdAt")
     .messages({
-      "any.only":
-        "Sort must be one of: price-asc, price-desc, newest, popular, name-asc, name-desc",
+      "any.only": "Invalid sort value",
     }),
 }).messages({
   "object.base": "List criteria must be an object",

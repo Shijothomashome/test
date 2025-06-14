@@ -10,6 +10,7 @@ import productsRoutes from './productRoutes.js';
 import collectionRoutes from './collectionRoutes.js';
 import couponRoutes from './couponRoutes.js'
 import uploadRoutes from './uploadsRoutes.js';
+import offerRoutes from './offerRoutes.js'
 
 router.use("/users", userRoutes);
 router.use("/products", productRoutes);
@@ -18,7 +19,9 @@ router.use("/brands", brandRoutes);
 router.use("/product/attributes", productAttributeRoutes);
 router.use("/products", productsRoutes);
 router.use("/collections" , collectionRoutes)
-router.use("/coupon",couponRoutes)
+// router.use("/coupon",couponRoutes)
 router.use("/images", uploadRoutes);
+router.use("/coupons",couponRoutes)
+router.use('/offers', offerRoutes);
 
 export default router;

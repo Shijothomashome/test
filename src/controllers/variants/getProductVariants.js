@@ -3,6 +3,9 @@
 //* @route   GET /api/v1/products/:id/variants
 //* @access  Public
 
+import { handleError } from "../../helpers/handleError.js";
+import productModel from "../../models/productModel.js";
+
 // This endpoint retrieves all variants of a product by its ID.
 // It can optionally group the variants by a specified attribute.
 // It populates the variant attributes and returns the grouped or ungrouped variants.
@@ -14,7 +17,7 @@ export const getProductVariants = async (req, res) => {
     const { id } = req.params;
     const { groupBy } = req.query;
 
-    const product = await Product.findById(id)
+    const product = await productModel.findById(id)
       .populate('variants.attributes.attribute');
 
     if (!product) {
@@ -26,7 +29,6 @@ export const getProductVariants = async (req, res) => {
 
     let variants = product.variants;
     
-    // Group variants if requested
     if (groupBy) {
       const grouped = {};
       variants.forEach(variant => {

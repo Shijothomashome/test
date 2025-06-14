@@ -10,15 +10,15 @@ const deleteCategory = async (req, res) => {
       return res.status(400).json({ message: "Category ID is required." });
     }
 
-    // Validate deletion reason
-    if (!deletionReason || deletionReason.trim() === "") {
-      return res.status(400).json({ message: "Deletion reason is required." });
-    }
-
     // Check if category exists
     const category = await categoryModel.findById(id);
     if (!category) {
       return res.status(404).json({ message: "Category not found." });
+    }
+    if (category.isDeleted) {
+      return res
+        .status(404)
+        .json({ message: "this category is already deleted." });
     }
 
     // Perform soft delete
@@ -26,6 +26,7 @@ const deleteCategory = async (req, res) => {
       id,
       {
         $set: {
+          isActive: false,
           deletionReason,
           deletedAt: new Date(),
           isDeleted: true,
@@ -38,7 +39,6 @@ const deleteCategory = async (req, res) => {
       message: "Category deleted successfully.",
       data: updatedCategory,
     });
-
   } catch (error) {
     console.error("Error deleting category:", error);
     return res.status(500).json({ message: "Internal server error." });

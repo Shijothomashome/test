@@ -8,6 +8,10 @@ export async function validateCoupon({ code, cartValue, userId, isFirstOrder = f
   const uppercaseCode = code.trim().toUpperCase();
   const now = new Date();
 
+     if (!mongoose.Types.ObjectId.isValid(userId)) {
+     throw new Error("Invalid User ID")
+  }
+
   const coupon = await Coupon.findOne({
     code: uppercaseCode,
     isDeleted: false,

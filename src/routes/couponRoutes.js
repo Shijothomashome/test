@@ -1,33 +1,28 @@
 import express from "express"
-import { createCoupon } from "../controllers/createCoupon.js";
-import { getAllCoupons } from "../controllers/getCouponsByAdmin.js";
-import { updateCoupon } from "../controllers/updateCouponByAdmin.js";
-import { toggleCouponStatus } from "../controllers/couponStatusToggle.js";
-import { deleteCoupon } from "../controllers/deleteCoupon.js";
-import { listAvailableCoupons } from "../controllers/getAllCoupons.js";
-import { validateCouponCode } from "../controllers/validateCouponCode.js";
-import { applyCouponToOrder } from "../controllers/applyCouponToOrder.js";
+import validatorMiddleware from "../middlewares/validatorMiddleware.js";
+import couponController from "../controllers/coupon/index.js"
+import couponValidatorSchemas from "../validators/couponValidatorSchemas.js";
 
 const router = express.Router();
 
 //Admin Section
-router.post("/admin/create-coupon", createCoupon); 
+router.post("/admin/create-coupon",validatorMiddleware(couponValidatorSchemas.createCouponSchema), couponController.createCoupon); 
 
-router.get("/admin/getallcoupons", getAllCoupons);
+ router.get("/admin/getallcoupons", couponController.getAllCoupons);
 
-router.put("/admin/update/:id", updateCoupon);     
+ router.put("/admin/update/:id",validatorMiddleware(couponValidatorSchemas.updateCouponSchema), couponController.updateCoupon);     
 
-router.patch("/admin/toggle/:id", toggleCouponStatus); 
+ router.patch("/admin/toggle/:id",validatorMiddleware(couponValidatorSchemas.toggleStatusSchema), couponController.toggleCouponStatus); 
 
-router.delete("/admin/delete/:id", deleteCoupon); 
+ router.delete("/admin/delete/:id",validatorMiddleware(couponValidatorSchemas.deleteCouponSchema), couponController.deleteCoupon); 
 
 
-//User Section
+// //User Section
 
-router.get("/getallcoupons", listAvailableCoupons); 
+ router.get("/getallcoupons", couponController.listAvailableCoupons); 
 
-router.post("/validate", validateCouponCode);
+ router.post("/validate",validatorMiddleware(couponValidatorSchemas.validateCouponCodeSchema), couponController.validateCouponCode);
 
-router.post("/apply", applyCouponToOrder);
+// router.post("/apply", couponController.applyCouponToOrder);
 
 export default router;
