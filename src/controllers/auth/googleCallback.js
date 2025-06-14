@@ -1,10 +1,10 @@
 import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
-import tokenGenerator from "../../utils/tokenGeneratorUtils.js"
+import tokenUtils from "../../utils/tokenGeneratorUtils.js"
 
 const googleCallback = (req, res) => {
     console.log('Google login successful:', req.user, req.session)
     // Generate refresh + access tokens
-    const { accessToken, refreshToken } = tokenGenerator(req.user._id, req.user.role);
+    const { accessToken, refreshToken } = tokenUtils.tokenGenerator(req.user._id, req.user.role);
 
     // Set cookies
     res.cookie('access_token', accessToken, {

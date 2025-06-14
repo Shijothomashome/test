@@ -1,6 +1,6 @@
 import userModel from "../../models/userModel.js";
 import bcrypt from 'bcryptjs';
-import tokenGenerator from "../../utils/tokenGeneratorUtils.js";
+import tokenGeneratorUtils from "../../utils/tokenGeneratorUtils.js";
 import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
 
 const customerLogin = async (req, res) => {
@@ -67,7 +67,7 @@ const customerLogin = async (req, res) => {
     }
 
     // Generate refresh + access tokens
-    const { accessToken, refreshToken } = tokenGenerator(user._id, user.role);
+    const { accessToken, refreshToken } = tokenGeneratorUtils.tokenGenerator(user._id, user.role);
 
     // Set cookies
     res.cookie('access_token', accessToken, {

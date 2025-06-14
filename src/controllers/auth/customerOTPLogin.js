@@ -1,6 +1,6 @@
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
-import tokenGenerator from "../../utils/tokenGeneratorUtils.js";
+import tokenGeneratorUtils from "../../utils/tokenGeneratorUtils.js";
 import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
 
 const customerOTPLogin = async (req, res) => {
@@ -62,7 +62,7 @@ const customerOTPLogin = async (req, res) => {
     await otpRecord.save();
 
     // Generate refresh + access tokens
-    const { accessToken, refreshToken } = tokenGenerator(user._id, user.role);
+    const { accessToken, refreshToken } = tokenGeneratorUtils.tokenGenerator(user._id, user.role);
 
     // Set cookies
     res.cookie('access_token', accessToken, {

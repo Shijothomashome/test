@@ -1,8 +1,9 @@
 import { OTP_EXPIRY_MINUTES } from "../../config/index.js";
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
-import sendEmailOtp from '../../utils/mailUtils.js'
-import sendSmsOtpManually from "../../utils/smsUtils.js";
+import emailUtils from '../../utils/mailUtils.js'
+import smsUtils from "../../utils/smsUtils.js";
+import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 
 const sendOTP = async (req, res) => {
     try {
@@ -56,7 +57,7 @@ const sendOTP = async (req, res) => {
                 return res.status(410).json({ success: false, message: 'User account has been deleted' });
             }
 
-            result = await sendEmailOtp(email);
+            result = await emailUtils.sendEmailOtp(email);
             if (!result.success) {
                 return res.status(500).json({ success: false, message: result.message });
             }
@@ -75,7 +76,7 @@ const sendOTP = async (req, res) => {
                 return res.status(410).json({ success: false, message: 'User account has been deleted' });
             }
 
-            result = await sendSmsOtpManually(phone);
+            result = await smsUtils.sendSmsOtpManually(phone);
             if (!result.valid) {
                 return res.status(500).json({ success: false, message: result.error });
             }

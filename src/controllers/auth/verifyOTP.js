@@ -36,7 +36,15 @@ const verifyOTP = async (req, res) => {
         if (!otpRecord) {
             return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
         }
-
+        if (user) {
+            if (purpose === 'verify-email') {
+                user.isEmailVerified = true;
+            } else if (purpose === 'verify-phone') {
+                user.isPhoneVerified = true;
+            }
+            await user.save()
+             otpRecord.isUsed = true;
+        }
         // Mark OTP as used
         otpRecord.isVerified = true;
         await otpRecord.save();

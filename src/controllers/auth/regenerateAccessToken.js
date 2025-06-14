@@ -1,5 +1,5 @@
-import accessTokenGenerator from "../../utils/tokenGeneratorUtils.js"
-import refreshTokenVerification from "../../utils/tokenVerificationUtils.js"
+import tokenGeneratorUtils from "../../utils/tokenGeneratorUtils.js"
+import tokenVerificationUtils from "../../utils/tokenVerificationUtils.js"
 import userModel from "../../models/userModel.js";
 
 const regenerateAccessToken = async (req, res) => {
@@ -11,7 +11,7 @@ const regenerateAccessToken = async (req, res) => {
         }
 
         // ✅ Step 1: Verify refresh token
-        const verificationResult = refreshTokenVerification(refreshToken);
+        const verificationResult = tokenVerificationUtils.refreshTokenVerification(refreshToken);
 
         if (!verificationResult.valid) {
             return res.status(403).json({ success: false, message: "Invalid refresh token" });
@@ -26,7 +26,7 @@ const regenerateAccessToken = async (req, res) => {
         }
 
         // ✅ Step 3: Generate new access token based refreshToken
-        const newAccessToken = accessTokenGenerator(refreshToken);
+        const newAccessToken = tokenGeneratorUtils.accessTokenGenerator(refreshToken);
 
         // ✅ Step 4: Set cookie
         res.cookie("access_token", newAccessToken, {
