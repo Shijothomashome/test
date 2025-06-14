@@ -1,7 +1,7 @@
 import categoryModel from "../../models/categoryModel.js";
 import mongoose from "mongoose";
-import uploadToS3 from "../../utils/s3Utils.js";
-import deleteFromS3 from "../../utils/s3Utils.js";
+import s3Utils from "../../utils/s3Utils.js";
+
 
 const updateCategory = async (req, res) => {
   try {
@@ -55,9 +55,9 @@ const updateCategory = async (req, res) => {
     // Handle image upload
     let imageUrl = category.image;
     if (req.file) {
-      imageUrl = await uploadToS3(req.file, "category");
+      imageUrl = await s3Utils.uploadToS3(req.file, "category");
       if (category.image) {
-        await deleteFromS3(category.image);
+        await s3Utils.deleteFromS3(category.image);
       }
     }
 
