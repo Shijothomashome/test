@@ -10,7 +10,7 @@ router.post("/admin/create", upload.single("logo"), validatorMiddleware(brandVal
 
  router.get("/admin/brands", brandController.getAllBrands);
 
- router.put("/admin/brands/:id", validatorMiddleware(brandValidatorSchemas.updateBrandSchemas), brandController.updateBrand);
+ router.put("/admin/brands/:id", upload.single("logo"), validatorMiddleware(brandValidatorSchemas.updateBrandSchemas), brandController.updateBrand);
 
  router.patch("/admin/brands/:id/toggle-status", validatorMiddleware(brandValidatorSchemas.updateToggleSwitchSchema), brandController.toggleBrandStatus);
 

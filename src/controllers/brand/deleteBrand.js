@@ -5,7 +5,7 @@ import brandModel from "../../models/brandModel.js";
 
 export const DeleteBrand = async (req, res) => {
   const { id } = req.params;
-  const { reason } = req.body;
+  const { deletionReason } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
@@ -13,7 +13,7 @@ export const DeleteBrand = async (req, res) => {
       .json({ success: false, message: "Invalid brand ID." })
   }
 
-  if (typeof reason !== "string" || !reason.trim()) {
+  if (typeof deletionReason !== "string" || !deletionReason.trim()) {
     return res
       .status(400)
       .json({ success: false, message: "`reason` is required." })
@@ -29,7 +29,7 @@ export const DeleteBrand = async (req, res) => {
 
     brand.isDeleted = true;
     brand.deletedAt = new Date();
-    brand.deletionReason = reason.trim()
+    brand.deletionReason = deletionReason.trim()
     await brand.save();
 
     res.status(200).json({
