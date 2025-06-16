@@ -11,7 +11,8 @@ router.get('/protected', middlewares.authenticate(['customer', 'admin']), testRe
 
 // GOOGLE AUTH
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email',] }));
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'api/v1/auth/google', }), authControllers.googleCallback);
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'api/v1/auth/google/failure', }), authControllers.googleCallback);
+router.get('/google/failure',authControllers.googleFailureLogin);
 
 // REGISTER AND LOGIN
 router.post('/customer/register', middlewares.validatorMiddleware(userValidatorSchemas.userSchema), authControllers.customerRegister);
@@ -22,5 +23,6 @@ router.post('/otp/verify', authControllers.verifyOTP);
 router.post('/customer/password-reset', middlewares.validatorMiddleware(userValidatorSchemas.passwordResetSchema), authControllers.customerPasswordReset);
 router.get("/regenerate-accessToken", authControllers.regenerateAccessToken);
 router.get("/logout", middlewares.authenticate(['customer', 'admin']), authControllers.logout);
+router.get("/me", middlewares.authenticate(['customer', 'admin']), authControllers.me);
 
 export default router;

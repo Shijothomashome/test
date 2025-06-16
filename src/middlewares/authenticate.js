@@ -15,7 +15,7 @@ const authenticate = (roles = []) => async (req, res, next) => {
     }
 
     try {
-        const user = await userModel.findById(verificationResult.decoded.id);
+        const user = await userModel.findById(verificationResult.decoded.id).select("-password -googleAccessToken -googleId _id");
 
         if (!user || user.isBlocked || user.isDeleted) {
             return res.status(403).json({ success: false, message: 'Access denied' });

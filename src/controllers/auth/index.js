@@ -7,6 +7,8 @@ import customerOTPLogin from "./customerOTPLogin.js";
 import regenerateAccessToken from "./regenerateAccessToken.js";
 import logout from "./logout.js";
 import googleCallback from "./googleCallback.js";
+import googleFailureLogin from "./googleFailureLogin.js";
+import me from "./me.js";
 
 export default {
     sendOTP,
@@ -17,5 +19,7 @@ export default {
     customerOTPLogin,
     regenerateAccessToken,
     logout,
-    googleCallback
+    googleCallback,
+    googleFailureLogin,
+    me
 }

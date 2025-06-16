@@ -1,4 +1,4 @@
-import { APP_FRONTEND_SUCCESS_CALL_BACK, REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
+import { APP_FRONTEND_GOOGLE_LOGIN_SUCCESS_CALL_BACK, REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
 import tokenUtils from "../../utils/tokenGeneratorUtils.js"
 
 const googleCallback = (req, res) => {
@@ -22,8 +22,8 @@ const googleCallback = (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
     // Redirect if frontend callback is defined
-    if (APP_FRONTEND_SUCCESS_CALL_BACK) {
-        return res.redirect(APP_FRONTEND_SUCCESS_CALL_BACK);
+    if (APP_FRONTEND_GOOGLE_LOGIN_SUCCESS_CALL_BACK) {
+        return res.redirect(APP_FRONTEND_GOOGLE_LOGIN_SUCCESS_CALL_BACK);
     }
 
     res.json({ message: 'Google login successful', user: req.user });
