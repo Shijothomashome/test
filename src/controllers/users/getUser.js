@@ -1,7 +1,6 @@
 import userModel from "../../models/userModel.js";
 const getUser = async (req, res) => {
   try {
-    console.log(req.params.id)
     const userId = req.params.id;
     const user = await userModel
       .findOne({ _id: userId, isDeleted: false })

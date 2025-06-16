@@ -6,7 +6,7 @@ const getAllUsers = async (req, res) => {
       name,
       email,
       phone,
-      role,
+      role ="customer",
       isBlocked,
       isDeleted,
       search = "",

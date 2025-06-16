@@ -1,3 +1,4 @@
 import getUserProfile from "./getUserProfile.js";
 import deleteUserProfile from "./deleteProfile.js";
-export default { getUserProfile, deleteUserProfile };
+import updateUserProfile from "./updateUserProfile.js";
+export default { getUserProfile, deleteUserProfile,updateUserProfile };
