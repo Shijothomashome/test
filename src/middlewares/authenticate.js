@@ -1,5 +1,5 @@
 import userModel from '../models/userModel.js';
-import tokenVerification from '../utils/tokenVerificationUtils.js';
+import tokenVerificationUtils from '../utils/tokenVerificationUtils.js';
 
 const authenticate = (roles = []) => async (req, res, next) => {
     const token = req.cookies?.access_token;
@@ -8,14 +8,14 @@ const authenticate = (roles = []) => async (req, res, next) => {
         return res.status(401).json({ success: false, message: 'Unauthorized: No access token' });
     }
 
-    const verificationResult = tokenVerification(token);
+    const verificationResult = tokenVerificationUtils.tokenVerification(token);
 
     if (!verificationResult.valid) {
         return res.status(401).json({ success: false, message: verificationResult.error || 'Invalid token' });
     }
 
     try {
-        const user = await userModel.findById(verificationResult.decoded.id);
+        const user = await userModel.findById(verificationResult.decoded.id).select("-password -googleAccessToken -googleId");
 
         if (!user || user.isBlocked || user.isDeleted) {
             return res.status(403).json({ success: false, message: 'Access denied' });

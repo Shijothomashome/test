@@ -1,35 +1,28 @@
 import express from 'express';
 const router = express.Router();
 import passport from 'passport';
-import authenticate from '../middlewares/authenticate.js';
-import { sendOTP, verifyOTP } from '../controllers/auth/OTPVerification.js';
-import { customerRegister, customerLogin, customerPasswordReset, OTPLogin } from '../controllers/auth/customerAuth.js';
-import { userSchema, loginSchema, passwordResetSchema } from '../validators/userValidatorSchemas.js'
-import { regenerateAccessToken } from '../controllers/auth/regenerateAccessToken.js';
-import logout from '../controllers/auth/logout.js';
-import validatorMiddleware from '../middlewares/validatorMiddleware.js';
-import googleCallback from '../controllers/auth/googleCallback.js'
+import middlewares from "../middlewares/index.js"
+import userValidatorSchemas from '../validators/index.js';
+import authControllers from "../controllers/auth/index.js";
+import testResponse from '../utils/testResponseUtils.js';
 
 // TEST Protected Route
-router.get('/protected', authenticate(['customer', 'admin']), (req, res) => {
-    res.json({ message: 'You are authenticated', user: req.user });
-});
+router.get('/protected', middlewares.authenticate(['customer', 'admin']), testResponse);
 
 // GOOGLE AUTH
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email',] }));
-// GOOGLE CALLBACK
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'api/v1/auth/google', }), googleCallback);
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'api/v1/auth/google/failure', }), authControllers.googleCallback);
+router.get('/google/failure',authControllers.googleFailureLogin);
 
-router.post('/otp/send', sendOTP);
-router.post('/otp/verify', verifyOTP);
-router.post('/customer/register', validatorMiddleware(userSchema), customerRegister);
-router.post('/customer/login', validatorMiddleware(loginSchema), customerLogin);
-router.post('/customer/password-reset', validatorMiddleware(passwordResetSchema), customerPasswordReset);
-router.post('/customer/otp-login', OTPLogin);
-
-router.get("/regenerate-accessToken", regenerateAccessToken)
-
-// LOGOUT
-router.get("/logout", authenticate(['customer', 'admin']), logout)
+// REGISTER AND LOGIN
+router.post('/customer/register', middlewares.validatorMiddleware(userValidatorSchemas.userSchema), authControllers.customerRegister);
+router.post('/customer/login', middlewares.validatorMiddleware(userValidatorSchemas.loginSchema), authControllers.customerLogin);
+router.post('/customer/otp-login', authControllers.customerOTPLogin);
+router.post('/otp/send', authControllers.sendOTP);
+router.post('/otp/verify', authControllers.verifyOTP);
+router.post('/customer/password-reset', middlewares.validatorMiddleware(userValidatorSchemas.passwordResetSchema), authControllers.customerPasswordReset);
+router.get("/regenerate-accessToken", authControllers.regenerateAccessToken);
+router.get("/logout", middlewares.authenticate(['customer', 'admin']), authControllers.logout);
+router.get("/me", middlewares.authenticate(['customer', 'admin']), authControllers.me);
 
 export default router;

@@ -1,5 +1,5 @@
 import brandModel from "../../models/brandModel.js";
-import uploadToS3 from "../../utils/s3Utils.js";
+import s3Utils from "../../utils/s3Utils.js";
 
 export const createBrand = async (req, res) => {
   try {
@@ -21,7 +21,7 @@ export const createBrand = async (req, res) => {
 
     let logoUrl = null;
     if (req.file) {
-      logoUrl = await uploadToS3(req.file, "brand");
+      logoUrl = await s3Utils.uploadToS3(req.file, "brand");
     }
 
     const newBrand = new brandModel({

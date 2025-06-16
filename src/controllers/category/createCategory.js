@@ -1,5 +1,5 @@
 import categoryModel from "../../models/categoryModel.js";
-import uploadToS3 from "../../utils/s3Utils.js"
+import s3Utils from "../../utils/s3Utils.js"
 
 const createCategory = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ const createCategory = async (req, res) => {
     }
     let imageUrl = null;
     if (req.file) {
-      imageUrl = await uploadToS3(req.file, "category");
+      imageUrl = await s3Utils.uploadToS3(req.file, "category");
     }
     const newCategory = new categoryModel({
       name: name.trim(),

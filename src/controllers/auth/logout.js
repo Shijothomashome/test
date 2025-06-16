@@ -4,8 +4,8 @@ import axios from "axios";
 
 const logout = async (req, res) => {
     try {
-        const user = await userModel.findById(req.user.id);
-
+        const user = await userModel.findById(req.user._id);
+        
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
