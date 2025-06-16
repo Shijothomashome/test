@@ -7,7 +7,7 @@ import middlewares from "../middlewares/index.js";
 const router = express.Router();
 
 //create offer
-router.post('/admin/create', middlewares.validatorMiddleware(), offerControllers.createOffer);
+router.post('/admin/create', middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), offerControllers.createOffer);
 
 //get all offers
 router.get('/admin/all', offerControllers.getAllOffers);
@@ -16,10 +16,10 @@ router.get('/admin/all', offerControllers.getAllOffers);
 router.get('/:id', offerControllers.getOfferById);
 
 //update offers
-router.put('/admin/:id/update', offerControllers.updateOffers);
+router.put('/admin/:id/update', middlewares.validatorMiddleware(offerValidatorSchemas.updateOfferSchema), offerControllers.updateOffers);
 
 //deleting offer 
-router.delete('/admin/:id/delete', offerControllers.deleteOffer)
+router.delete('/admin/:id/delete', middlewares.validatorMiddleware(offerValidatorSchemas.deleteOfferSchema), offerControllers.deleteOffer)
 
 //get all offers for user
 // router.get('/user/:id', getAllOffersForUser)

@@ -5,12 +5,11 @@ import getOfferById from './getOfferById.js';
 import updateOffers from './updateOffers.js';
 import getAllOffersForUser from './getAllOffersForUser.js';
 
-
 export default {
     createOffer,
     deleteOffer,
     getAllOffers,
     getOfferById,
     updateOffers,
-    getAllOffersForUser
+    getAllOffersForUser,
 }
