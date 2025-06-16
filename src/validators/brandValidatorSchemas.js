@@ -46,13 +46,7 @@ const isValidObjectId = (value, helpers) => {
       'date.base': `"deletedAt" must be a valid date`,
     }),
 
-  deletionReason: Joi.string()
-    .trim()
-    .optional()
-    .allow('')
-    .messages({
-      'string.base': `"deletionReason" must be a string`,
-    }),
+  
 });
 
 
@@ -78,26 +72,6 @@ const updateBrandSchemas = Joi.object({
     .optional()
     .messages({
       'boolean.base': `"isActive" must be true or false`,
-    }),
-
-  isDeleted: Joi.boolean()
-    .optional()
-    .messages({
-      'boolean.base': `"isDeleted" must be true or false`,
-    }),
-
-  deletedAt: Joi.date()
-    .optional()
-    .messages({
-      'date.base': `"deletedAt" must be a valid date`,
-    }),
-
-  deletionReason: Joi.string()
-    .trim()
-    .optional()
-    .allow('')
-    .messages({
-      'string.base': `"deletionReason" must be a string`,
     }),
 });
 

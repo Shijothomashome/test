@@ -18,7 +18,11 @@ const options = {
       },
     ],
   },
-  apis: ['./src/swagger/path/*.js'], // path to the API docs
+  apis: [
+  './src/swagger/path/*.js',
+  './src/swagger/path/brand/admin*.js',
+  './src/swagger/path/brand/user*.js',
+],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

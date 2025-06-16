@@ -4,13 +4,14 @@ import brandModel from "../../models/brandModel.js";
 
 export const getAllBrands = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const { page = 1, limit = 10, search = "", isActive } = req.query;
     const pageNum = Math.max(parseInt(page, 10), 1);
     const pageSize = Math.max(parseInt(limit, 10), 1);
 
     const filter = {
       isDeleted: false,
       ...(search.trim() && { name: { $regex: search.trim(), $options: "i" } }),
+       ...(isActive !== undefined && { isActive: isActive === "true" }),
     };
 
     const totalCount = await brandModel.countDocuments(filter);
