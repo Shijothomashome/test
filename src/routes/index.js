@@ -9,6 +9,7 @@ import couponRoutes from './couponRoutes.js'
 import wishlistRoutes from './wishlistRoutes.js';
 import offerRoutes from './offerRoutes.js'
 import authRoutes from './authRoutes.js';
+import cartRoutes from "./cartRoutes.js"
 
 router.use('/auth', authRoutes);
 router.use("/users", userRoutes);
@@ -18,6 +19,7 @@ router.use("/brands", brandRoutes);
 router.use("/coupons", couponRoutes)
 router.use('/offers', offerRoutes);
 router.use("/wishlist",wishlistRoutes);
+router.use("/cart",cartRoutes);
 
 
 export default router;
