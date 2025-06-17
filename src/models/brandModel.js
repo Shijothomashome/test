@@ -13,4 +13,6 @@ const brandSchema = new mongoose.Schema({
     timestamps: true
 });
 
+brandSchema.index({ name: 1, isDeleted: 1 });
+
 export default mongoose.model("Brand", brandSchema);
