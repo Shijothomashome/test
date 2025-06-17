@@ -3,7 +3,7 @@ import userModel from "../../models/userModel.js";
 const deleteAdminProfile = async (req, res) => {
   try {
     const { deletionReason } = req.body || {};
-    const adminId = req.user._id;
+    const adminId = req.user?._id;
     if (!adminId) {
       return res.status(401).json({
         success: false,

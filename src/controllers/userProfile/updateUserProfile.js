@@ -2,7 +2,7 @@ import userModel from "../../models/userModel.js";
 import s3Utils from "../../utils/s3Utils.js";
 const updateUserProfile = async (req, res) => {
   try {
-      const userId = req.user._id;
+      const userId = req.user?._id;
       if (!userId) {
         return res.status(401).json({ status: false, message: "Unauthorized" });
       }

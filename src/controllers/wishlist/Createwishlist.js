@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import productModel from "../../models/productModel.js";
 const createWishlist = async (req, res) => {
   try {
-    const userId =req.user._id;
+    const userId =req.user?._id;
     const { productId, variantId } = req.body;
 
     if (

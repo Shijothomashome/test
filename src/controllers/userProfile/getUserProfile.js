@@ -2,7 +2,7 @@ import userModel from "../../models/userModel.js";
 const getUserProfile = async (req, res) => {
   try {
       
-      const userId = req.user._id;
+      const userId = req.user?._id;
       const user = await userModel
         .findOne({ _id: userId, isDeleted: false })
         .select("-password -googleAccessToken");
