@@ -14,6 +14,22 @@ const cartItemSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1
+    },
+    mrp: {
+        type: Number,
+        required: true,
+    },
+    sellingPrice: {
+        type: Number,
+        required: true,
+    },
+    subTotal: {
+        type: Number,
+        required: true,
+    },
+    subMRPTotal: {
+        type: Number,
+        required: true,
     }
 }, { _id: false });
 
@@ -26,20 +42,20 @@ const cartSchema = new mongoose.Schema({
     },
 
     items: [cartItemSchema],
-
-    couponCode: {
-        type: String,
-        default: null
+    totalMRP: {
+        type: Number,
+        required: true,
     },
-
-    createdAt: {
-        type: Date,
-        default: Date.now
+    savedAmount: {
+        type: Number,
+        required: true,
     },
-
-    updatedAt: {
-        type: Date
-    }
+    totalPrice: {
+        type: Number,
+        required: true,
+    },
+}, {
+    timestamps: true,
 });
 
 export default mongoose.model("Cart", cartSchema);
