@@ -33,6 +33,8 @@ import {
   productListSchema,
 } from "../validators/productValidation.js";
 import variantSchema from "../models/productVariantModel.js";
+import { getProductVariant } from "../controllers/variants/getProductVariant.js";
+// import { getCollectionProductsWithCache } from "../controllers/collection/smartCollections.js";
 
 const router = express.Router();
 
@@ -57,6 +59,7 @@ router
 
 router
   .route("/:productId/variants/:variantId")
+  .get(getProductVariant)
   .put(validate(variantUpdateSchema), updateVariant);
 
 router
@@ -70,6 +73,34 @@ router.route("/:productId/recommended").get(getRecommendedProducts);
 router.route("/:productId/similar").get(getSimilarProducts);
 // router.route("/best-selling").get(getBestSellingProducts);
 router.route("/featured").get(getFeaturedProducts);
+
+
+// router.route('/:id/products/cached')
+//   .get(getCollectionProductsWithCache);
+
+router.route('/:id/convert')
+  .post(async (req, res) => {
+    try {
+      const collection = await convertCollectionType(
+        req.params.id,
+        req.body.newType,
+        req.body.rules
+      );
+      res.json({ success: true, data: collection });
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+router.route('/:id/suggest-rules')
+  .get(async (req, res) => {
+    try {
+      const rules = await suggestSmartCollectionRules(req.params.id);
+      res.json({ success: true, data: rules });
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
 
 router
   .route("/:id")

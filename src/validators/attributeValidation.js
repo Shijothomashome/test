@@ -73,25 +73,57 @@ export const createAttributeSchema = Joi.object({
   values: baseAttributeSchema.values.required(),
   isGlobal: baseAttributeSchema.isGlobal.required()
 }).when(Joi.object({ isGlobal: Joi.valid(true) }), {
-  then: globalAttributeValidation,
-  otherwise: nonGlobalAttributeValidation
+  then: Joi.object({
+    categories: Joi.forbidden().messages({
+      'any.unknown': 'Global attributes cannot have categories'
+    })
+  }).concat(Joi.object().unknown(true)), // This allows other fields
+  otherwise: Joi.object({
+    categories: baseAttributeSchema.categories.min(1).messages({
+      'array.min': 'At least one category is required for non-global attributes'
+    })
+  })
 });
+
 
 // Update attribute schema
 export const updateAttributeSchema = Joi.object({
-  ...baseAttributeSchema
-}).min(1).when(Joi.object({ isGlobal: Joi.valid(true) }), {
-  then: globalAttributeValidation,
-  otherwise: nonGlobalAttributeValidation
-});
+  name: baseAttributeSchema.name,
+  values: baseAttributeSchema.values,
+  isGlobal: baseAttributeSchema.isGlobal,
+  categories: Joi.when('isGlobal', {
+    is: true,
+    then: Joi.forbidden().messages({
+      'any.unknown': 'Global attributes cannot have categories'
+    }),
+    otherwise: baseAttributeSchema.categories
+  }),
+  isVariantAttribute: baseAttributeSchema.isVariantAttribute,
+  isActive: baseAttributeSchema.isActive,
+  isDeleted: baseAttributeSchema.isDeleted,
+  deletedAt: baseAttributeSchema.deletedAt,
+  deletionReason: baseAttributeSchema.deletionReason
+}).min(1);
 
 // Get attributes schema (for query params)
 export const getAttributesSchema = Joi.object({
-  isGlobal: Joi.boolean(),
-  isVariantAttribute: Joi.boolean(),
-  isActive: Joi.boolean(),
+  search: Joi.string().trim().empty('').messages({
+    'string.base': 'Search query must be a string'
+  }),
   category: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).messages({
     'string.pattern.base': 'Category ID must be a valid ObjectId'
+  }),
+  isActive: Joi.boolean().sensitive().messages({
+    'boolean.base': 'isActive must be a boolean'
+  }),
+  isGlobal: Joi.boolean().sensitive().messages({
+    'boolean.base': 'isGlobal must be a boolean'
+  }),
+  isVariantAttribute: Joi.boolean().sensitive().messages({
+    'boolean.base': 'isVariantAttribute must be a boolean'
+  }),
+  isDeleted: Joi.boolean().sensitive().messages({
+    'boolean.base': 'isDeleted must be a boolean'
   }),
   page: Joi.number().integer().min(1).default(1).messages({
     'number.base': 'Page must be a number',
@@ -103,6 +135,5 @@ export const getAttributesSchema = Joi.object({
     'number.integer': 'Limit must be an integer',
     'number.min': 'Limit must be at least {#limit}',
     'number.max': 'Limit must not exceed {#limit}'
-  }),
-  includeDeleted: Joi.boolean().default(false)
+  })
 });

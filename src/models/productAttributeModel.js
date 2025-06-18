@@ -81,10 +81,7 @@ const attributeSchema = new mongoose.Schema(
       type: String,
       trim: true 
     }],
-    selectedValues: [{  // New field for manual selection
-      type: String,
-      trim: true 
-    }],
+
     isGlobal: { type: Boolean, default: false },
     categories: [{ 
       type: mongoose.Schema.Types.ObjectId, 
@@ -98,7 +95,7 @@ const attributeSchema = new mongoose.Schema(
   },
   { 
     timestamps: true,
-    collation: { locale: 'en', strength: 2 } // Case-insensitive collation
+    collation: { locale: 'en', strength: 2 }
   }
 );
 

@@ -120,6 +120,7 @@ export const getProducts = async (req, res) => {
         { path: 'category', select: 'name' },
         { path: 'brand', select: 'name' }
       ],
+      select: '-variants', // This excludes the variants field
       lean: true
     };
 

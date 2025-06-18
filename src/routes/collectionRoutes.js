@@ -5,7 +5,6 @@ import {
   getCollectionById,
   getCollectionProducts,
   getCollections,
-  // reorderCollectionProducts,
   updateCollection,
   updateCollectionProducts,
 } from "../controllers/collection/index.js";
@@ -14,7 +13,6 @@ import {
   createCollectionSchema,
   updateCollectionSchema,
   updateCollectionProductsSchema,
-  reorderProductsSchema,
   collectionListSchema
 } from "../validators/collectionValidation.js";
 
@@ -37,8 +35,5 @@ router.route("/:id")
 
 router.route("/:id/products")
   .put(validate(updateCollectionProductsSchema), updateCollectionProducts);
-
-// router.route("/:id/reorder")
-//   .put(validate(reorderProductsSchema), reorderCollectionProducts);
 
 export default router;

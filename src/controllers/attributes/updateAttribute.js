@@ -1,76 +1,104 @@
+import mongoose from 'mongoose';
 import Attribute from "../../models/productAttributeModel.js";
 
 export const updateAttribute = async (req, res) => {
   try {
-    const { name, isGlobal, values, isVariantAttribute, isActive } = req.body;
-    const attribute = await Attribute.findOne({
-      _id: req.params.id,
-      isDeleted: false
-    });
+    // Validate ID format first
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid attribute ID format'
+      });
+    }
+
+    // Find attribute without isDeleted filter initially
+    const attribute = await Attribute.findById(req.params.id)
+      .populate('categories', 'name slug');
 
     if (!attribute) {
       return res.status(404).json({
         success: false,
-        message: 'Attribute not found or has been deleted'
+        message: 'Attribute not found'
       });
     }
 
-    // Check if name is being changed to an existing one
-    if (name && name !== attribute.name) {
-      const existingAttribute = await Attribute.findOne({ 
+    if (attribute.isDeleted) {
+      return res.status(410).json({
+        success: false,
+        message: 'Attribute has been deleted'
+      });
+    }
+
+    const { 
+      name, 
+      isGlobal = attribute.isGlobal, 
+      values, 
+      isVariantAttribute, 
+      isActive 
+    } = req.body;
+
+    // Name uniqueness check
+    if (name && name.toLowerCase().trim() !== attribute.name.toLowerCase()) {
+      const existingAttribute = await Attribute.findOne({
         name: name.toLowerCase().trim(),
         _id: { $ne: attribute._id }
       });
+      
       if (existingAttribute) {
         return res.status(400).json({
           success: false,
-          message: 'Attribute with this name already exists'
+          message: 'Attribute name already exists'
         });
       }
     }
 
-    // Prevent changing global status if categories exist
-    if (isGlobal !== undefined && isGlobal !== attribute.isGlobal) {
-      if (!isGlobal && (!attribute.categories || attribute.categories.length === 0)) {
+    // Global status change validation
+    if (isGlobal !== attribute.isGlobal) {
+      if (isGlobal && attribute.categories?.length > 0) {
         return res.status(400).json({
           success: false,
-          message: 'Non-global attributes must have at least one category'
+          message: 'Cannot make attribute global - remove categories first'
         });
       }
 
-      if (isGlobal && attribute.categories && attribute.categories.length > 0) {
+      if (!isGlobal && (!req.body.categories || req.body.categories.length === 0)) {
         return res.status(400).json({
           success: false,
-          message: 'Cannot make attribute global - it already has categories assigned'
+          message: 'Non-global attributes require at least one category'
         });
       }
     }
 
-    // Update only allowed fields
+    // Prepare updates
     const updates = {
-      name: name || attribute.name,
-      isGlobal: isGlobal !== undefined ? isGlobal : attribute.isGlobal,
+      name: name ? name.trim().toLowerCase() : attribute.name,
       values: values || attribute.values,
+      isGlobal,
       isVariantAttribute: isVariantAttribute !== undefined ? isVariantAttribute : attribute.isVariantAttribute,
       isActive: isActive !== undefined ? isActive : attribute.isActive,
       categories: isGlobal ? [] : (req.body.categories || attribute.categories)
     };
 
+    // Apply updates
     Object.assign(attribute, updates);
-    await attribute.save();
+    const updatedAttribute = await attribute.save();
 
     res.json({
       success: true,
       message: 'Attribute updated successfully',
-      data: attribute
+      data: updatedAttribute
     });
+
   } catch (error) {
+    console.error('Update attribute error:', error);
+    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
         message: 'Invalid attribute ID'
       });
     }
+    
     res.status(500).json({
       success: false,
       message: 'Failed to update attribute',

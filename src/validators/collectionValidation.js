@@ -100,11 +100,6 @@ export const updateCollectionProductsSchema = Joi.object({
   action: Joi.string().valid("add", "remove", "replace").required()
 });
 
-// Reorder products schema
-export const reorderProductsSchema = Joi.object({
-  productIds: Joi.array().items(objectId).min(1).required()
-});
-
 // Collection list schema
 export const collectionListSchema = Joi.object({
   shop_id: objectId,

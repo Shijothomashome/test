@@ -61,10 +61,10 @@ const productSchema = new mongoose.Schema(
     thumbnail: { type: String },
     images: [{ type: String }],
 
-    collection_id: {
+    collection_ids: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Collection",
-    },
+    }],
 
     variantAttributes: [
       {
