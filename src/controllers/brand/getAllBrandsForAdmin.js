@@ -5,8 +5,8 @@ const getAllBrandsForAdmin = async (req, res) => {
     const { page = 1, limit = 10, search = "", isActive } = req.query;
     const pageNum = Math.max(parseInt(page, 10), 1);
     const pageSize = Math.max(parseInt(limit, 10), 1);
-
     const trimmedSearch = search.trim();
+    
     const filter = {
       isDeleted: false,
       ...(trimmedSearch && { name: { $regex: trimmedSearch, $options: "i" } }),

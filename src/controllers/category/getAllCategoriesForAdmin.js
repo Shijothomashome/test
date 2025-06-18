@@ -1,16 +1,7 @@
-
 import categoryModel from "../../models/categoryModel.js";
-const getAllCategories = async (req, res) => {
+const getAllCategoriesForAdmin = async (req, res) => {
   try {
-    const {
-      search = "",
-      isActive,
-      parentCategory,
-      page = 1,
-      limit = 10,
-      sortBy = "createdAt",
-      sortOrder = "desc",
-    } = req.query;
+    const { search = "", isActive, parentCategoryId, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = req.query;
 
     const filters = { isDeleted: false };
 
@@ -20,13 +11,13 @@ const getAllCategories = async (req, res) => {
     }
 
     // Filter by isActive (boolean)
-    if (isActive !== undefined) {
-      filters.isActive = isActive === "true"; // convert string to boolean
+    if (typeof isActive === "boolean") {
+      filters.isActive = isActive;
     }
 
     // Filter by parentCategory (ObjectId)
-    if (parentCategory) {
-      filters.parentCategory = parentCategory;
+    if (parentCategoryId) {
+      filters.parentCategoryId = parentCategoryId;
     }
 
     // Sorting direction
@@ -37,12 +28,7 @@ const getAllCategories = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Query categories with filters
-    const categories = await categoryModel
-      .find(filters)
-      .populate("parentCategory", "name")
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(parseInt(limit));
+    const categories = await categoryModel.find(filters).populate("parentCategoryId", "name").sort(sortOptions).skip(skip).limit(parseInt(limit)).lean();
 
     // Count total for pagination info
     const total = await categoryModel.countDocuments(filters);
@@ -59,8 +45,12 @@ const getAllCategories = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching categories:", error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message || "Something went wrong.",
+    });
   }
 };
 
-export default getAllCategories;
+export default getAllCategoriesForAdmin;

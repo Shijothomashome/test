@@ -1,24 +1,61 @@
 /**
  * @swagger
  * tags:
- *   - name: Brands
- *     description: Brand related endpoints
- *     x-displayName: Brands
- *     tags:
- *       - name: Admin - Brand
- *         description: Admin-only brand management APIs
- *       - name: Customer - Brand
- *         description: Public-facing brand listing APIs
+ *   - name: Admin - Brand
+ *     description: Admin-only brand management APIs
+ *   - name: User - Brand
+ *     description: Public-facing brand listing APIs
  */
 
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     apiKey:
+ *       type: apiKey
+ *       in: header
+ *       name: api-key
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     Brand:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         logo:
+ *           type: string
+ *         isActive:
+ *           type: boolean
+ *         isDeleted:
+ *           type: boolean
+ *         deletedAt:
+ *           type: string
+ *           format: date-time
+ *         deletionReason:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ */
+
+//
+// ─── ADMIN CREATE BRAND ─────────────────────────────────────
+//
 /**
  * @swagger
  * /admin/brands:
  *   post:
  *     summary: Create a new brand
  *     tags: [Admin - Brand]
- *     consumes:
- *       - multipart/form-data
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -30,119 +67,83 @@
  *             properties:
  *               name:
  *                 type: string
- *                 description: Brand name
+ *                 description: Required. Brand name
  *               image:
  *                 type: string
  *                 format: binary
- *                 description: Optional logo image
+ *                 description: Optional. Logo image file
  *               isActive:
  *                 type: boolean
+ *                 description: Optional. true or false
  *     responses:
  *       201:
  *         description: Brand created successfully
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brand created successfully
- *               brand:
- *                 _id: "685182afc1df5e6c8f32220c"
- *                 name: "dummy brand"
- *                 logo: "https://s3.amazonaws.com/brand/logo.jpg"
- *                 isActive: true
- *                 isDeleted: false
- *                 createdAt: "2025-06-17T14:58:55.168Z"
- *                 updatedAt: "2025-06-17T14:58:55.168Z"
- *                 __v: 0
  *       400:
- *         description: Validation error or bad request
- *         content:
- *           application/json:
- *             example:
- *               success: false
- *               message: Only one image allowed in 'image' field.
+ *         description: Validation or Multer error
  *       409:
  *         description: Brand name already exists
- *         content:
- *           application/json:
- *             example:
- *               success: false
- *               message: Brand name already exists.
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             example:
- *               success: false
- *               message: Internal server error
  */
 
+//
+// ─── ADMIN GET BRANDS ─────────────────────────────────────
+//
 /**
  * @swagger
  * /admin/brands:
  *   get:
  *     summary: Get list of brands (Admin)
  *     tags: [Admin - Brand]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *         description: Page number (optional)
+ *         description: Optional. Page number
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Limit per page (optional)
+ *         description: Optional. Records per page
  *       - in: query
  *         name: search
  *         schema:
  *           type: string
- *         description: Search by name (optional)
+ *         description: Optional. Search by name
  *       - in: query
  *         name: isActive
  *         schema:
  *           type: boolean
- *         description: Filter by active status (optional)
+ *         description: Optional. true or false
  *     responses:
  *       200:
- *         description: Brands list with pagination
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brands fetched successfully
- *               data:
- *                 - _id: "685182afc1df5e6c8f32220c"
- *                   name: "dummy brand"
- *                   logo: "https://s3.amazonaws.com/brand/logo.jpg"
- *                   isActive: true
- *                   isDeleted: false
- *                   createdAt: "2025-06-17T14:58:55.168Z"
- *                   updatedAt: "2025-06-17T14:58:55.168Z"
- *                   __v: 0
- *               pagination:
- *                 totalCount: 1
- *                 totalPages: 1
- *                 currentPage: 1
- *                 pageSize: 10
+ *         description: Paginated list of brands
+ *       500:
+ *         description: Internal server error
  */
 
+//
+// ─── ADMIN UPDATE BRAND ─────────────────────────────────────
+//
 /**
  * @swagger
  * /admin/brands/{id}:
  *   put:
  *     summary: Update a brand
  *     tags: [Admin - Brand]
- *     consumes:
- *       - multipart/form-data
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: Brand ID
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -151,25 +152,17 @@
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Optional brand name
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Optional. New logo image
  *               isActive:
  *                 type: boolean
+ *                 description: Optional. true or false
  *     responses:
  *       200:
  *         description: Brand updated successfully
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brand updated successfully
- *               brand:
- *                 _id: "685182afc1df5e6c8f32220c"
- *                 name: "updated brand"
- *                 logo: "https://s3.amazonaws.com/brand/logo-updated.jpg"
- *                 isActive: false
- *                 updatedAt: "2025-06-17T15:05:22.168Z"
  *       400:
  *         description: Invalid input
  *       404:
@@ -178,12 +171,18 @@
  *         description: Brand name already exists
  */
 
+//
+// ─── ADMIN DELETE BRAND (SOFT DELETE) ─────────────────────────────
+//
 /**
  * @swagger
  * /admin/brands/{id}:
  *   delete:
  *     summary: Soft delete a brand
  *     tags: [Admin - Brand]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -196,32 +195,33 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - deletionReason
  *             properties:
  *               deletionReason:
  *                 type: string
+ *                 description: Required reason for deletion
  *     responses:
  *       200:
  *         description: Brand deleted successfully
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brand deleted successfully.
- *               data:
- *                 id: "685182afc1df5e6c8f32220c"
- *                 deletedAt: "2025-06-17T15:10:00.000Z"
  *       400:
  *         description: Invalid brand ID
  *       404:
  *         description: Brand not found or already deleted
  */
 
+//
+// ─── ADMIN TOGGLE STATUS ─────────────────────────────────────
+//
 /**
  * @swagger
  * /admin/brands/{id}/status:
  *   patch:
  *     summary: Toggle brand active status
  *     tags: [Admin - Brand]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -234,59 +234,50 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - isActive
  *             properties:
  *               isActive:
  *                 type: boolean
+ *                 description: Required. true or false
  *     responses:
  *       200:
- *         description: Status toggled
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brand has been deactivated.
- *               data:
- *                 id: "685182afc1df5e6c8f32220c"
- *                 isActive: false
+ *         description: Status updated
  *       404:
  *         description: Brand not found
  */
 
+//
+// ─── CUSTOMER - GET ACTIVE BRANDS ─────────────────────────────
+//
 /**
  * @swagger
  * /brands:
  *   get:
  *     summary: Get list of active brands (Customer)
- *     tags: [Customer - Brand]
+ *     tags: [User - Brand]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
+ *         description: Optional. Page number
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *         description: Optional. Items per page
  *       - in: query
  *         name: search
  *         schema:
  *           type: string
+ *         description: Optional. Search by brand name
  *     responses:
  *       200:
- *         description: Public brand list
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               message: Brands fetched successfully
- *               data:
- *                 - _id: "685182afc1df5e6c8f32220c"
- *                   name: "dummy brand"
- *                   logo: "https://s3.amazonaws.com/brand/logo.jpg"
- *                   isActive: true
- *               pagination:
- *                 totalCount: 1
- *                 totalPages: 1
- *                 currentPage: 1
- *                 pageSize: 10
+ *         description: List of public brands
+ *       500:
+ *         description: Internal server error
  */
