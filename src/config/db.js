@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import clc from "cli-color";
+import dotenv from "dotenv";
+dotenv.config(); 
+
 
 const connectDB = async () => {
   try {

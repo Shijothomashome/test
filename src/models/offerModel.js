@@ -57,7 +57,14 @@ const offerSchema = new mongoose.Schema({
     },
 
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date }
+    updatedAt: { type: Date },
+
+    // Soft delete support
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: { type: Date }
 });
 
 export default mongoose.model("Offer", offerSchema);
