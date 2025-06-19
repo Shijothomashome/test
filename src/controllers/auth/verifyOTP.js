@@ -39,11 +39,12 @@ const verifyOTP = async (req, res) => {
         if (user) {
             if (purpose === 'verify-email') {
                 user.isEmailVerified = true;
+                otpRecord.isUsed = true;
             } else if (purpose === 'verify-phone') {
                 user.isPhoneVerified = true;
+                otpRecord.isUsed = true;
             }
             await user.save()
-             otpRecord.isUsed = true;
         }
         // Mark OTP as used
         otpRecord.isVerified = true;
