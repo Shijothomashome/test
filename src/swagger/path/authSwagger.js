@@ -192,9 +192,6 @@
  *                   - login-phone: OTP-based login via phone
  *                   - reset-password: Resetting password using OTP
  *                 example: verify-email
- *               user_id:
- *                 type: string
- *                 example: "64f30d923bf23e4f8a1c1234"
  *     responses:
  *       200:
  *         description: OTP sent
@@ -232,9 +229,6 @@
  *                   - login-phone
  *                   - reset-password
  *                 example: verify-email
- *               user_id:
- *                 type: string
- *                 example: "64f30d923bf23e4f8a1c1234"
  *     responses:
  *       200:
  *         description: OTP verified
@@ -250,6 +244,18 @@
  *       200:
  *         description: New access token generated
  */
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get the currently logged-in user's details
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User details fetched successfully
+ */
+
 
 /**
  * @swagger
