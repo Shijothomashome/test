@@ -26,8 +26,14 @@
  *                 type: string
  *                 example: johndoe@example.com
  *               phone:
- *                 type: string
- *                 example: "+971501234567"
+ *                 type: object
+ *                 properties:
+ *                   code:
+ *                     type: string
+ *                     example: "+971"
+ *                   number:
+ *                     type: string
+ *                     example: "501234567"
  *               password:
  *                 type: string
  *                 example: strongPassword123
@@ -36,8 +42,10 @@
  *                 properties:
  *                   email:
  *                     type: string
+ *                     example: "65ae...d7"
  *                   phone:
  *                     type: string
+ *                     example: "65ae...a4"
  *               addressList:
  *                 type: array
  *                 items:
@@ -69,6 +77,8 @@
  *         description: Registered successfully
  *       400:
  *         description: Invalid input
+ *       409:
+ *         description: Email or phone number already exists
  */
 
 /**
@@ -143,8 +153,14 @@
  *                 type: string
  *                 example: johndoe@example.com
  *               phone:
- *                 type: string
- *                 example: "+971501234567"
+ *                 type: object
+ *                 properties:
+ *                   code:
+ *                     type: string
+ *                     example: "+971"
+ *                   number:
+ *                     type: string
+ *                     example: "501234567"
  *               verification_id:
  *                 type: string
  *                 example: "abc123"
@@ -174,8 +190,14 @@
  *                 type: string
  *                 example: johndoe@example.com
  *               phone:
- *                 type: string
- *                 example: "+971501234567"
+ *                 type: object
+ *                 properties:
+ *                   code:
+ *                     type: string
+ *                     example: "+971"
+ *                   number:
+ *                     type: string
+ *                     example: "501234567"
  *               purpose:
  *                 type: string
  *                 enum:
@@ -184,13 +206,6 @@
  *                   - login-email
  *                   - login-phone
  *                   - reset-password
- *                 description: |
- *                   OTP purpose options:
- *                   - verify-email: Verifying email during signup
- *                   - verify-phone: Verifying phone during signup
- *                   - login-email: OTP-based login via email
- *                   - login-phone: OTP-based login via phone
- *                   - reset-password: Resetting password using OTP
  *                 example: verify-email
  *     responses:
  *       200:
@@ -215,8 +230,14 @@
  *                 type: string
  *                 example: johndoe@example.com
  *               phone:
- *                 type: string
- *                 example: "+971501234567"
+ *                 type: object
+ *                 properties:
+ *                   code:
+ *                     type: string
+ *                     example: "+971"
+ *                   number:
+ *                     type: string
+ *                     example: "501234567"
  *               otp:
  *                 type: string
  *                 example: "654321"
@@ -255,7 +276,6 @@
  *       200:
  *         description: User details fetched successfully
  */
-
 
 /**
  * @swagger

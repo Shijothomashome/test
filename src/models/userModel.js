@@ -28,10 +28,10 @@ const userSchema = new mongoose.Schema({
     },
 
     phone: {
-        type: String,
-        unique: true,
-        sparse: true,
+        code: { type: String }, // e.g., "+971"
+        number: { type: String, unique: true, sparse: true }, // e.g., "501234567"
     },
+
 
     password: {
         type: String,

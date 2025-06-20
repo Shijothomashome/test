@@ -11,6 +11,9 @@ const otpQueueSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    code: {
+      type: String,
+    },
     contact: {
       type: String,
     },
