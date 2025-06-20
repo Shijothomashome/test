@@ -50,15 +50,21 @@ const verifySmsOtp = async (phoneNumber, otp) => {
 };
 
 // Send normal SMS (non-OTP)
-const sendSms = async (phoneNumber, content, value) => {
+const sendSms = async (phone, content, value) => {
   try {
-    if (!phoneNumber) return { valid: false, error: 'Phone number is required to send a message.' };
+    const phoneCode = phone?.code?.trim();
+    const phoneNumber = phone?.number?.trim();
+
+    if (!phoneCode || !phoneNumber) {
+      return { valid: false, error: 'Phone number and code are required to send a message.' };
+    }
 
     const message = await client.messages.create({
       body: content,
       from: TWILIO_PHONE_NUMBER,
-      to: `+91${phoneNumber}`,
+      to: `${phoneCode}${phoneNumber}`,
     });
+
 
     console.log('Message sent! SID:', message.sid);
     return {
@@ -75,13 +81,13 @@ const sendSms = async (phoneNumber, content, value) => {
 };
 
 // Send OTP manually (custom flow)
-const sendSmsOtpManually = async (phoneNumber) => {
+const sendSmsOtpManually = async (phone) => {
   const otp = generateOtp(6);
-  const result = await sendSms(phoneNumber, otpMessageTemplate(otp));
+  const result = await sendSms(phone, otpMessageTemplate(otp));
   return { ...result, otp };
 };
 
-export default{
+export default {
   sendSmsOtp,
   verifySmsOtp,
   sendSms,

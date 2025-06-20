@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 
 const customerRegister = async (req, res) => {
   const session = await mongoose.startSession();
+
   try {
     session.startTransaction();
 
@@ -17,10 +18,17 @@ const customerRegister = async (req, res) => {
       });
     }
 
+    if (phone && (!phone.code || !phone.number)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone format: expected { code, number }',
+      });
+    }
+
     const existingUser = await userModel.findOne({
       $or: [
         email ? { email } : null,
-        phone ? { phone } : null,
+        phone ? { "phone.code": phone.code, "phone.number": phone.number } : null,
       ].filter(Boolean),
     });
 
@@ -31,53 +39,60 @@ const customerRegister = async (req, res) => {
       });
     }
 
-    const emailVerified = email && verification_ids.email
-      ? await otpQueueModel.findOne({
+    // OTP validations
+    let emailVerified = null;
+    let phoneVerified = null;
+
+    if (email && verification_ids.email) {
+      emailVerified = await otpQueueModel.findOne({
         _id: verification_ids.email,
         contact: email,
         purpose: 'verify-email',
         isUsed: false,
         isVerified: true,
-      })
-      : null;
+      });
 
-    const phoneVerified = phone && verification_ids.phone
-      ? await otpQueueModel.findOne({
+      if (!emailVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or unverified email OTP',
+        });
+      }
+    }
+
+    if (phone && verification_ids.phone) {
+      phoneVerified = await otpQueueModel.findOne({
         _id: verification_ids.phone,
-        contact: phone,
+        contact: phone.number,
+        code: phone.code,
         purpose: 'verify-phone',
         isUsed: false,
         isVerified: true,
-      })
-      : null;
+      });
+
+      if (!phoneVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or unverified phone OTP',
+        });
+      }
+    }
+
+    // Mark OTPs as used
+    if (emailVerified) {
+      emailVerified.isUsed = true;
+      await emailVerified.save({ session });
+    }
 
     if (phoneVerified) {
       phoneVerified.isUsed = true;
       await phoneVerified.save({ session });
     }
 
-    if (emailVerified) {
-      emailVerified.isUsed = true;
-      await emailVerified.save({ session });
-    }
-
-    if (verification_ids.email && !emailVerified) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or unverified email OTP',
-      });
-    }
-
-    if (verification_ids.phone && !phoneVerified) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or unverified phone OTP',
-      });
-    }
-
+    // Create hashed password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await userModel.create([{
+    const newUser = {
       name,
       email,
       phone,
@@ -86,26 +101,28 @@ const customerRegister = async (req, res) => {
       role: 'customer',
       isEmailVerified: !!emailVerified,
       isPhoneVerified: !!phoneVerified,
-    }], { session });
+    };
+
+    const created = await userModel.create([newUser], { session });
 
     await session.commitTransaction();
-    session.endSession();
 
     return res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      userId: user[0]._id,
+      userId: created[0]._id,
     });
 
   } catch (err) {
     await session.abortTransaction();
-    session.endSession(); // always end session
-    console.error('Transaction aborted:', err.message);
+    console.error('Registration failed:', err);
     return res.status(500).json({
       success: false,
       message: 'Registration failed',
       error: err.message,
     });
+  } finally {
+    session.endSession();
   }
 };
 

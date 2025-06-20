@@ -1,6 +1,6 @@
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
-import validateOtpInput from "../../utils/validateOtpInputUtils.js"
+import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 
 const verifyOTP = async (req, res) => {
     try {
@@ -13,22 +13,29 @@ const verifyOTP = async (req, res) => {
         }
 
         let user = null;
-        if (email || phone) {
-            user = await userModel.findOne(email ? { email } : { phone });
+
+        if (email) {
+            user = await userModel.findOne({ email });
+        } else if (phone?.code && phone?.number) {
+
+            user = await userModel.findOne({
+                'phone.code': phone.code,
+                'phone.number': phone.number,
+            }); 
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid contact details' });
         }
 
-        // if (user_id && user && user._id.toString() !== user_id) {
-        //     return res.status(403).json({ success: false, message: 'Unauthorized user' });
-        // }
-
-        // Find the OTP record
+        // Build OTP query object correctly
         const otpQuery = {
-            contact: email || phone,
+            contact: email || phone?.number,
             otp,
             purpose,
             isUsed: false,
             expiresAt: { $gt: new Date() },
+            ...(phone?.number && phone?.code ? { code: phone.code } : {})
         };
+
         // if (user?._id) otpQuery.to = user._id;
 
         const otpRecord = await otpQueueModel.findOne(otpQuery);
@@ -36,6 +43,7 @@ const verifyOTP = async (req, res) => {
         if (!otpRecord) {
             return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
         }
+
         if (user) {
             if (purpose === 'verify-email') {
                 user.isEmailVerified = true;
@@ -44,29 +52,14 @@ const verifyOTP = async (req, res) => {
                 user.isPhoneVerified = true;
                 otpRecord.isUsed = true;
             }
-            await user.save()
+
+            await user.save();
         }
-        // Mark OTP as used
+
+        // Mark OTP as verified
         otpRecord.isVerified = true;
         await otpRecord.save();
 
-        // // Update user verification or create reset token
-        // if (user) {
-        //     if (purpose === 'verify-email') {
-        //         user.isEmailVerified = true;
-        //     } else if (purpose === 'verify-phone') {
-        //         user.isPhoneVerified = true;
-        //     } else if (purpose === 'reset-password') {
-        //         user.tokens = {
-        //             ...user.toObject().tokens,
-        //             reset_token: {
-        //                 value: randomUUID(),
-        //                 expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
-        //             }
-        //         };
-        //     }
-        //     await user.save();
-        // }
         const purposeMessages = {
             'reset-password': 'Password reset token generated successfully',
             'verify-email': 'Email verified successfully',
@@ -74,13 +67,13 @@ const verifyOTP = async (req, res) => {
             'login-email': 'Logged in with email successfully',
             'login-phone': 'Logged in with phone successfully',
         };
+
         return res.status(200).json({
             success: true,
             message: purposeMessages[purpose] || 'Action completed successfully',
             verification_id: otpRecord._id,
             // reset_token: user?.tokens?.reset_token?.value || undefined,
         });
-
 
     } catch (error) {
         console.error("verifyOTP error:", error);
