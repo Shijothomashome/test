@@ -1,7 +1,7 @@
 import { OTP_EXPIRY_MINUTES } from "../../config/index.js";
 import otpQueueModel from "../../models/otpQueueModel.js";
 import userModel from "../../models/userModel.js";
-import emailUtils from '../../utils/mailUtils.js'
+import emailUtils from "../../utils/mailUtils.js";
 import smsUtils from "../../utils/smsUtils.js";
 import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 
@@ -9,29 +9,27 @@ const sendOTP = async (req, res) => {
     try {
         const { email, phone, purpose } = req.body;
 
-        // Validate inputs
         const validationError = validateOtpInput({ email, phone, purpose });
         if (validationError) {
             return res.status(400).json({ success: false, message: validationError });
         }
 
         let user = null;
-        if (email || phone) {
-            user = await userModel.findOne(email ? { email } : { phone });
+
+        if (email) {
+            user = await userModel.findOne({ email });
+        } else if (phone?.code && phone?.number) {
+            user = await userModel.findOne({ phone: { code: phone.code, number: phone.number } });
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid contact details' });
         }
 
-        // if (user_id && user && user._id.toString() !== user_id) {
-        //     return res.status(403).json({ success: false, message: 'Unauthorized user' });
-        // }
-
-        // Check if OTP already exists and is valid
         const otpQuery = {
-            contact: email || phone,
             purpose,
             isUsed: false,
             expiresAt: { $gt: new Date() },
+            ...(email ? { contact: email } : { contact: phone.number, code: phone.code }),
         };
-        // if (user?._id) otpQuery.to = user._id;
 
         const existingOTP = await otpQueueModel.findOne(otpQuery);
         if (existingOTP) {
@@ -41,19 +39,19 @@ const sendOTP = async (req, res) => {
             });
         }
 
-        // Send OTP according to contact method
         let otp, result;
+
         if (email) {
             if (['reset-password', 'login-email'].includes(purpose) && !user) {
-                return res.status(400).json({ success: false, message: `User not found for ${purpose.split("-").join(" ")}` });
+                return res.status(400).json({ success: false, message: `User not found for ${purpose.replace("-", " ")}` });
             }
             if (['reset-password', 'login-email'].includes(purpose) && user && (!user.isEmailVerified && !user.isVerified)) {
                 return res.status(400).json({ success: false, message: 'Email is not verified' });
             }
-            if (user && user.isBlocked) {
+            if (user?.isBlocked) {
                 return res.status(403).json({ success: false, message: 'User is blocked' });
             }
-            if (user && user.isDeleted) {
+            if (user?.isDeleted) {
                 return res.status(410).json({ success: false, message: 'User account has been deleted' });
             }
 
@@ -64,15 +62,15 @@ const sendOTP = async (req, res) => {
             otp = result.otp;
         } else {
             if (['reset-password', 'login-phone'].includes(purpose) && !user) {
-                return res.status(400).json({ success: false, message: `User not found for  ${purpose.split("-").join(" ")}` });
+                return res.status(400).json({ success: false, message: `User not found for ${purpose.replace("-", " ")}` });
             }
             if (['reset-password', 'login-phone'].includes(purpose) && user && !user.isPhoneVerified) {
                 return res.status(400).json({ success: false, message: 'Phone is not verified' });
             }
-            if (user && user.isBlocked) {
+            if (user?.isBlocked) {
                 return res.status(403).json({ success: false, message: 'User is blocked' });
             }
-            if (user && user.isDeleted) {
+            if (user?.isDeleted) {
                 return res.status(410).json({ success: false, message: 'User account has been deleted' });
             }
 
@@ -83,11 +81,11 @@ const sendOTP = async (req, res) => {
             otp = result.otp;
         }
 
-        // Save OTP record
         await otpQueueModel.create({
             to: user?._id ?? undefined,
-            contact: email || phone,
             otp,
+            contact: email || phone.number,
+            code: phone?.code,
             purpose,
             isUsed: false,
             isVerified: false,
