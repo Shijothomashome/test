@@ -1,50 +1,20 @@
 import express from "express";
-import middlewares from "../middlewares/index.js";
+import validatorMiddleware from "../middlewares/validatorMiddleware.js";
 import categoryControllers from "../controllers/category/index.js";
 import categoryValidatorSchema from "../validators/index.js";
 import upload from "../config/multerConfig.js";
+import multerErrorHandler from "../middlewares/multerErrorHandler.js";
 
 const router = express.Router();
 
-// ==================== Admin Routes ====================
+// ADMIN ROUTES
+router.post("/admin/categories", upload.single("image"), multerErrorHandler, validatorMiddleware(categoryValidatorSchema.createCategoryByAdminSchema), categoryControllers.createCategoryByAdmin);
+router.get("/admin/categories", categoryControllers.getAllCategoriesForAdmin);
+router.put("/admin/categories/:id", upload.single("image"), multerErrorHandler, validatorMiddleware(categoryValidatorSchema.updateCategoryByAdminSchema), categoryControllers.updateCategoryByAdmin);
+router.patch("/admin/categories/:id/status", validatorMiddleware(categoryValidatorSchema.toggleCategoryStatusByAdminSchema), categoryControllers.updateCategoryStatusByAdmin);
+router.delete("/admin/categories/:id", validatorMiddleware(categoryValidatorSchema.deleteCategoryByAdminSchema), categoryControllers.deleteCategoryByAdmin);
 
-// Create new category
-router.post(
-  "/",
-  upload.single("image"),
-  middlewares.validatorMiddleware(categoryValidatorSchema.createCategorySchema),
-
-  categoryControllers.createCategory
-);
-
-// Update category
-router.put(
-  "/:id",
-  upload.single("image"),
-  middlewares.validatorMiddleware(categoryValidatorSchema.updateCategorySchema),
-  categoryControllers.updateCategory
-);
-
-// Toggle category active status
-router.patch(
-  "/:id/toggle-status",
-  middlewares.validatorMiddleware(categoryValidatorSchema.toggleCategorySchema),
-  categoryControllers.updateToggleStatus
-);
-
-// Delete category
-router.delete(
-  "/:id",
-  middlewares.validatorMiddleware(categoryValidatorSchema.deleteCategorySchema),
-  categoryControllers.deleteCategory
-);
-
-// Get all categories
-router.get("/", categoryControllers.getAllCategories);
-
-// ==================== User Routes ====================
-
-// Get parent and sub-categories (this will never be hit because the same route is already defined above)
-router.get("/user", categoryControllers.getSubandParentCategories);
+// USER ROUTES
+router.get("/categories", validatorMiddleware(categoryValidatorSchema.getAllCategoriesForUserQuerySchema), categoryControllers.getAllCategoriesForUser);
 
 export default router;

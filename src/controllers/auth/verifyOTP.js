@@ -4,7 +4,7 @@ import validateOtpInput from "../../utils/validateOtpInputUtils.js"
 
 const verifyOTP = async (req, res) => {
     try {
-        const { email, phone, otp, user_id, purpose } = req.body;
+        const { email, phone, otp, purpose } = req.body;
 
         // Validate inputs
         const validationError = validateOtpInput({ email, phone, purpose });
@@ -17,9 +17,9 @@ const verifyOTP = async (req, res) => {
             user = await userModel.findOne(email ? { email } : { phone });
         }
 
-        if (user_id && user && user._id.toString() !== user_id) {
-            return res.status(403).json({ success: false, message: 'Unauthorized user' });
-        }
+        // if (user_id && user && user._id.toString() !== user_id) {
+        //     return res.status(403).json({ success: false, message: 'Unauthorized user' });
+        // }
 
         // Find the OTP record
         const otpQuery = {
@@ -29,7 +29,7 @@ const verifyOTP = async (req, res) => {
             isUsed: false,
             expiresAt: { $gt: new Date() },
         };
-        if (user?._id) otpQuery.to = user._id;
+        // if (user?._id) otpQuery.to = user._id;
 
         const otpRecord = await otpQueueModel.findOne(otpQuery);
 
@@ -39,11 +39,12 @@ const verifyOTP = async (req, res) => {
         if (user) {
             if (purpose === 'verify-email') {
                 user.isEmailVerified = true;
+                otpRecord.isUsed = true;
             } else if (purpose === 'verify-phone') {
                 user.isPhoneVerified = true;
+                otpRecord.isUsed = true;
             }
             await user.save()
-             otpRecord.isUsed = true;
         }
         // Mark OTP as used
         otpRecord.isVerified = true;

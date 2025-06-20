@@ -1,16 +1,15 @@
-import createCategory from './createCategory.js';
-import updateCategory from './updateCategory.js';
-import updateToggleStatus from './updateTogglestatus.js';   
-import deleteCategory from './deleteCategory.js';
-import getAllCategories from './getAllCategories.js';
-import getSubandParentCategories from './getSubandParentCategories.js';
-
+import createCategoryByAdmin from "./createCategoryByAdmin.js";
+import getAllCategoriesForAdmin from "./getAllCategoriesForAdmin.js";
+import updateCategoryByAdmin from "./updateCategoryByAdmin.js";
+import updateCategoryStatusByAdmin from "./updateCategoryStatusByAdmin.js";
+import deleteCategoryByAdmin from "./deleteCategoryByAdmin.js";
+import getAllCategoriesForUser from "./getAllCategoriesForUser.js";
 
 export default {
-    createCategory,
-    updateCategory,
-    updateToggleStatus,
-    deleteCategory,
-    getAllCategories,
-    getSubandParentCategories
-}
+  createCategoryByAdmin,
+  updateCategoryByAdmin,
+  updateCategoryStatusByAdmin,
+  deleteCategoryByAdmin,
+  getAllCategoriesForAdmin,
+  getAllCategoriesForUser,
+};

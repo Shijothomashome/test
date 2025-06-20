@@ -1,6 +1,6 @@
 import { OTP_PURPOSES } from "../config/index.js";
 
-const validateOtpInput = ({ email, phone, purpose, user_id }) => {
+const validateOtpInput = ({ email, phone, purpose }) => {
     if (!OTP_PURPOSES.includes(purpose)) {
         return `Invalid purpose "${purpose}". Allowed values are: ${OTP_PURPOSES.join(', ')}`;
     }

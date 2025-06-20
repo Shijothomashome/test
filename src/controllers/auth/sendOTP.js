@@ -7,10 +7,10 @@ import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 
 const sendOTP = async (req, res) => {
     try {
-        const { email, phone, user_id, purpose } = req.body;
+        const { email, phone, purpose } = req.body;
 
         // Validate inputs
-        const validationError = validateOtpInput({ email, phone, purpose, user_id });
+        const validationError = validateOtpInput({ email, phone, purpose });
         if (validationError) {
             return res.status(400).json({ success: false, message: validationError });
         }
@@ -20,9 +20,9 @@ const sendOTP = async (req, res) => {
             user = await userModel.findOne(email ? { email } : { phone });
         }
 
-        if (user_id && user && user._id.toString() !== user_id) {
-            return res.status(403).json({ success: false, message: 'Unauthorized user' });
-        }
+        // if (user_id && user && user._id.toString() !== user_id) {
+        //     return res.status(403).json({ success: false, message: 'Unauthorized user' });
+        // }
 
         // Check if OTP already exists and is valid
         const otpQuery = {
@@ -31,7 +31,7 @@ const sendOTP = async (req, res) => {
             isUsed: false,
             expiresAt: { $gt: new Date() },
         };
-        if (user?._id) otpQuery.to = user._id;
+        // if (user?._id) otpQuery.to = user._id;
 
         const existingOTP = await otpQueueModel.findOne(otpQuery);
         if (existingOTP) {

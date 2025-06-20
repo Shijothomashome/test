@@ -1,16 +1,16 @@
-import { createBrand } from "./createBrand.js";
-import { DeleteBrand } from "./deleteBrand.js";
-import { getAllBrands } from "./getAllBrandsAdmin.js";
-import { getCustomerBrands } from "./getAllBrandUser.js";
-import { toggleBrandStatus } from "./toggleBrandStatus.js";
-import { updateBrand } from "./updateBrand.js";
+import createBrandByAdmin from "./createBrandByAdmin.js";
+import getAllBrandsForAdmin from "./getAllBrandsForAdmin.js";
+import updateBrandByAdmin from "./updateBrandByAdmin.js";
+import deleteBrandByAdmin from "./deleteBrandByAdmin.js";
+import toggleBrandStatusByAdmin from "./toggleBrandStatusByAdmin.js";
+import getAllBrandsForUser from "./getAllBrandsForUser.js";
 
 export default {
-    createBrand,
-    DeleteBrand,
-    getAllBrands, //Admin
-    getCustomerBrands,
-    toggleBrandStatus,
-    updateBrand,
+    createBrandByAdmin,
+    deleteBrandByAdmin,
+    getAllBrandsForAdmin, //Admin
+    getAllBrandsForUser,
+    toggleBrandStatusByAdmin,
+    updateBrandByAdmin,
 
 }

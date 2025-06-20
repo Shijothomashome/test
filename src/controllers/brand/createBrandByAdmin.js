@@ -1,20 +1,16 @@
 import brandModel from "../../models/brandModel.js";
 import s3Utils from "../../utils/s3Utils.js";
 
-export const createBrand = async (req, res) => {
+const createBrandByAdmin = async (req, res) => {
   try {
-    const { name } = req.body;
-
-  
-    if (!name || !name.trim()) {
-      return res.status(400).json({ success: false, message: "Brand name is required." });
-    }
-
+    const { isActive = true } = req.body;
+    const trimmedName = req.body.name?.trim();
 
     const existing = await brandModel.findOne({
-      name: name.trim(),
+      name: trimmedName,
       isDeleted: false,
     });
+
     if (existing) {
       return res.status(409).json({ success: false, message: "Brand name already exists." });
     }
@@ -25,8 +21,9 @@ export const createBrand = async (req, res) => {
     }
 
     const newBrand = new brandModel({
-      name: name.trim(),
+      name: trimmedName,
       logo: logoUrl,
+      isActive,
     });
 
     const savedBrand = await newBrand.save();
@@ -38,8 +35,12 @@ export const createBrand = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating brand:", error);
-    return res.status(500).json({ success: false, message: "Internal server error." });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message || "Something went wrong",
+    });
   }
 };
 
-export default createBrand;
+export default createBrandByAdmin;
