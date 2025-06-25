@@ -40,17 +40,17 @@ const router = express.Router();
 
 // Product CRUD routes
 router
-  .route("/")
+  .route("/products")
   .post(validate(createProductSchema), createProduct)
   .get(validate(productListSchema, { query: true }), getProducts);
 
 router
-  .route("/search")
+  .route("/products/search")
   .get(validate(productSearchSchema, { query: true }), searchProducts);
 
 // Variant management routes
 router
-  .route("/:id/variants")
+  .route("/products/:id/variants")
   .get(getProductVariants)
   .post(validate(variantSchema), addVariants)
   .put(validate(Joi.array().items(variantUpdateSchema)), updateVariants);
@@ -58,27 +58,27 @@ router
 // router.route("/generate-variants").post, generateVariants;
 
 router
-  .route("/:productId/variants/:variantId")
+  .route("/products/:productId/variants/:variantId")
   .get(getProductVariant)
   .put(validate(variantUpdateSchema), updateVariant);
 
 router
-  .route("/:productId/variant-groups/:groupValue")
+  .route("/products/:productId/variant-groups/:groupValue")
   .put(validate(variantGroupUpdateSchema), updateVariantGroup);
 
 // Product discovery routes
-router.route("/category/:categoryId").get(getProductsByCategory);
-router.route("/brand/:brandId").get(getProductsByBrand);
-router.route("/:productId/recommended").get(getRecommendedProducts);
-router.route("/:productId/similar").get(getSimilarProducts);
-// router.route("/best-selling").get(getBestSellingProducts);
-router.route("/featured").get(getFeaturedProducts);
+router.route("/products/category/:categoryId").get(getProductsByCategory);
+router.route("/products/brand/:brandId").get(getProductsByBrand);
+router.route("/products/:productId/recommended").get(getRecommendedProducts);
+router.route("/products/:productId/similar").get(getSimilarProducts);
+// router.route("/products/best-selling").get(getBestSellingProducts);
+router.route("/products/featured").get(getFeaturedProducts);
 
 
 // router.route('/:id/products/cached')
 //   .get(getCollectionProductsWithCache);
 
-router.route('/:id/convert')
+router.route('/products/:id/convert')
   .post(async (req, res) => {
     try {
       const collection = await convertCollectionType(
@@ -92,7 +92,7 @@ router.route('/:id/convert')
     }
   });
 
-router.route('/:id/suggest-rules')
+router.route('/products/:id/suggest-rules')
   .get(async (req, res) => {
     try {
       const rules = await suggestSmartCollectionRules(req.params.id);
@@ -103,7 +103,7 @@ router.route('/:id/suggest-rules')
   });
 
 router
-  .route("/:id")
+  .route("/products/:id")
   .get(getProductById)
   .put(validate(updateProductSchema), updateProduct)
   .delete(deleteProduct);

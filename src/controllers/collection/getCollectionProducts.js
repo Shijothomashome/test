@@ -51,14 +51,25 @@ export const getCollectionProducts = async (req, res) => {
       select: 'name price images slug variants'
     };
 
-    const products = await Product.paginate(
-      { 
-        collection_id: id,
-        isDeleted: false,
-        isActive: true 
-      },
-      options
-    );
+    const collection = await Collection.findById(id);
+    if (!collection) {
+      throw new Error("Collection not found", 404);
+    }
+
+    let products;
+    if (collection.collection_type === 'smart') {
+      const query = buildSmartCollectionQuery(collection.rules, collection.disjunctive);
+      products = await Product.paginate(query, options);
+    } else {
+      products = await Product.paginate(
+        { 
+          collection_id: id,
+          isDeleted: false,
+          isActive: true 
+        },
+        options
+      );
+    }
 
     res.status(200).json({
       success: true,

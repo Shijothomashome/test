@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
+import { initSmartCollections } from './services/collectionQueue.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,10 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use(API_PREFIX, apiRouter);
+
+await initSmartCollections().catch(err => {
+  console.error('Failed to initialize smart collections:', err);
+});
 
 // Connect DB and start server
 await connectDB();

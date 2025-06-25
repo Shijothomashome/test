@@ -10,17 +10,14 @@ export const createCollection = async (req, res) => {
   try {
     const collectionData = req.body;
 
-    // Validate required fields
     if (!collectionData.title) {
       throw new Error("Title is required");
     }
 
-    // Generate handle if not provided
     if (!collectionData.handle) {
       collectionData.handle = generateSlug(collectionData.title);
     }
 
-    // Validate smart collection rules
     if (collectionData.collection_type === 'smart' && 
         (!collectionData.rules || collectionData.rules.length === 0)) {
       throw new Error("Smart collections require rules");
@@ -37,16 +34,3 @@ export const createCollection = async (req, res) => {
     handleError(res, error);
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-

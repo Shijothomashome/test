@@ -17,8 +17,8 @@ router.use("/products", productRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/brands", brandRoutes);
 router.use("/product/attributes", productAttributeRoutes);
-router.use("/products", productsRoutes);
-router.use("/collections" , collectionRoutes)
+router.use("/", productsRoutes);
+router.use("/" , collectionRoutes)
 // router.use("/coupon",couponRoutes)
 router.use("/images", uploadRoutes);
 router.use("/coupons",couponRoutes)

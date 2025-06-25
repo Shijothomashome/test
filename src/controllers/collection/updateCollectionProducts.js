@@ -79,38 +79,32 @@ export const updateCollectionProducts = async (req, res) => {
     }
 
     const collection = await Collection.findById(id);
-
     if (!collection) {
       throw new Error("Collection not found", 404);
     }
 
-    // Prevent manual updates for smart collections
     if (collection.collection_type === 'smart') {
       throw new Error("Cannot manually update products in smart collections");
     }
 
     if (action === 'replace') {
-      // Remove this collection from all products first
       await Product.updateMany(
         { collection_id: id },
         { $unset: { collection_id: 1 } }
       );
       
-      // Set this collection for all specified products
       await Product.updateMany(
         { _id: { $in: products } },
         { collection_id: id }
       );
     } 
     else if (action === 'add') {
-      // Add this collection to specified products
       await Product.updateMany(
         { _id: { $in: products } },
         { collection_id: id }
       );
     } 
     else if (action === 'remove') {
-      // Remove this collection from specified products
       await Product.updateMany(
         { 
           _id: { $in: products },
@@ -119,6 +113,8 @@ export const updateCollectionProducts = async (req, res) => {
         { $unset: { collection_id: 1 } }
       );
     }
+
+    await collection.updateProductsCount();
 
     res.status(200).json({
       success: true,

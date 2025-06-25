@@ -93,6 +93,17 @@ export const updateProductCollections = async (req, res) => {
 
     await product.save();
 
+    // Update products count for both collections if needed
+    if (action === 'set' && product.collection_id) {
+      const oldCollection = await Collection.findById(product.collection_id);
+      if (oldCollection) await oldCollection.updateProductsCount();
+    }
+    
+    if (collectionId) {
+      const newCollection = await Collection.findById(collectionId);
+      if (newCollection) await newCollection.updateProductsCount();
+    }
+
     res.status(200).json({
       success: true,
       message: `Collection ${action} successful`,

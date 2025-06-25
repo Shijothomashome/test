@@ -33,7 +33,6 @@ export const getCollections = async (req, res) => {
 
     const collections = await Collection.paginate(filter, options);
 
-    // Add products_count to each collection
     const collectionsWithCount = await Promise.all(
       collections.docs.map(async collection => {
         const count = await Product.countDocuments({

@@ -40,7 +40,6 @@ export const getCollectionById = async (req, res) => {
       throw new Error("Collection not found", 404);
     }
 
-    // Get products count
     const products_count = await Product.countDocuments({
       collection_id: collection._id,
       isDeleted: false

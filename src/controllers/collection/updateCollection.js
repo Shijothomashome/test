@@ -13,21 +13,18 @@ export const updateCollection = async (req, res) => {
       throw new Error("Collection not found", 404);
     }
 
-    // Update fields
     collection.title = title || collection.title;
     collection.description = description || collection.description;
     collection.image = image || collection.image;
     collection.seo = seo || collection.seo;
     collection.status = status || collection.status;
 
-    // Handle handle update
     if (title && !req.body.handle) {
       collection.handle = generateSlug(title);
     } else if (req.body.handle) {
       collection.handle = req.body.handle;
     }
 
-    // Update rules if smart collection
     if (collection.collection_type === 'smart') {
       if (rules && rules.length > 0) {
         collection.rules = rules;

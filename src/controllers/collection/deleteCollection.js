@@ -39,7 +39,6 @@ export const deleteCollection = async (req, res) => {
       throw new Error("Collection not found", 404);
     }
 
-    // Remove collection reference from all products
     await Product.updateMany(
       { collection_id: collection._id },
       { $unset: { collection_id: 1 } }

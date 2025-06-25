@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";  // Importing mongoose-paginate-v2 for pagination support
+import mongoosePaginate from "mongoose-paginate-v2";
+import { setupCollectionHooks } from '../hooks/collectionHooks.js';
 
 const { Schema } = mongoose;
 
@@ -127,41 +128,75 @@ const collectionSchema = new Schema(
     shop_id: {
       type: Schema.Types.ObjectId,
       ref: "Shop",
-      // required: true,
     },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: { 
+      virtuals: true,
+      transform: function(doc, ret) {
+        delete ret.__v;
+        return ret;
+      }
+    },
+    toObject: { 
+      virtuals: true,
+      transform: function(doc, ret) {
+        delete ret.__v;
+        return ret;
+      }
+    },
   }
 );
 
-// Virtual for product relationship (not stored in DB)
+// Virtual for product relationship
 collectionSchema.virtual("products", {
   ref: "Product",
   localField: "_id",
   foreignField: "collection_id",
+  options: { sort: { createdAt: -1 } } // Example sorting
 });
 
-// Update timestamp before saving
-collectionSchema.pre("save", function (next) {
+// Indexes for better query performance
+collectionSchema.index({ handle: 1 }, { unique: true });
+collectionSchema.index({ collection_type: 1 });
+collectionSchema.index({ status: 1 });
+collectionSchema.index({ shop_id: 1 });
+
+// Document middleware
+collectionSchema.pre("save", function(next) {
+  if (this.isModified('title') && !this.isModified('handle')) {
+    this.handle = this.constructor.generateHandle(this.title);
+  }
   this.updated_at = new Date();
   next();
 });
 
-// Update products count when products are added/removed
-collectionSchema.methods.updateProductsCount = async function () {
+// Static methods
+collectionSchema.statics.generateHandle = function(title) {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+// Instance methods
+collectionSchema.methods.updateProductsCount = async function() {
   const Product = mongoose.model("Product");
   this.products_count = await Product.countDocuments({
     collection_id: this._id,
+    isDeleted: { $ne: true }
   });
   await this.save();
 };
 
-// Add the plugin to your schema before creating the model
+// Add pagination plugin
 collectionSchema.plugin(mongoosePaginate);
 
-const Collection = mongoose.model("Collection", collectionSchema);
+// Apply hooks to the schema
+setupCollectionHooks(collectionSchema);
 
+// Then create the model
+const Collection = mongoose.model("Collection", collectionSchema);
 export default Collection;
