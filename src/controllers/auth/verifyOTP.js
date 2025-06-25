@@ -36,7 +36,7 @@ const verifyOTP = async (req, res) => {
             ...(phone?.number && phone?.code ? { code: phone.code } : {})
         };
 
-        // if (user?._id) otpQuery.to = user._id;
+        if (user?._id) otpQuery.to = user._id;
 
         const otpRecord = await otpQueueModel.findOne(otpQuery);
 

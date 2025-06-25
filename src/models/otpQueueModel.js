@@ -2,11 +2,11 @@ import mongoose from 'mongoose';
 
 const otpQueueSchema = new mongoose.Schema(
   {
-    // to: {
-    //   ref: "User",
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   // required: true,
-    // },
+    to: {
+      ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      // required: true,
+    },
     otp: {
       type: String,
       required: true,
