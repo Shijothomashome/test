@@ -1,0 +1,53 @@
+name: Deploy to Server with PM2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH key for access to the server
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # Step 3: SSH into the server and deploy using PM2
+      - name: SSH into server and deploy using PM2
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            cd /home/ubuntu/e-com || exit
+
+            # Pull latest code
+            git pull origin main || exit
+
+            # Install dependencies
+            npm install || exit
+
+            # Build the project (if needed)
+            # npm run build || exit  # Uncomment if you use a build step
+
+            # Reload or start the app with PM2
+            pm2 start ecosystem.config.js --only medico || \
+            pm2 restart medico || \
+            pm2 start npm --name "medico" -- start || exit
+
+            # Save the PM2 process list
+            pm2 save
+
+            echo "Deployment complete!" || exit
+          EOF
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}

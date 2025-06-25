@@ -1,4 +1,4 @@
-
+// Middleware to validate request data using Joi schema
   const validatorMiddleware = (schema) => {
     return (req, res, next) => {
       const data = req.method === 'GET' ? req.query : req.body || {};      
