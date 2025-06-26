@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
-// import { initSmartCollections } from './services/collectionQueue.js';
+import { initSmartCollections } from './utils/collectionQueue.js';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
@@ -42,7 +42,6 @@ await connectDB();
 // Load Passport config (must come before routes)
 import './config/passport.js';
 import { JWT_SECRET } from "./config/index.js";
-import { initSmartCollections } from "./services/collectionQueue.js";
 
 // === MIDDLEWARE ===
 app.use(cors({
