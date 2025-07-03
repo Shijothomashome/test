@@ -1,236 +1,16 @@
 /**
  * @swagger
  * tags:
- *   name: Products
- *   description: Product management
+ *   name: Admin Products
+ *   description: Product management by admin
  */
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Product:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *           example: 507f1f77bcf86cd799439011
- *         name:
- *           type: string
- *           example: Premium T-Shirt
- *         slug:
- *           type: string
- *           example: premium-t-shirt
- *         description:
- *           type: string
- *           example: High quality cotton t-shirt
- *         category:
- *           type: string
- *           example: 507f1f77bcf86cd799439012
- *         brand:
- *           type: string
- *           example: 507f1f77bcf86cd799439013
- *         tags:
- *           type: array
- *           items:
- *             type: string
- *           example: ["men", "cotton", "summer"]
- *         thumbnail:
- *           type: string
- *           example: https://example.com/images/tshirt.jpg
- *         images:
- *           type: array
- *           items:
- *             type: string
- *           example: ["https://example.com/images/tshirt1.jpg", "https://example.com/images/tshirt2.jpg"]
- *         collection_ids:
- *           type: array
- *           items:
- *             type: string
- *           example: ["507f1f77bcf86cd799439014"]
- *         variantAttributes:
- *           type: array
- *           items:
- *             type: string
- *           example: ["507f1f77bcf86cd799439015"]
- *         hasVariants:
- *           type: boolean
- *           example: true
- *         variants:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/ProductVariant'
- *         basePrice:
- *           type: object
- *           properties:
- *             mrp:
- *               type: number
- *               example: 29.99
- *             sellingPrice:
- *               type: number
- *               example: 24.99
- *             costPrice:
- *               type: number
- *               example: 15.00
- *         minPrice:
- *           type: number
- *           example: 24.99
- *         maxPrice:
- *           type: number
- *           example: 34.99
- *         baseInventory:
- *           type: object
- *           properties:
- *             stock:
- *               type: number
- *               example: 100
- *             lowStockThreshold:
- *               type: number
- *               example: 10
- *             backorder:
- *               type: boolean
- *               example: false
- *             trackInventory:
- *               type: boolean
- *               example: true
- *         isFreeShipping:
- *           type: boolean
- *           example: false
- *         shippingClass:
- *           type: string
- *           enum: ["Standard", "Fragile", "Oversized", "Heavy", "Express", "Cold Storage", "Digital", "Custom"]
- *           example: "Standard"
- *         taxable:
- *           type: boolean
- *           example: true
- *         taxCode:
- *           type: string
- *           example: "CLOTHING"
- *         seo:
- *           type: object
- *           properties:
- *             title:
- *               type: string
- *             description:
- *               type: string
- *             keywords:
- *               type: array
- *               items:
- *                 type: string
- *         isActive:
- *           type: boolean
- *           example: true
- *         isFeatured:
- *           type: boolean
- *           example: false
- *         isDeleted:
- *           type: boolean
- *           example: false
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
- * 
- *     ProductVariant:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *           example: 507f1f77bcf86cd799439016
- *         attributes:
- *           type: array
- *           items:
- *             type: object
- *             properties:
- *               attribute:
- *                 type: string
- *                 example: "color"
- *               value:
- *                 type: string
- *                 example: "red"
- *         sku:
- *           type: string
- *           example: "TSHIRT-RED-M"
- *         price:
- *           type: object
- *           properties:
- *             mrp:
- *               type: number
- *               example: 29.99
- *             sellingPrice:
- *               type: number
- *               example: 24.99
- *             costPrice:
- *               type: number
- *               example: 15.00
- *         inventory:
- *           type: object
- *           properties:
- *             stock:
- *               type: number
- *               example: 50
- *             lowStockThreshold:
- *               type: number
- *               example: 5
- *             backorder:
- *               type: boolean
- *               example: false
- *             trackInventory:
- *               type: boolean
- *               example: true
- *         images:
- *           type: array
- *           items:
- *             type: string
- *           example: ["https://example.com/images/tshirt-red.jpg"]
- *         isActive:
- *           type: boolean
- *           example: true
- * 
- *     ProductListResponse:
- *       type: object
- *       properties:
- *         success:
- *           type: boolean
- *           example: true
- *         data:
- *           type: object
- *           properties:
- *             products:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
- *             pagination:
- *               type: object
- *               properties:
- *                 total:
- *                   type: number
- *                   example: 100
- *                 limit:
- *                   type: number
- *                   example: 10
- *                 page:
- *                   type: number
- *                   example: 1
- *                 pages:
- *                   type: number
- *                   example: 10
- *                 hasNextPage:
- *                   type: boolean
- *                   example: true
- *                 hasPrevPage:
- *                   type: boolean
- *                   example: false
- */
-
-/**
- * @swagger
- * /products:
+ * /product/admin/products:
  *   post:
  *     summary: Create a new product
- *     tags: [Products]
+ *     tags: [Admin Products]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -251,9 +31,132 @@
  *       401:
  *         description: Unauthorized
  * 
+ * /product/admin/products/{id}:
+ *   put:
+ *     summary: Update a product
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Product not found
+ *       401:
+ *         description: Unauthorized
+ * 
+ *   delete:
+ *     summary: Delete a product
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * /product/admin/products/{id}/convert:
+ *   post:
+ *     summary: Convert product collection type
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newType:
+ *                 type: string
+ *                 description: New collection type
+ *               rules:
+ *                 type: object
+ *                 description: Collection rules
+ *     responses:
+ *       200:
+ *         description: Collection type converted successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ * 
+ * /product/admin/products/{id}/suggest-rules:
+ *   get:
+ *     summary: Suggest smart collection rules
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: Suggested rules returned
+ *       404:
+ *         description: Product not found
+ *       401:
+ *         description: Unauthorized
+ */
+
+
+/**
+ * @swagger
+ * tags:
+ *   name: User Products
+ *   description: Product operations for users
+ */
+
+/**
+ * @swagger
+ * /product/products:
  *   get:
  *     summary: List all products
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: query
  *         name: page
@@ -305,14 +208,11 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ProductListResponse'
- */
-
-/**
- * @swagger
- * /products/search:
+ * 
+ * /product/products/search:
  *   get:
  *     summary: Search products
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: query
  *         name: query
@@ -349,14 +249,11 @@
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Product'
- */
-
-/**
- * @swagger
- * /products/{id}:
+ * 
+ * /product/products/{id}:
  *   get:
  *     summary: Get product by ID or slug
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: path
  *         name: id
@@ -374,65 +271,10 @@
  *       404:
  *         description: Product not found
  * 
- *   put:
- *     summary: Update product
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Product'
- *     responses:
- *       200:
- *         description: Product updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Product'
- *       400:
- *         description: Invalid input
- *       404:
- *         description: Product not found
- *       401:
- *         description: Unauthorized
- * 
- *   delete:
- *     summary: Delete a product
- *     tags: [Products]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     responses:
- *       200:
- *         description: Product deleted successfully
- *       404:
- *         description: Product not found
- *       401:
- *         description: Unauthorized
- */
-
-/**
- * @swagger
- * /products/category/{categoryId}:
+ * /product/products/category/{categoryId}:
  *   get:
  *     summary: Get products by category
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: path
  *         name: categoryId
@@ -472,14 +314,11 @@
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Product'
- */
-
-/**
- * @swagger
- * /products/brand/{brandId}:
+ * 
+ * /product/products/brand/{brandId}:
  *   get:
  *     summary: Get products by brand
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: path
  *         name: brandId
@@ -519,14 +358,11 @@
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Product'
- */
-
-/**
- * @swagger
- * /products/{productId}/recommended:
+ * 
+ * /product/products/{productId}/recommended:
  *   get:
  *     summary: Get recommended products
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: path
  *         name: productId
@@ -554,14 +390,11 @@
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Product'
- */
-
-/**
- * @swagger
- * /products/{productId}/similar:
+ * 
+ * /product/products/{productId}/similar:
  *   get:
  *     summary: Get similar products
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: path
  *         name: productId
@@ -589,14 +422,11 @@
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Product'
- */
-
-/**
- * @swagger
- * /products/featured:
+ * 
+ * /product/products/featured:
  *   get:
  *     summary: Get featured products
- *     tags: [Products]
+ *     tags: [User Products]
  *     parameters:
  *       - in: query
  *         name: limit
@@ -620,37 +450,20 @@
  *                     $ref: '#/components/schemas/Product'
  */
 
+
 /**
  * @swagger
- * /products/{id}/variants:
- *   get:
- *     summary: Get product variants
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     responses:
- *       200:
- *         description: List of product variants
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/ProductVariant'
- * 
- *   post:
+ * tags:
+ *   name: Admin Variants
+ *   description: Product variant management by admin
+ */
+
+/**
+ * @swagger
+ * /product/admin/products/{id}/variants:
+ *   put:
  *     summary: Add variants to product
- *     tags: [Products]
+ *     tags: [Admin Variants]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -669,14 +482,27 @@
  *     responses:
  *       200:
  *         description: Variants added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductVariant'
  *       400:
  *         description: Invalid input
  *       401:
  *         description: Unauthorized
  * 
- *   put:
+ *   patch:
  *     summary: Update multiple variants
- *     tags: [Products]
+ *     tags: [Admin Variants]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -697,44 +523,28 @@
  *     responses:
  *       200:
  *         description: Variants updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductVariant'
  *       400:
  *         description: Invalid input
  *       401:
  *         description: Unauthorized
- */
-
-/**
- * @swagger
- * /products/{productId}/variants/{variantId}:
- *   get:
- *     summary: Get product variant
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: productId
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *       - in: path
- *         name: variantId
- *         required: true
- *         schema:
- *           type: string
- *         description: Variant ID
- *     responses:
- *       200:
- *         description: Variant details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ProductVariant'
- *       404:
- *         description: Variant not found
  * 
+ * /product/admin/products/{productId}/variants/{variantId}:
  *   put:
- *     summary: Update product variant
- *     tags: [Products]
+ *     summary: Update a specific variant
+ *     tags: [Admin Variants]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -759,18 +569,21 @@
  *     responses:
  *       200:
  *         description: Variant updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductVariant'
  *       400:
  *         description: Invalid input
+ *       404:
+ *         description: Variant not found
  *       401:
  *         description: Unauthorized
- */
-
-/**
- * @swagger
- * /products/{productId}/variant-groups/{groupValue}:
+ * 
+ * /product/admin/products/{productId}/variant-groups/{groupValue}:
  *   put:
  *     summary: Update variant group
- *     tags: [Products]
+ *     tags: [Admin Variants]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -816,8 +629,86 @@
  *     responses:
  *       200:
  *         description: Variant group updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 updatedCount:
+ *                   type: number
  *       400:
  *         description: Invalid input
  *       401:
  *         description: Unauthorized
+ */
+
+
+
+/**
+ * @swagger
+ * tags:
+ *   name: User Variants
+ *   description: Product variant information for users
+ */
+
+/**
+ * @swagger
+ * /product/products/{id}/variants:
+ *   get:
+ *     summary: Get all variants for a product
+ *     tags: [User Variants]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *     responses:
+ *       200:
+ *         description: List of product variants
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductVariant'
+ *       404:
+ *         description: Product not found
+ * 
+ * /product/products/{productId}/variants/{variantId}:
+ *   get:
+ *     summary: Get specific variant details
+ *     tags: [User Variants]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product ID
+ *       - in: path
+ *         name: variantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Variant ID
+ *     responses:
+ *       200:
+ *         description: Variant details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductVariant'
+ *       404:
+ *         description: Variant not found
  */

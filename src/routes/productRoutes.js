@@ -39,46 +39,38 @@ import { getProductVariant } from "../controllers/variants/getProductVariant.js"
 const router = express.Router();
 
 // Product CRUD routes
-router
-  .route("/products")
-  .post(validate(createProductSchema), createProduct)
-  .get(validate(productListSchema, { query: true }), getProducts);
 
-router
-  .route("/products/search")
-  .get(validate(productSearchSchema, { query: true }), searchProducts);
 
-// Variant management routes
-router
-  .route("/products/:id/variants")
-  .get(getProductVariants)
-  .post(validate(variantSchema), addVariants)
-  .put(validate(Joi.array().items(variantUpdateSchema)), updateVariants);
+// router.get("/user/orders", getUserOrdersByUser);
 
-// router.route("/generate-variants").post, generateVariants;
+// Admin Routes
+router.post("/admin/products", validate(createProductSchema), createProduct);
+router.put("/admin/products/:id/variants", validate(variantSchema), addVariants);
+router.put("/admin/products/:id/variants", validate(Joi.array().items(variantUpdateSchema)), updateVariants);
+router.put("/admin/products/:productId/variants/:variantId", validate(variantUpdateSchema), updateVariant);
+router.put("/admin/products/:productId/variant-groups/:groupValue", validate(variantGroupUpdateSchema), updateVariantGroup);
+router.put("/admin/products/:id", validate(updateProductSchema), updateProduct);
+router.delete("/admin/products/:id", deleteProduct);
 
-router
-  .route("/products/:productId/variants/:variantId")
-  .get(getProductVariant)
-  .put(validate(variantUpdateSchema), updateVariant);
 
-router
-  .route("/products/:productId/variant-groups/:groupValue")
-  .put(validate(variantGroupUpdateSchema), updateVariantGroup);
-
-// Product discovery routes
-router.route("/products/category/:categoryId").get(getProductsByCategory);
-router.route("/products/brand/:brandId").get(getProductsByBrand);
-router.route("/products/:productId/recommended").get(getRecommendedProducts);
-router.route("/products/:productId/similar").get(getSimilarProducts);
-// router.route("/products/best-selling").get(getBestSellingProducts);
-router.route("/products/featured").get(getFeaturedProducts);
-
+// User Routes
+router.get("/products", validate(productListSchema, { query: true }), getProducts);
+router.get("/products/search", validate(productSearchSchema, { query: true }), searchProducts);
+router.get("/products/:id/variants", getProductVariants);
+router.get("/products/:productId/variants/:variantId", getProductVariant);
+router.get("/products/category/:categoryId", getProductsByCategory);
+router.get("/products/brand/:brandId", getProductsByBrand);
+router.get("/products/:productId/recommended", getRecommendedProducts);
+router.get("/products/:productId/similar", getProductVariant);
+// router.get("/products/best-selling", getBestSellingProducts);
+router.get("/products/featured", getFeaturedProducts);
+router.get("/products/:id", getProductById);
 
 // router.route('/:id/products/cached')
 //   .get(getCollectionProductsWithCache);
 
-router.route('/products/:id/convert')
+//Admin Product Collection Routes
+router.route('/admin/products/:id/convert')
   .post(async (req, res) => {
     try {
       const collection = await convertCollectionType(
@@ -92,7 +84,7 @@ router.route('/products/:id/convert')
     }
   });
 
-router.route('/products/:id/suggest-rules')
+router.route('/admin/products/:id/suggest-rules')
   .get(async (req, res) => {
     try {
       const rules = await suggestSmartCollectionRules(req.params.id);
@@ -102,10 +94,5 @@ router.route('/products/:id/suggest-rules')
     }
   });
 
-router
-  .route("/products/:id")
-  .get(getProductById)
-  .put(validate(updateProductSchema), updateProduct)
-  .delete(deleteProduct);
 
 export default router;

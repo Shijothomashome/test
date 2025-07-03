@@ -5,9 +5,16 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Your API Title',
+      title: 'Ecom API documentation',
       version: '1.0.0',
       description: 'API documentation using Swagger',
+
+      contact: {
+        name: 'API Support',
+        email: 'support@medico.oxiumev.com',
+        url: 'https://medico.oxiumev.com/support'
+      },
+      termsOfService: 'https://medico.oxiumev.com/terms'
     },
     servers: [
       {
