@@ -1,7 +1,7 @@
 // routes/uploadsRoutes.js
 import express from 'express';
 import { uploadImage, deleteImage } from '../controllers/imageUpload/uploadsController.js';
-import upload from "../middlewares/multer.js";
+import upload from "../config/multerConfig.js";
 
 const router = express.Router();
 

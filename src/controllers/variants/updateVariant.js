@@ -3,6 +3,9 @@
 //* @route   PUT /api/v1/products/:productId/variants/:variantId
 //* @access  Private (Admin)
 
+import { handleError } from "../../helpers/handleError.js";
+import productModel from "../../models/productModel.js";
+
 // This endpoint allows admins to update a specific variant of a product by its ID.
 // It validates the input, updates the variant data, and returns the updated variant.
 // Note: Ensure that the Product model has the necessary fields for variants.
@@ -13,7 +16,7 @@ export const updateVariant = async (req, res) => {
     const { productId, variantId } = req.params;
     const updateData = req.body;
 
-    const product = await Product.findById(productId);
+    const product = await productModel.findById(productId);
     if (!product) {
       return res.status(404).json({ 
         success: false, 

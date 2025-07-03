@@ -1,14 +1,4 @@
 import express from "express";
-// import {
-//   createCollection,
-//   deleteCollection,
-//   getCollectionById,
-//   getCollectionProducts,
-//   getCollections,
-//   updateCollection,
-//   updateCollectionProducts,
-//   updateProductCollections
-// } from "../controllers/collectionController.js";
 import { validate } from "../middlewares/validate.js";
 import {
   createCollectionSchema,
@@ -28,43 +18,16 @@ import { deleteCollection } from "../controllers/collection/deleteCollection.js"
 
 const router = express.Router();
 
-// Public routes
+// ADMIN routes
+router.get("/admin/collections/:id", getCollectionById);
+router.post("/admin/collections",  validate(createCollectionSchema),createCollection);
+router.put("/admin/collections/:id", validate(updateCollectionSchema), updateCollection);
+router.put("/admin/collections/:id/products", validate(updateCollectionProductsSchema), updateCollectionProducts);
+router.put("/admin/products/:productId/collections", updateProductCollections);
+router.delete("/admin/collections/:id", deleteCollection);
+
+// USER routes
 router.get("/collections", validate(collectionListSchema, { query: true }), getCollections);
-router.get("/collections/:id", getCollectionById);
 router.get("/collections/:id/products", getCollectionProducts);
-
-// Protected admin routes
-router.post("/collections", 
-  // authenticate, 
-  // authorize('admin'), 
-  validate(createCollectionSchema), 
-  createCollection
-);
-
-router.put("/admin/collections/:id", 
-  // authenticate, 
-  // authorize('admin'), 
-  validate(updateCollectionSchema), 
-  updateCollection
-);
-
-router.delete("/admin/collections/:id", 
-  // authenticate, 
-  // authorize('admin'), 
-  deleteCollection
-);
-
-router.put("/admin/collections/:id/products", 
-  // authenticate, 
-  // authorize('admin'), 
-  validate(updateCollectionProductsSchema), 
-  updateCollectionProducts
-);
-
-router.put("/admin/products/:productId/collections", 
-  // authenticate, 
-  // authorize('admin'), 
-  updateProductCollections
-);
 
 export default router;

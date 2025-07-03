@@ -3,6 +3,7 @@
 //* @route   GET /api/v1/products/:productId/variants/:variantId
 //* @access  Public
 
+import mongoose from "mongoose";
 import { handleError } from "../../helpers/handleError.js";
 import productModel from "../../models/productModel.js";
 

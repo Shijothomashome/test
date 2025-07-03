@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+const returnItemSchema = new mongoose.Schema({
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    variantId: { type: mongoose.Schema.Types.ObjectId },
+    originalQuantity: Number,
+    returnQuantity: Number,
+    returnReason: String,
+    returnStatus: { type: String, enum: ["REQUESTED", "APPROVED", "REJECTED", "RECEIVED"], default: "REQUESTED" },
+    price: Number
+}, { _id: false });
+
+const returnRequestSchema = new mongoose.Schema({
+    returnId: String,
+    items: [returnItemSchema],
+    status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED", "COMPLETED"], default: "PENDING" },
+    requestedAt: Date,
+    processedAt: Date,
+    reason: String,
+    paymentMethod: String,
+    refundAmount: Number,
+    refundId: String
+}, { _id: false });
+
 const orderItemSchema = new mongoose.Schema({
     productId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -62,15 +84,15 @@ const orderSchema = new mongoose.Schema({
     },
     orderNumber: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        default: `TEMP-${Date.now()}`
     },
     items: [orderItemSchema],
     shippingAddress: shippingAddressSchema,
     paymentDetails: paymentDetailsSchema,
     orderStatus: {
         type: String,
-        enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"],
+        enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURN_REQUESTED","RETURNED"],
         default: "PENDING"
     },
     subTotal: {
@@ -93,18 +115,28 @@ const orderSchema = new mongoose.Schema({
     deliveryDate: Date,
     trackingNumber: String,
     couponCode: String,
-    notes: String
+    notes: String,
+    returns: [returnRequestSchema]
 }, {
     timestamps: true
 });
 
 // Generate order number before saving
-orderSchema.pre("save", async function(next) {
-    if (!this.orderNumber) {
-        const count = await mongoose.models.Order.countDocuments();
-        this.orderNumber = `ORD${Date.now()}${count.toString().padStart(6, "0")}`;
+orderSchema.pre('save', async function(next) {
+    if (this.isNew && this.orderNumber.startsWith('TEMP-')) {
+        try {
+            const count = await this.constructor.countDocuments();
+            this.orderNumber = `ORD-${Date.now()}-${(count + 1).toString().padStart(6, '0')}`;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
     }
-    next();
 });
+
+// Create index for orderNumber
+orderSchema.index({ orderNumber: 1 }, { unique: true });
 
 export default mongoose.model("Order", orderSchema);

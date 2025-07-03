@@ -1,4 +1,4 @@
-import { scheduleSmartCollectionUpdate } from '../services/collectionQueue.js';
+import { scheduleSmartCollectionUpdate } from '../utils/collectionQueue.js';
 
 /**
  * Sets up Mongoose middleware for collections

@@ -10,6 +10,7 @@ const router = express.Router();
 // ADMIN ROUTES
 router.post("/admin/categories", upload.single("image"), multerErrorHandler, validatorMiddleware(categoryValidatorSchema.createCategoryByAdminSchema), categoryControllers.createCategoryByAdmin);
 router.get("/admin/categories", categoryControllers.getAllCategoriesForAdmin);
+router.get("/admin/categories/:id", categoryControllers.getCategoryByIdForAdmin);
 router.put("/admin/categories/:id", upload.single("image"), multerErrorHandler, validatorMiddleware(categoryValidatorSchema.updateCategoryByAdminSchema), categoryControllers.updateCategoryByAdmin);
 router.patch("/admin/categories/:id/status", validatorMiddleware(categoryValidatorSchema.toggleCategoryStatusByAdminSchema), categoryControllers.updateCategoryStatusByAdmin);
 router.delete("/admin/categories/:id", validatorMiddleware(categoryValidatorSchema.deleteCategoryByAdminSchema), categoryControllers.deleteCategoryByAdmin);

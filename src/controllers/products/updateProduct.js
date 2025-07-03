@@ -1,9 +1,8 @@
 import Product from "../../models/productModel.js";
-// import CollectionProduct from "../../models/collectionProductModel";
-// import { generateSlug } from "../../helpers/generateSlug";
-// import { generateSKU } from "../../helpers/generateSKU";
+import { generateSlug } from "../../helpers/generateSlug.js";
 import { handleError } from "../../helpers/handleError.js";
 import Collection from "../../models/collectionModel.js";
+import mongoose from "mongoose";
 
 //! Update a product
 //* @desc    Update a product by ID

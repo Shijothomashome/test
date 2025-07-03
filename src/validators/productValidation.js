@@ -1,7 +1,7 @@
-// this code snippet defines the validation schemas for product and variant data using Joi, 
-// a powerful schema description language and data validator for JavaScript. 
-// It includes validation for product attributes, variant generation, pricing rules, stock rules, 
-// and more, ensuring that the data adheres to the expected formats and constraints 
+// this code snippet defines the validation schemas for product and variant data using Joi,
+// a powerful schema description language and data validator for JavaScript.
+// It includes validation for product attributes, variant generation, pricing rules, stock rules,
+// and more, ensuring that the data adheres to the expected formats and constraints
 // before being processed or stored in a database.
 
 import Joi from "joi";
@@ -466,6 +466,40 @@ export const createProductSchema = Joi.object({
 // Update product schema
 export const updateProductSchema = Joi.object({
   ...baseProductSchema,
+  name: baseProductSchema.name.optional(),
+  slug: baseProductSchema.slug.optional(),
+  description: baseProductSchema.description.optional(),
+  shortDescription: baseProductSchema.shortDescription.optional(),
+  category: baseProductSchema.category.optional(),
+  brand: baseProductSchema.brand.optional(),
+  collection_id: baseProductSchema.collection_id.optional(),
+  tags: baseProductSchema.tags.optional(),
+  thumbnail: baseProductSchema.thumbnail.optional(),
+  images: baseProductSchema.images.optional(),
+  variantAttributes: baseProductSchema.variantAttributes.optional(),
+  selectedAttributeValues: baseProductSchema.selectedAttributeValues.optional(),
+  variantGroupBy: baseProductSchema.variantGroupBy.optional(),
+  variantGeneration: variantGenerationSchema.optional(),
+  hasVariants: baseProductSchema.hasVariants.optional(),
+  variants: Joi.array().items(variantSchema).optional().messages({
+    "array.base": "Variants must be an array",
+    "array.min": "At least one variant is required",
+  }),
+  basePrice: baseProductSchema.basePrice.optional(),
+  baseInventory: baseProductSchema.baseInventory.optional(),
+  minPrice: baseProductSchema.minPrice.optional(),
+  maxPrice: baseProductSchema.maxPrice.optional(),
+  isFreeShipping: baseProductSchema.isFreeShipping.optional(),
+  shippingClass: baseProductSchema.shippingClass.optional(),
+  taxable: baseProductSchema.taxable.optional(),
+  taxCode: baseProductSchema.taxCode.optional(),
+  seo: baseProductSchema.seo.optional(),
+  isActive: baseProductSchema.isActive.optional(),
+  isFeatured: baseProductSchema.isFeatured.optional(),
+  publishedAt: baseProductSchema.publishedAt.optional(),
+  isDeleted: baseProductSchema.isDeleted.optional(),
+  deletedAt: baseProductSchema.deletedAt.optional(),
+  deletionReason: baseProductSchema.deletionReason.optional(),
 })
   .min(1)
   .messages({
@@ -566,6 +600,15 @@ export const variantUpdateSchema = Joi.object({
   }).messages({
     "object.base": "Inventory must be an object",
   }),
+  images: Joi.array()
+    .items(
+      Joi.string().uri().messages({
+        "string.uri": "Image must be a valid URI",
+      })
+    )
+    .messages({
+      "array.base": "Images must be an array",
+    }),
   isActive: Joi.boolean(),
   isPublished: Joi.boolean(),
   customLabel: Joi.string().trim().max(100).messages({
@@ -677,14 +720,7 @@ export const productListSchema = Joi.object({
     "number.max": "Limit cannot be greater than 100",
   }),
   sort: Joi.string()
-    .valid(
-      "-createdAt",
-      "createdAt",
-      "-price",
-      "price",
-      "-name",
-      "name"
-    )
+    .valid("-createdAt", "createdAt", "-price", "price", "-name", "name")
     .default("-createdAt")
     .messages({
       "any.only": "Invalid sort value",

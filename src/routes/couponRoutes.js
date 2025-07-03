@@ -17,7 +17,7 @@ router.post("/admin/create-coupon",validatorMiddleware(couponValidatorSchemas.cr
  router.delete("/admin/delete/:id",validatorMiddleware(couponValidatorSchemas.deleteCouponSchema), couponController.deleteCoupon); 
 
 
-// //User Section
+//User Section
 
  router.get("/getallcoupons", couponController.listAvailableCoupons); 
 

@@ -1,7 +1,7 @@
 // controllers/uploadsController.js
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import s3client from '../../utilities/s3client.js';
 import { v4 as uuidv4 } from 'uuid';
+import s3client from '../../config/s3Client.js';
 
 export const uploadImage = async (req, res) => {
   try {

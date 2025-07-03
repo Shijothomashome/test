@@ -67,7 +67,7 @@ const nonGlobalAttributeValidation = Joi.object({
 });
 
 // Create attribute schema
-export const createAttributeSchema = Joi.object({
+const createAttributeSchema = Joi.object({
   ...baseAttributeSchema,
   name: baseAttributeSchema.name.required(),
   values: baseAttributeSchema.values.required(),
@@ -77,7 +77,7 @@ export const createAttributeSchema = Joi.object({
     categories: Joi.forbidden().messages({
       'any.unknown': 'Global attributes cannot have categories'
     })
-  }).concat(Joi.object().unknown(true)), // This allows other fields
+  }).concat(Joi.object().unknown(true)),
   otherwise: Joi.object({
     categories: baseAttributeSchema.categories.min(1).messages({
       'array.min': 'At least one category is required for non-global attributes'
@@ -87,7 +87,7 @@ export const createAttributeSchema = Joi.object({
 
 
 // Update attribute schema
-export const updateAttributeSchema = Joi.object({
+const updateAttributeSchema = Joi.object({
   name: baseAttributeSchema.name,
   values: baseAttributeSchema.values,
   isGlobal: baseAttributeSchema.isGlobal,
@@ -106,7 +106,7 @@ export const updateAttributeSchema = Joi.object({
 }).min(1);
 
 // Get attributes schema (for query params)
-export const getAttributesSchema = Joi.object({
+const getAttributesSchema = Joi.object({
   search: Joi.string().trim().empty('').messages({
     'string.base': 'Search query must be a string'
   }),
@@ -137,3 +137,11 @@ export const getAttributesSchema = Joi.object({
     'number.max': 'Limit must not exceed {#limit}'
   })
 });
+
+export default {
+  createAttributeSchema,
+  updateAttributeSchema,
+  getAttributesSchema,
+  globalAttributeValidation,
+  nonGlobalAttributeValidation
+}

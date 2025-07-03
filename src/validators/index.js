@@ -3,6 +3,7 @@ import categoryValidatorSchemas from './categoryValidatorSchemas.js';
 import brandValidatorSchemas from './brandValidatorSchemas.js';
 import wishlistItemValidator from './whishlistValidator.js';
 import couponValidatorSchemas from './couponValidatorSchemas.js';
+import attributeValidation from './attributeValidation.js';
 
 export default {
   ...userValidatorSchemas,
@@ -10,4 +11,5 @@ export default {
   ...brandValidatorSchemas,
   ...wishlistItemValidator,
   ...couponValidatorSchemas,
+  ...attributeValidation
 };
