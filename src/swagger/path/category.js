@@ -87,6 +87,74 @@
  */
 
 //
+// ─── GET CATEGORY BY ID (ADMIN) ─────────────────────────────────────────────
+//
+/**
+ * @swagger
+ * /admin/categories/{id}:
+ *   get:
+ *     summary: Get details of a single category by ID (admin)
+ *     tags: [Admin - Categories]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the category to retrieve
+ *     responses:
+ *       200:
+ *         description: Category details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     isActive:
+ *                       type: boolean
+ *                     isDeleted:
+ *                       type: boolean
+ *                     parentCategoryId:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         image:
+ *                           type: string
+ *                         isActive:
+ *                           type: boolean
+ *                         isDeleted:
+ *                           type: boolean
+ *                     image:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                     updatedAt:
+ *                       type: string
+ *                     subCategoriesCount:
+ *                       type: integer
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+//
 // ─── GET ALL CATEGORIES (ADMIN) ─────────────────────────────────────────────
 //
 /**

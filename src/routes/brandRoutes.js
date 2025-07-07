@@ -9,11 +9,12 @@ const router = express.Router();
 // ADMIN ROUTES
 router.post("/admin/brands", upload.single("image"), multerErrorHandler, validatorMiddleware(brandValidatorSchemas.createBrandByAdminSchema), brandController.createBrandByAdmin);
 router.get("/admin/brands", validatorMiddleware(brandValidatorSchemas.getAllBrandsForAdminQuerySchema), brandController.getAllBrandsForAdmin);
+router.get("/admin/brands/:id", validatorMiddleware(brandValidatorSchemas.getBrandByIdSchema), brandController.getBrandByIdForAdmin);
 router.put("/admin/brands/:id", upload.single("image"), validatorMiddleware(brandValidatorSchemas.updateBrandSchemaByAdmin), brandController.updateBrandByAdmin);
 router.delete("/admin/brands/:id", validatorMiddleware(brandValidatorSchemas.deleteBrandByAdminSchema), brandController.deleteBrandByAdmin);
 router.patch("/admin/brands/:id/status", validatorMiddleware(brandValidatorSchemas.toggleBrandStatusByAdminSchema), brandController.toggleBrandStatusByAdmin);
 
 // CUSTOMER ROUTES
 router.get("/brands", validatorMiddleware(brandValidatorSchemas.getAllBrandsForUserQuerySchema), brandController.getAllBrandsForUser);
-
+//brands/:id
 export default router;

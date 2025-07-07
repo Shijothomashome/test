@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
+import { initSmartCollections } from './utils/collectionQueue.js';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
@@ -72,6 +73,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // === STATIC ===
 app.use(express.static(path.join(__dirname, "public")));
 
+
+
+// Root path => show the static homepage
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index.html"));
 });
@@ -86,6 +90,13 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ success: false, message: "Something went wrong" });
 });
+
+await initSmartCollections().catch(err => {
+  console.error('Failed to initialize smart collections:', err);
+});
+
+// Connect DB and start server
+await connectDB();
 
 
 // === START SERVER ===

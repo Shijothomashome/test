@@ -1,0 +1,455 @@
+//! This file handles the creation of a product in the e-commerce system.
+//! in this file , products id will save to collection products model
+//! This is the main controller for creating products, handling variants, and managing collections.
+
+
+// import Product from "../../models/productModel.js";
+// import { generateSlug } from "../../helpers/generateSlug.js";
+// import { generateSKU } from "../../helpers/generateSKU.js";
+// import { handleError } from "../../helpers/handleError.js";
+// import {
+//   generateVariantCombinations,
+//   calculateVariantPrice,
+//   calculateVariantStock,
+// } from "../../helpers/variantHelper.js";
+// import mongoose from "mongoose";
+
+// export const createProduct = async (req, res) => {
+//   try {
+//     const productData = req.body;
+
+//     // Validate required fields
+//     if (!productData.name || !productData.category) {
+//       throw new Error("Name and category are required");
+//     }
+
+//     // Generate slug if not provided
+//     if (!productData.slug) {
+//       productData.slug = generateSlug(productData.name);
+//     }
+
+//     // Calculate min/max prices if not provided
+//     if (!productData.minPrice || !productData.maxPrice) {
+//       productData.minPrice = productData.basePrice?.sellingPrice || 0;
+//       productData.maxPrice = productData.basePrice?.sellingPrice || 0;
+//     }
+
+//     // Handle variant generation if needed
+//     if (productData.variantAttributes?.length > 0) {
+//       const attributes = await mongoose
+//         .model("Attribute")
+//         .find({
+//           _id: { $in: productData.variantAttributes },
+//           isVariantAttribute: true,
+//         })
+//         .lean();
+
+//       if (attributes.length > 0) {
+//         // Transform selectedAttributeValues from object to array format for DB storage
+//         if (productData.selectedAttributeValues) {
+//           productData.selectedAttributeValues = Object.entries(productData.selectedAttributeValues).map(
+//             ([attributeId, values]) => ({
+//               attribute: attributeId,
+//               values: values
+//             })
+//           );
+//         }
+
+//         // Validate selected values if provided
+//         if (productData.selectedAttributeValues) {
+//           for (const selectedAttr of productData.selectedAttributeValues) {
+//             const attribute = attributes.find(
+//               (a) => a._id.toString() === selectedAttr.attribute.toString()
+//             );
+//             if (!attribute) {
+//               throw new Error(`Attribute ${selectedAttr.attribute} not found`);
+//             }
+
+//             const invalidValues = selectedAttr.values.filter(
+//               (val) => !attribute.values.includes(val)
+//             );
+
+//             if (invalidValues.length > 0) {
+//               throw new Error(
+//                 `Invalid values for attribute ${
+//                   attribute.name
+//                 }: ${invalidValues.join(", ")}`
+//               );
+//             }
+//           }
+//         }
+
+//         const attrValuePairs = attributes.map((attr) => {
+//           // Find selected values for this attribute if they exist
+//           const selectedValues = productData.selectedAttributeValues?.find(
+//             (sa) => sa.attribute.toString() === attr._id.toString()
+//           );
+
+//           // Use selectedValues if provided, otherwise use all values
+//           const valuesToUse = selectedValues?.values || attr.values;
+
+//           if (!valuesToUse || valuesToUse.length === 0) {
+//             throw new Error(`No values selected for attribute ${attr.name}`);
+//           }
+
+//           return {
+//             attribute: attr._id,
+//             values: valuesToUse,
+//             name: attr.name,
+//           };
+//         });
+
+//         const newCombinations = generateVariantCombinations(
+//           attrValuePairs,
+//           productData.variantGroupBy
+//         );
+
+//         if (productData.variantGeneration?.autoGenerate) {
+//           productData.variants = await Promise.all(
+//             newCombinations.map(async (combo) => {
+//               // Calculate variant price based on pricing strategy
+//               const variantPrice = calculateVariantPrice(
+//                 productData.variantGeneration,
+//                 combo.attributes
+//               );
+
+//               // Calculate stock based on stock rules
+//               const variantStock = calculateVariantStock(
+//                 productData.variantGeneration,
+//                 combo.attributes,
+//                 productData.variantGeneration.initialStock || 0
+//               );
+
+//               return {
+//                 attributes: combo.attributes,
+//                 variantGroup: combo.variantGroup,
+//                 sku: generateSKU(productData.name, combo.attributes),
+//                 price: {
+//                   mrp: variantPrice.mrp,
+//                   sellingPrice: variantPrice.sellingPrice,
+//                   costPrice:
+//                     variantPrice.costPrice || variantPrice.sellingPrice * 0.8,
+//                 },
+//                 inventory: {
+//                   stock: variantStock,
+//                   lowStockThreshold:
+//                     variantStock > 0
+//                       ? productData.baseInventory?.lowStockThreshold || 5
+//                       : 0,
+//                   backorder: productData.baseInventory?.backorder || false,
+//                   trackInventory:
+//                     productData.baseInventory?.trackInventory !== false,
+//                 },
+//                 images: [],
+//                 isActive: true,
+//                 isPublished: true,
+//               };
+//             })
+//           );
+
+//           // Update min/max prices based on variants
+//           if (productData.variants.length > 0) {
+//             const prices = productData.variants.map(
+//               (v) => v.price.sellingPrice
+//             );
+//             productData.minPrice = Math.min(...prices);
+//             productData.maxPrice = Math.max(...prices);
+//           }
+
+//           productData.hasVariants = true;
+//         }
+//       }
+//     }
+
+//     // Set hasVariants if variants are provided manually
+//     if (!productData.hasVariants && productData.variants?.length > 0) {
+//       productData.hasVariants = true;
+//       // Update min/max prices for manual variants
+//       const prices = productData.variants.map((v) => v.price.sellingPrice);
+//       productData.minPrice = Math.min(...prices);
+//       productData.maxPrice = Math.max(...prices);
+//     }
+
+//     // Create the product
+//     const product = new Product(productData);
+//     await product.save();
+
+//     res.status(201).json({
+//       success: true,
+//       data: product,
+//     });
+//   } catch (error) {
+//     handleError(res, error);
+//   }
+// };
+
+
+
+import Product from "../../models/productModel.js";
+import Collection from "../../models/collectionModel.js";
+import { generateSlug } from "../../helpers/generateSlug.js";
+import { generateSKU } from "../../helpers/generateSKU.js";
+import { handleError } from "../../helpers/handleError.js";
+import {
+  generateVariantCombinations,
+  calculateVariantPrice,
+  calculateVariantStock,
+} from "../../helpers/variantHelper.js";
+import mongoose from "mongoose";
+
+/**
+ * Updates collections with new product information
+ * @param {Array} collectionIds - Array of collection IDs
+ * @param {string} productId - Product ID to add
+ */
+const updateProductCollections = async (collectionIds, productId) => {
+  if (!collectionIds || collectionIds.length === 0) return;
+  
+  // Add product to collections
+  await Collection.updateMany(
+    { _id: { $in: collectionIds } },
+    { $addToSet: { products: productId } }
+  );
+  
+  // Update products count in collections
+  const collections = await Collection.find({ _id: { $in: collectionIds } });
+  await Promise.all(collections.map(collection => collection.updateProductsCount()));
+};
+
+/**
+ * Validates collection IDs exist and are active
+ * @param {Array} collectionIds - Array of collection IDs
+ * @throws {Error} If any collection is invalid
+ */
+const validateCollections = async (collectionIds) => {
+  if (!collectionIds || collectionIds.length === 0) return;
+  
+  const collections = await Collection.find({
+    _id: { $in: collectionIds },
+    status: 'active'
+  });
+  
+  if (collections.length !== collectionIds.length) {
+    const foundIds = collections.map(c => c._id.toString());
+    const missingIds = collectionIds.filter(id => !foundIds.includes(id.toString()));
+    throw new Error(`Invalid or inactive collections: ${missingIds.join(', ')}`);
+  }
+};
+
+export const createProduct = async (req, res) => {
+  try {
+    const productData = req.body;
+
+    // Validate required fields
+    if (!productData.name || !productData.category) {
+      throw new Error("Name and category are required");
+    }
+
+    // Validate collections if provided
+    if (productData.collection_ids) {
+      await validateCollections(productData.collection_ids);
+    }
+
+    // Generate slug if not provided
+    if (!productData.slug) {
+      productData.slug = generateSlug(productData.name);
+    }
+
+    // Calculate min/max prices if not provided
+    if (!productData.minPrice || !productData.maxPrice) {
+      productData.minPrice = productData.basePrice?.sellingPrice || 0;
+      productData.maxPrice = productData.basePrice?.sellingPrice || 0;
+    }
+
+    // Handle variant generation if needed
+    if (productData.variantAttributes?.length > 0) {
+      const attributes = await mongoose
+        .model("Attribute")
+        .find({
+          _id: { $in: productData.variantAttributes },
+          isVariantAttribute: true,
+        })
+        .lean();
+
+      if (attributes.length > 0) {
+        // Transform selectedAttributeValues from object to array format for DB storage
+        if (productData.selectedAttributeValues) {
+          productData.selectedAttributeValues = Object.entries(productData.selectedAttributeValues).map(
+            ([attributeId, values]) => ({
+              attribute: attributeId,
+              values: values
+            })
+          );
+        }
+
+        // Validate selected values if provided
+        if (productData.selectedAttributeValues) {
+          for (const selectedAttr of productData.selectedAttributeValues) {
+            const attribute = attributes.find(
+              (a) => a._id.toString() === selectedAttr.attribute.toString()
+            );
+            if (!attribute) {
+              throw new Error(`Attribute ${selectedAttr.attribute} not found`);
+            }
+
+            const invalidValues = selectedAttr.values.filter(
+              (val) => !attribute.values.includes(val)
+            );
+
+            if (invalidValues.length > 0) {
+              throw new Error(
+                `Invalid values for attribute ${
+                  attribute.name
+                }: ${invalidValues.join(", ")}`
+              );
+            }
+          }
+        }
+
+        const attrValuePairs = attributes.map((attr) => {
+          // Find selected values for this attribute if they exist
+          const selectedValues = productData.selectedAttributeValues?.find(
+            (sa) => sa.attribute.toString() === attr._id.toString()
+          );
+
+          // Use selectedValues if provided, otherwise use all values
+          const valuesToUse = selectedValues?.values || attr.values;
+
+          if (!valuesToUse || valuesToUse.length === 0) {
+            throw new Error(`No values selected for attribute ${attr.name}`);
+          }
+
+          return {
+            attribute: attr._id,
+            values: valuesToUse,
+            name: attr.name,
+          };
+        });
+
+        const newCombinations = generateVariantCombinations(
+          attrValuePairs,
+          productData.variantGroupBy
+        );
+
+        if (productData.variantGeneration?.autoGenerate) {
+          productData.variants = await Promise.all(
+            newCombinations.map(async (combo) => {
+              // Calculate variant price based on pricing strategy
+              const variantPrice = calculateVariantPrice(
+                productData.variantGeneration,
+                combo.attributes
+              );
+
+              // Calculate stock based on stock rules
+              const variantStock = calculateVariantStock(
+                productData.variantGeneration,
+                combo.attributes,
+                productData.variantGeneration.initialStock || 0
+              );
+
+              return {
+                attributes: combo.attributes,
+                variantGroup: combo.variantGroup,
+                sku: generateSKU(productData.name, combo.attributes),
+                price: {
+                  mrp: variantPrice.mrp,
+                  sellingPrice: variantPrice.sellingPrice,
+                  costPrice:
+                    variantPrice.costPrice || variantPrice.sellingPrice * 0.8,
+                },
+                inventory: {
+                  stock: variantStock,
+                  lowStockThreshold:
+                    variantStock > 0
+                      ? productData.baseInventory?.lowStockThreshold || 5
+                      : 0,
+                  backorder: productData.baseInventory?.backorder || false,
+                  trackInventory:
+                    productData.baseInventory?.trackInventory !== false,
+                },
+                images: [],
+                isActive: true,
+                isPublished: true,
+              };
+            })
+          );
+
+          // Update min/max prices based on variants
+          if (productData.variants.length > 0) {
+            const prices = productData.variants.map(
+              (v) => v.price.sellingPrice
+            );
+            productData.minPrice = Math.min(...prices);
+            productData.maxPrice = Math.max(...prices);
+          }
+
+          productData.hasVariants = true;
+        }
+      }
+    }
+
+    // Set hasVariants if variants are provided manually
+    if (!productData.hasVariants && productData.variants?.length > 0) {
+      productData.hasVariants = true;
+      // Update min/max prices for manual variants
+      const prices = productData.variants.map((v) => v.price.sellingPrice);
+      productData.minPrice = Math.min(...prices);
+      productData.maxPrice = Math.max(...prices);
+    }
+
+    // Create the product
+    const product = new Product(productData);
+    await product.save();
+
+    // Update collections with this product
+    if (productData.collection_ids) {
+      await updateProductCollections(productData.collection_ids, product._id);
+    }
+
+    res.status(201).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+/**
+ * Updates product collections (for use in updateProduct controller)
+ * @param {string} productId - Product ID
+ * @param {Array} newCollectionIds - New collection IDs
+ * @param {Array} oldCollectionIds - Previous collection IDs
+ */
+export const syncProductCollections = async (productId, newCollectionIds = [], oldCollectionIds = []) => {
+  // Convert to strings for comparison
+  const newIds = newCollectionIds.map(id => id.toString());
+  const oldIds = oldCollectionIds.map(id => id.toString());
+  
+  // Find collections to add and remove
+  const collectionsToAdd = newIds.filter(id => !oldIds.includes(id));
+  const collectionsToRemove = oldIds.filter(id => !newIds.includes(id));
+  
+  // Add to new collections
+  if (collectionsToAdd.length > 0) {
+    await Collection.updateMany(
+      { _id: { $in: collectionsToAdd } },
+      { $addToSet: { products: productId } }
+    );
+  }
+  
+  // Remove from old collections
+  if (collectionsToRemove.length > 0) {
+    await Collection.updateMany(
+      { _id: { $in: collectionsToRemove } },
+      { $pull: { products: productId } }
+    );
+  }
+  
+  // Update counts for all affected collections
+  const affectedCollections = [...collectionsToAdd, ...collectionsToRemove];
+  if (affectedCollections.length > 0) {
+    const collections = await Collection.find({ _id: { $in: affectedCollections } });
+    await Promise.all(collections.map(collection => collection.updateProductsCount()));
+  }
+};

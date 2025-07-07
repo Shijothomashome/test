@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
@@ -10,13 +9,14 @@ const categorySchema = new mongoose.Schema({
     },
     image: { type: String },
     isActive: { type: Boolean, default: true },
-
     // Soft delete fields
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
-    deletionReason: { type: String }
-}, {
-    timestamps: true
-});
+    deletionReason: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.model("Category", categorySchema);
