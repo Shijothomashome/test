@@ -11,8 +11,39 @@ const getCart = async (req, res) => {
             {
                 $lookup: {
                     from: "products",
-                    localField: "items.productId",
-                    foreignField: "_id",
+                    let: { productId: "$items.productId" },
+                    pipeline: [
+                        { 
+                            $match: { 
+                                $expr: { $eq: ["$_id", "$$productId"] } 
+                            } 
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                slug: 1,
+                                description: 1,
+                                shortDescription: 1,
+                                category: 1,
+                                brand: 1,
+                                tags: 1,
+                                thumbnail: 1,
+                                images: 1,
+                                basePrice: 1,
+                                baseInventory: 1,
+                                isFreeShipping: 1,
+                                shippingClass: 1,
+                                taxable: 1,
+                                variants: {
+                                    $filter: {
+                                        input: "$variants",
+                                        as: "variant",
+                                        cond: { $eq: ["$$variant._id", "$items.variantId"] }
+                                    }
+                                }
+                            }
+                        }
+                    ],
                     as: "product"
                 }
             },
@@ -21,19 +52,25 @@ const getCart = async (req, res) => {
                 $addFields: {
                     "items.product": {
                         $mergeObjects: [
-                            "$product",
                             {
-                                selectedVariant: {
-                                    $first: {
-                                        $filter: {
-                                            input: "$product.variants",
-                                            as: "variant",
-                                            cond: {
-                                                $eq: ["$$variant._id", "$items.variantId"]
-                                            }
-                                        }
-                                    }
-                                }
+                                _id: "$product._id",
+                                name: "$product.name",
+                                slug: "$product.slug",
+                                description: "$product.description",
+                                shortDescription: "$product.shortDescription",
+                                category: "$product.category",
+                                brand: "$product.brand",
+                                tags: "$product.tags",
+                                thumbnail: "$product.thumbnail",
+                                images: "$product.images",
+                                basePrice: "$product.basePrice",
+                                baseInventory: "$product.baseInventory",
+                                isFreeShipping: "$product.isFreeShipping",
+                                shippingClass: "$product.shippingClass",
+                                taxable: "$product.taxable"
+                            },
+                            {
+                                selectedVariant: { $arrayElemAt: ["$product.variants", 0] }
                             }
                         ]
                     }

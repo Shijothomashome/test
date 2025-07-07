@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000/api/v1', // change as per your setup
+        url: 'http://localhost:5000/api/v1', // change as per your setup
       },
       {
         url: 'https://medico.oxiumev.com/api/v1', // change as per your setup
