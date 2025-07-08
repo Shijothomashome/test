@@ -8,42 +8,42 @@ const router = express.Router();
 
 // Admin Section - Requires admin role
 router.post("/admin/coupons",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(couponValidatorSchemas.createCouponSchema),
   couponController.createCoupon
 );
 
 router.get("/admin/coupons",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   couponController.getAllCoupons
 );
 
 router.put("/admin/coupons/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(couponValidatorSchemas.updateCouponSchema),
   couponController.updateCoupon
 );
 
 router.patch("/admin/coupons/toggle/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(couponValidatorSchemas.toggleStatusSchema),
   couponController.toggleCouponStatus
 );
 
 router.delete("/admin/coupons/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(couponValidatorSchemas.deleteCouponSchema),
   couponController.deleteCoupon
 );
 
 // User Section - Requires authentication
 router.get("/coupons",
-  authenticate(),
+//   authenticate(),
   couponController.listAvailableCoupons
 );
 
 router.post("/coupons/validate",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(couponValidatorSchemas.validateCouponCodeSchema),
   couponController.validateCouponCode
 );

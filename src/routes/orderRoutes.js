@@ -15,43 +15,43 @@ const router = express.Router();
 
 // User routes - require authentication
 router.get("/user/orders", 
-    authenticate(),
+    // authenticate(),
     getUserOrdersByUser
 );
 
 router.get("/user/orders/:orderId", 
-    authenticate(),
+    // authenticate(),
     getOrderByUser
 );
 
 router.put("/user/orders/:orderId/cancel", 
-    authenticate(),
+    // authenticate(),
     cancelOrderByUser
 );
 
 router.get("/user/orders/:orderId/track", 
-    authenticate(),
+    // authenticate(),
     trackOrderByUser
 );
 
 router.post("/user/orders/:orderId/return", 
-    authenticate(),
+    // authenticate(),
     returnOrderByUser
 );
 
 // Admin routes - require admin privileges
 router.get("/admin/orders", 
-    authenticate(['admin']),
+    // authenticate(['admin']),
     getAllOrdersByAdmin
 );
 
 router.put("/admin/orders/:orderId/status", 
-    authenticate(['admin']),
+    // authenticate(['admin']),
     updateOrderStatusByAdmin
 );
 
 router.get("/admin/orders/analytics", 
-    authenticate(['admin']),
+    // authenticate(['admin']),
     getOrderAnalyticsByAdmin
 );
 

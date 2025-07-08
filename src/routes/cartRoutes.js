@@ -8,27 +8,31 @@ import authenticate from "../middlewares/authenticate.js";
 // All cart routes require authentication (no specific role required)
 router.post(
   "/cart",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(cartValidatorSchema.cartItemsSchema),
   cartControllers.createCart
 );
 
-router.get("/cart", authenticate(), cartControllers.getCart);
+router.get("/cart", 
+    // authenticate(), 
+    cartControllers.getCart);
 
 router.put(
   "/cart/items",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(cartValidatorSchema.cartItemsSchema),
   cartControllers.updateCartItemQty
 );
 
 router.delete(
   "/cart/items",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(cartValidatorSchema.cartItemDeleteSchema),
   cartControllers.deleteCartItems
 );
 
-router.delete("/cart/clear", authenticate(), cartControllers.deleteCart);
+router.delete("/cart/clear", 
+    // authenticate(), 
+    cartControllers.deleteCart);
 
 export default router;

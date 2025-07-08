@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Route 1: Initiate Checkout (COD or Online Payment) - Requires authentication
 router.post("/checkout",
-  authenticate(),  // Only authenticated users can initiate checkout
+//   authenticate(),  // Only authenticated users can initiate checkout
   initiateCheckout
 );
 
