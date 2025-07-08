@@ -1,27 +1,48 @@
-import express from 'express'
-import offerControllers from '../controllers/offer/index.js'
+import express from 'express';
+import offerControllers from '../controllers/offer/index.js';
 import offerValidatorSchemas from "../validators/index.js";
 import middlewares from "../middlewares/index.js";
-
+import authenticate from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
-//create offer
-router.post('/admin/create', middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), offerControllers.createOffer);
+// ADMIN ROUTES
+// Create offer - Admin only
+router.post('/admin/offers', 
+  authenticate(['admin']),
+  middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), 
+  offerControllers.createOffer
+);
 
-//get all offers
-router.get('/admin/all', offerControllers.getAllOffers);
+// Get all offers - Admin only 
+router.get('/admin/offers', 
+  authenticate(['admin']),
+  offerControllers.getAllOffers
+);
 
-//get all offers by id
-router.get('/:id', offerControllers.getOfferById);
+// Get offer by ID - Public access (no authentication needed)
+router.get('/offers/:id', 
+  offerControllers.getOfferById
+);
 
-//update offers
-router.put('/admin/:id/update', middlewares.validatorMiddleware(offerValidatorSchemas.updateOfferSchema), offerControllers.updateOffers);
+// Update offer - Admin only
+router.put('/admin/offers/:id', 
+  authenticate(['admin']),
+  middlewares.validatorMiddleware(offerValidatorSchemas.updateOfferSchema), 
+  offerControllers.updateOffers
+);
 
-//deleting offer 
-router.delete('/admin/:id/delete', middlewares.validatorMiddleware(offerValidatorSchemas.deleteOfferSchema), offerControllers.deleteOffer)
+// Delete offer - Admin only
+router.delete('/admin/offers/:id', 
+  authenticate(['admin']),
+  middlewares.validatorMiddleware(offerValidatorSchemas.deleteOfferSchema), 
+  offerControllers.deleteOffer
+);
 
-//get all offers for user
-// router.get('/user/:id', getAllOffersForUser)
+// USER ROUTES (commented out but ready for implementation)
+// router.get('/user/:id',
+//   authenticate(),
+//   getAllOffersForUser
+// );
 
 export default router;

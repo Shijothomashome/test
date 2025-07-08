@@ -81,7 +81,7 @@
 
 /**
  * @swagger
- * /api/v1/checkout:
+ * /checkout:
  *   post:
  *     summary: Initiate checkout process
  *     description: Creates a new order and processes payment based on the selected method (COD or ONLINE)
@@ -202,7 +202,7 @@
 
 /**
  * @swagger
- * /api/v1/checkout/verify-payment:
+ * /checkout/verify-payment:
  *   post:
  *     summary: Verify Razorpay payment
  *     description: Verifies the signature and updates payment and order status after successful payment

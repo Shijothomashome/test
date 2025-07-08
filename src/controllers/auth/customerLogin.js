@@ -119,7 +119,8 @@ const customerLogin = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      user: userData,
+      tocken : accessToken,
+      user: userData ,
     });
   } catch (err) {
     console.error("Login error:", err);
