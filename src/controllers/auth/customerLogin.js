@@ -101,17 +101,17 @@ const customerLogin = async (req, res) => {
 
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
-      maxAge: 10 * 60 * 1000, // 10 minutes
+      secure: false, // change to true in production
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000 // 10 mins
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: false, // change to true in production
+      sameSite: 'lax',
       path: REGENERATE_ACCESS_TOKEN_PATH,
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     const { password: _, ...userData } = user.toObject();
@@ -119,8 +119,8 @@ const customerLogin = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      tocken : accessToken,
-      user: userData ,
+      tocken: accessToken,
+      user: userData,
     });
   } catch (err) {
     console.error("Login error:", err);
