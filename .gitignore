@@ -34,3 +34,6 @@ dump/
 
 # Static uploads (optional, if you plan to handle file uploads)
 public/uploads/
+
+todo.txt
+/todo.txt

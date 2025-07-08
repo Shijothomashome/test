@@ -10,7 +10,7 @@ const router = express.Router();
 
 // ADMIN ROUTES - Only accessible by admin users
 router.post("/admin/categories", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   upload.single("image"), 
   multerErrorHandler, 
   validatorMiddleware(categoryValidatorSchema.createCategoryByAdminSchema), 
@@ -18,17 +18,17 @@ router.post("/admin/categories",
 );
 
 router.get("/admin/categories", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   categoryControllers.getAllCategoriesForAdmin
 );
 
 router.get("/admin/categories/:id", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   categoryControllers.getCategoryByIdForAdmin
 );
 
 router.put("/admin/categories/:id", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   upload.single("image"), 
   multerErrorHandler, 
   validatorMiddleware(categoryValidatorSchema.updateCategoryByAdminSchema), 
@@ -36,20 +36,20 @@ router.put("/admin/categories/:id",
 );
 
 router.patch("/admin/categories/:id/status", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(categoryValidatorSchema.toggleCategoryStatusByAdminSchema), 
   categoryControllers.updateCategoryStatusByAdmin
 );
 
 router.delete("/admin/categories/:id", 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(categoryValidatorSchema.deleteCategoryByAdminSchema), 
   categoryControllers.deleteCategoryByAdmin
 );
 
 // USER ROUTES - Accessible by all authenticated users
 router.get("/categories", 
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(categoryValidatorSchema.getAllCategoriesForUserQuerySchema), 
   categoryControllers.getAllCategoriesForUser
 );

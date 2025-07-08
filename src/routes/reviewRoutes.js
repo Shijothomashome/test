@@ -16,21 +16,21 @@ const router = express.Router();
 // ADMIN ROUTES - Only accessible by users with 'admin' role
 router.get(
   "/admin/reviews",
-  authenticate(["admin"]),
+//   authenticate(["admin"]),
   validatorMiddleware(reviewValidatorSchemas.getAllReviewsForAdminQuerySchema),
   getAllReviews
 );
 
 router.put(
   "/admin/reviews/:id/status",
-  authenticate(["admin"]),
+//   authenticate(["admin"]),
   validatorMiddleware(reviewValidatorSchemas.updateReviewStatusSchema),
   updateReviewStatus
 );
 
 router.delete(
   "/admin/reviews/:id",
-  authenticate(["admin"]),
+//   authenticate(["admin"]),
   validatorMiddleware(reviewValidatorSchemas.deleteReviewByAdminSchema),
   deleteReview
 );
@@ -38,35 +38,35 @@ router.delete(
 // CUSTOMER ROUTES - Accessible by all authenticated users
 router.post(
   "/reviews",
-  authenticate(["customer", "admin"]),
+//   authenticate(["customer", "admin"]),
   validatorMiddleware(reviewValidatorSchemas.createReviewSchema),
   createReview
 );
 
 router.get(
   "/products/:id/reviews",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(reviewValidatorSchemas.getProductReviewsQuerySchema),
   getProductReviews
 );
 
 router.get(
   "/reviews/:id",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(reviewValidatorSchemas.getReviewByIdSchema),
   getReview
 );
 
 router.put(
   "/reviews/:id",
-  authenticate(["customer", "admin"]),
+//   authenticate(["customer", "admin"]),
   validatorMiddleware(reviewValidatorSchemas.updateReviewSchema),
   updateReview
 );
 
 router.post(
   "/reviews/:id/helpful",
-  authenticate(["customer", "admin"]),
+//   authenticate(["customer", "admin"]),
   validatorMiddleware(reviewValidatorSchemas.toggleHelpfulSchema),
   toggleHelpful
 );

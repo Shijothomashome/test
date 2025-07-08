@@ -20,47 +20,47 @@ const router = express.Router();
 
 // ADMIN routes - Require admin privileges
 router.get("/admin/collections/:id", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   getCollectionById
 );
 
 router.post("/admin/collections", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   validate(createCollectionSchema),
   createCollection
 );
 
 router.put("/admin/collections/:id", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   validate(updateCollectionSchema), 
   updateCollection
 );
 
 router.put("/admin/collections/:id/products", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   validate(updateCollectionProductsSchema), 
   updateCollectionProducts
 );
 
 router.put("/admin/products/:productId/collections", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   updateProductCollections
 );
 
 router.delete("/admin/collections/:id", 
-  authenticate(['admin']),
+  // authenticate(['admin']),
   deleteCollection
 );
 
 // USER routes - Accessible to all authenticated users
 router.get("/collections", 
-  authenticate(),
+  // authenticate(),
   validate(collectionListSchema, { query: true }), 
   getCollections
 );
 
 router.get("/collections/:id/products", 
-  authenticate(),
+  // authenticate(),
   getCollectionProducts
 );
 
