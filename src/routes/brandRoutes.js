@@ -4,17 +4,62 @@ import brandValidatorSchemas from "../validators/brandValidatorSchemas.js";
 import validatorMiddleware from "../middlewares/validatorMiddleware.js";
 import multerErrorHandler from "../middlewares/multerErrorHandler.js";
 import upload from "../config/multerConfig.js";
+import authenticate from "../middlewares/authenticate.js";
+
 const router = express.Router();
 
-// ADMIN ROUTES
-router.post("/admin/brands", upload.single("image"), multerErrorHandler, validatorMiddleware(brandValidatorSchemas.createBrandByAdminSchema), brandController.createBrandByAdmin);
-router.get("/admin/brands", validatorMiddleware(brandValidatorSchemas.getAllBrandsForAdminQuerySchema), brandController.getAllBrandsForAdmin);
-router.get("/admin/brands/:id", validatorMiddleware(brandValidatorSchemas.getBrandByIdSchema), brandController.getBrandByIdForAdmin);
-router.put("/admin/brands/:id", upload.single("image"), validatorMiddleware(brandValidatorSchemas.updateBrandSchemaByAdmin), brandController.updateBrandByAdmin);
-router.delete("/admin/brands/:id", validatorMiddleware(brandValidatorSchemas.deleteBrandByAdminSchema), brandController.deleteBrandByAdmin);
-router.patch("/admin/brands/:id/status", validatorMiddleware(brandValidatorSchemas.toggleBrandStatusByAdminSchema), brandController.toggleBrandStatusByAdmin);
+// ADMIN ROUTES - Only accessible by users with 'admin' role
+router.post(
+  "/admin/brands",
+  authenticate(["admin"]),
+  upload.single("image"),
+  multerErrorHandler,
+  validatorMiddleware(brandValidatorSchemas.createBrandByAdminSchema),
+  brandController.createBrandByAdmin
+);
 
-// CUSTOMER ROUTES
-router.get("/brands", validatorMiddleware(brandValidatorSchemas.getAllBrandsForUserQuerySchema), brandController.getAllBrandsForUser);
-//brands/:id
+router.get(
+  "/admin/brands",
+  authenticate(["admin"]),
+  validatorMiddleware(brandValidatorSchemas.getAllBrandsForAdminQuerySchema),
+  brandController.getAllBrandsForAdmin
+);
+
+router.get(
+  "/admin/brands/:id",
+  authenticate(["admin"]),
+  validatorMiddleware(brandValidatorSchemas.getBrandByIdSchema),
+  brandController.getBrandByIdForAdmin
+);
+
+router.put(
+  "/admin/brands/:id",
+  authenticate(["admin"]),
+  upload.single("image"),
+  validatorMiddleware(brandValidatorSchemas.updateBrandSchemaByAdmin),
+  brandController.updateBrandByAdmin
+);
+
+router.delete(
+  "/admin/brands/:id",
+  authenticate(["admin"]),
+  validatorMiddleware(brandValidatorSchemas.deleteBrandByAdminSchema),
+  brandController.deleteBrandByAdmin
+);
+
+router.patch(
+  "/admin/brands/:id/status",
+  authenticate(["admin"]),
+  validatorMiddleware(brandValidatorSchemas.toggleBrandStatusByAdminSchema),
+  brandController.toggleBrandStatusByAdmin
+);
+
+// CUSTOMER ROUTES - Accessible by all authenticated users
+router.get(
+  "/brands",
+  authenticate(),
+  validatorMiddleware(brandValidatorSchemas.getAllBrandsForUserQuerySchema),
+  brandController.getAllBrandsForUser
+);
+
 export default router;

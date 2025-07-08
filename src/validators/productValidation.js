@@ -14,6 +14,68 @@ const objectId = Joi.string().custom((value, helpers) => {
   return value;
 }, "ObjectId validation");
 
+
+// Content Block Schema
+const contentBlockSchema = Joi.object({
+  type: Joi.string()
+    .valid(
+      "paragraph",
+      "heading",
+      "list",
+      "image",
+      "table",
+      "divider",
+      "warning",
+      "info"
+    )
+    .required()
+    .messages({
+      "any.only": "Invalid content block type",
+      "any.required": "Content block type is required"
+    }),
+  content: Joi.alternatives()
+    .try(Joi.string(), Joi.array().items(Joi.string()))
+    .required()
+    .messages({
+      "alternatives.types": "Content must be a string or array of strings",
+      "any.required": "Content is required"
+    }),
+  order: Joi.number().integer().min(0).required()
+    .messages({
+      "number.base": "Order must be a number",
+      "number.integer": "Order must be an integer",
+      "number.min": "Order cannot be negative",
+      "any.required": "Order is required"
+    }),
+  styleClass: Joi.string().max(50)
+    .messages({
+      "string.max": "Style class cannot be longer than 50 characters"
+    }),
+  styles: Joi.object().pattern(
+    Joi.string(),
+    Joi.string()
+  ).messages({
+    "object.base": "Styles must be an object"
+  }),
+  textStyles: Joi.object({
+    bold: Joi.boolean().default(false),
+    italic: Joi.boolean().default(false),
+    underline: Joi.boolean().default(false),
+    color: Joi.string().pattern(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
+      .messages({
+        "string.pattern.base": "Color must be a valid hex color code"
+      }),
+    backgroundColor: Joi.string().pattern(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
+      .messages({
+        "string.pattern.base": "Background color must be a valid hex color code"
+      })
+  }).messages({
+    "object.base": "Text styles must be an object"
+  })
+});
+
+
+
 const selectedAttributeValueSchema = Joi.object({
   attribute: objectId.required().messages({
     "any.invalid": "Attribute ID is invalid",
@@ -253,12 +315,31 @@ const baseProductSchema = {
       "string.pattern.base":
         "Slug can only contain lowercase letters, numbers, and hyphens",
     }),
-  description: Joi.string().trim().max(2000).messages({
-    "string.max": "Description cannot be longer than 2000 characters",
-  }),
-  shortDescription: Joi.string().trim().max(500).messages({
-    "string.max": "Short description cannot be longer than 500 characters",
-  }),
+  description: Joi.string().trim().max(2000)
+    .messages({
+      "string.max": "Description cannot be longer than 2000 characters"
+    }),
+    
+  richDescription: Joi.array().items(contentBlockSchema)
+    .messages({
+      "array.base": "Rich description must be an array"
+    }),
+    
+  shortDescription: Joi.string().trim().max(500)
+    .messages({
+      "string.max": "Short description cannot be longer than 500 characters"
+    }),
+    
+  isDealOfTheDay: Joi.boolean().default(false)
+    .messages({
+      "boolean.base": "Deal of the day must be a boolean"
+    }),
+    
+  dealExpiresAt: Joi.date().greater('now')
+    .messages({
+      "date.base": "Deal expiration must be a valid date",
+      "date.greater": "Deal expiration must be in the future"
+    }),
   category: objectId.required().messages({
     "any.invalid": "Category ID is invalid",
     "any.required": "Category is required",
@@ -727,4 +808,71 @@ export const productListSchema = Joi.object({
     }),
 }).messages({
   "object.base": "List criteria must be an object",
+});
+
+// Deal of the Day Toggle Schema
+export const toggleDealOfTheDaySchema = Joi.object({
+  productIds: Joi.array().items(
+    objectId.required()
+  ).min(1).required()
+    .messages({
+      "array.base": "Product IDs must be an array",
+      "array.min": "At least one product ID is required",
+      "any.required": "Product IDs are required",
+      "any.invalid": "Invalid product ID format"
+    }),
+  isDealOfTheDay: Joi.boolean().required()
+    .messages({
+      "boolean.base": "isDealOfTheDay must be a boolean",
+      "any.required": "isDealOfTheDay is required"
+    }),
+  dealDurationHours: Joi.number().min(1).max(744).optional() 
+    .messages({
+      "number.base": "Deal duration must be a number",
+      "number.min": "Minimum duration is 1 hour",
+      "number.max": "Maximum duration is 744 hours (31 days)"
+    })
+}).messages({
+  "object.base": "Deal of the day toggle data must be an object"
+});
+
+// Get Deals of the Day Schema
+export const getDealsOfTheDaySchema = Joi.object({
+  limit: Joi.number().integer().min(1).max(20).default(5)
+    .messages({
+      "number.base": "Limit must be a number",
+      "number.integer": "Limit must be an integer",
+      "number.min": "Minimum limit is 1",
+      "number.max": "Maximum limit is 20"
+    }),
+  includeExpired: Joi.boolean().default(false)
+    .messages({
+      "boolean.base": "includeExpired must be a boolean"
+    })
+}).messages({
+  "object.base": "Deals query must be an object"
+});
+
+export const toggleFeaturedSchema = Joi.object({
+  productIds: Joi.array().items(
+    objectId.required()
+  ).min(1).required()
+    .messages({
+      "array.base": "Product IDs must be an array",
+      "array.min": "At least one product ID is required",
+      "any.required": "Product IDs are required",
+      "any.invalid": "Invalid product ID format"
+    }),
+  isFeatured: Joi.boolean().required()
+    .messages({
+      "boolean.base": "isFeatured must be a boolean",
+      "any.required": "isFeatured is required"
+    }),
+  featuredExpiresAt: Joi.date().greater('now').optional()
+    .messages({
+      "date.base": "Featured expiration must be a valid date",
+      "date.greater": "Featured expiration must be in the future"
+    })
+}).messages({
+  "object.base": "Featured toggle data must be an object"
 });

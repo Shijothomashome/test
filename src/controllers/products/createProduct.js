@@ -183,8 +183,6 @@
 //   }
 // };
 
-
-
 import Product from "../../models/productModel.js";
 import Collection from "../../models/collectionModel.js";
 import { generateSlug } from "../../helpers/generateSlug.js";
@@ -199,27 +197,21 @@ import mongoose from "mongoose";
 
 /**
  * Updates collections with new product information
- * @param {Array} collectionIds - Array of collection IDs
- * @param {string} productId - Product ID to add
  */
 const updateProductCollections = async (collectionIds, productId) => {
   if (!collectionIds || collectionIds.length === 0) return;
   
-  // Add product to collections
   await Collection.updateMany(
     { _id: { $in: collectionIds } },
     { $addToSet: { products: productId } }
   );
   
-  // Update products count in collections
   const collections = await Collection.find({ _id: { $in: collectionIds } });
   await Promise.all(collections.map(collection => collection.updateProductsCount()));
 };
 
 /**
  * Validates collection IDs exist and are active
- * @param {Array} collectionIds - Array of collection IDs
- * @throws {Error} If any collection is invalid
  */
 const validateCollections = async (collectionIds) => {
   if (!collectionIds || collectionIds.length === 0) return;
@@ -234,6 +226,41 @@ const validateCollections = async (collectionIds) => {
     const missingIds = collectionIds.filter(id => !foundIds.includes(id.toString()));
     throw new Error(`Invalid or inactive collections: ${missingIds.join(', ')}`);
   }
+};
+
+/**
+ * Processes rich description content before saving
+ */
+const processRichDescription = (richDescription) => {
+  if (!richDescription || !Array.isArray(richDescription)) return [];
+
+  return richDescription.map((block, index) => {
+    // Ensure each block has an order
+    if (typeof block.order !== 'number') {
+      block.order = index;
+    }
+
+    // Normalize content based on type
+    switch(block.type) {
+      case 'list':
+        if (!Array.isArray(block.content)) {
+          block.content = [block.content];
+        }
+        break;
+      case 'image':
+        if (typeof block.content !== 'string') {
+          throw new Error('Image block content must be a URL string');
+        }
+        break;
+      case 'table':
+        if (!Array.isArray(block.content)) {
+          throw new Error('Table content must be an array of rows');
+        }
+        break;
+    }
+
+    return block;
+  }).sort((a, b) => a.order - b.order);
 };
 
 export const createProduct = async (req, res) => {
@@ -255,6 +282,11 @@ export const createProduct = async (req, res) => {
       productData.slug = generateSlug(productData.name);
     }
 
+    // Process rich description if provided
+    if (productData.richDescription) {
+      productData.richDescription = processRichDescription(productData.richDescription);
+    }
+
     // Calculate min/max prices if not provided
     if (!productData.minPrice || !productData.maxPrice) {
       productData.minPrice = productData.basePrice?.sellingPrice || 0;
@@ -272,7 +304,6 @@ export const createProduct = async (req, res) => {
         .lean();
 
       if (attributes.length > 0) {
-        // Transform selectedAttributeValues from object to array format for DB storage
         if (productData.selectedAttributeValues) {
           productData.selectedAttributeValues = Object.entries(productData.selectedAttributeValues).map(
             ([attributeId, values]) => ({
@@ -282,7 +313,6 @@ export const createProduct = async (req, res) => {
           );
         }
 
-        // Validate selected values if provided
         if (productData.selectedAttributeValues) {
           for (const selectedAttr of productData.selectedAttributeValues) {
             const attribute = attributes.find(
@@ -307,12 +337,9 @@ export const createProduct = async (req, res) => {
         }
 
         const attrValuePairs = attributes.map((attr) => {
-          // Find selected values for this attribute if they exist
           const selectedValues = productData.selectedAttributeValues?.find(
             (sa) => sa.attribute.toString() === attr._id.toString()
           );
-
-          // Use selectedValues if provided, otherwise use all values
           const valuesToUse = selectedValues?.values || attr.values;
 
           if (!valuesToUse || valuesToUse.length === 0) {
@@ -334,13 +361,11 @@ export const createProduct = async (req, res) => {
         if (productData.variantGeneration?.autoGenerate) {
           productData.variants = await Promise.all(
             newCombinations.map(async (combo) => {
-              // Calculate variant price based on pricing strategy
               const variantPrice = calculateVariantPrice(
                 productData.variantGeneration,
                 combo.attributes
               );
 
-              // Calculate stock based on stock rules
               const variantStock = calculateVariantStock(
                 productData.variantGeneration,
                 combo.attributes,
@@ -374,7 +399,6 @@ export const createProduct = async (req, res) => {
             })
           );
 
-          // Update min/max prices based on variants
           if (productData.variants.length > 0) {
             const prices = productData.variants.map(
               (v) => v.price.sellingPrice
@@ -388,10 +412,8 @@ export const createProduct = async (req, res) => {
       }
     }
 
-    // Set hasVariants if variants are provided manually
     if (!productData.hasVariants && productData.variants?.length > 0) {
       productData.hasVariants = true;
-      // Update min/max prices for manual variants
       const prices = productData.variants.map((v) => v.price.sellingPrice);
       productData.minPrice = Math.min(...prices);
       productData.maxPrice = Math.max(...prices);
@@ -416,21 +438,15 @@ export const createProduct = async (req, res) => {
 };
 
 /**
- * Updates product collections (for use in updateProduct controller)
- * @param {string} productId - Product ID
- * @param {Array} newCollectionIds - New collection IDs
- * @param {Array} oldCollectionIds - Previous collection IDs
+ * Updates product collections
  */
 export const syncProductCollections = async (productId, newCollectionIds = [], oldCollectionIds = []) => {
-  // Convert to strings for comparison
   const newIds = newCollectionIds.map(id => id.toString());
   const oldIds = oldCollectionIds.map(id => id.toString());
   
-  // Find collections to add and remove
   const collectionsToAdd = newIds.filter(id => !oldIds.includes(id));
   const collectionsToRemove = oldIds.filter(id => !newIds.includes(id));
   
-  // Add to new collections
   if (collectionsToAdd.length > 0) {
     await Collection.updateMany(
       { _id: { $in: collectionsToAdd } },
@@ -438,7 +454,6 @@ export const syncProductCollections = async (productId, newCollectionIds = [], o
     );
   }
   
-  // Remove from old collections
   if (collectionsToRemove.length > 0) {
     await Collection.updateMany(
       { _id: { $in: collectionsToRemove } },
@@ -446,7 +461,6 @@ export const syncProductCollections = async (productId, newCollectionIds = [], o
     );
   }
   
-  // Update counts for all affected collections
   const affectedCollections = [...collectionsToAdd, ...collectionsToRemove];
   if (affectedCollections.length > 0) {
     const collections = await Collection.find({ _id: { $in: affectedCollections } });
