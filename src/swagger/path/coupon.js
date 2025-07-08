@@ -57,11 +57,38 @@
  *           type: boolean
  *           default: true
  *           description: Coupon active status
+ * 
+ *     ValidateCouponRequest:
+ *       type: object
+ *       required:
+ *         - code
+ *         - cartValue
+ *       properties:
+ *         code:
+ *           type: string
+ *           description: Coupon code to validate
+ *         cartValue:
+ *           type: number
+ *           description: Current cart value
+ *         isFirstOrder:
+ *           type: boolean
+ *           default: false
+ *           description: Is this user's first order
+ * 
+ *     ValidateCouponResponse:
+ *       type: object
+ *       properties:
+ *         discountAmount:
+ *           type: number
+ *           description: Calculated discount amount
+ *         finalPrice:
+ *           type: number
+ *           description: Final price after discount
  */
 
 /**
  * @swagger
- * /coupon/admin/create-coupon:
+ * /admin/coupons:
  *   post:
  *     summary: Create a new coupon
  *     tags: [Admin Coupons]
@@ -76,73 +103,38 @@
  *     responses:
  *       201:
  *         description: Coupon created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Coupon'
  *       400:
  *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
  *       409:
  *         description: Coupon code already exists
- *       500:
- *         description: Server error
- */
-
-/**
- * @swagger
- * /coupon/admin/getallcoupons:
+ * 
  *   get:
  *     summary: Get all coupons (admin view)
  *     tags: [Admin Coupons]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: number
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *         description: Items per page
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: Search by coupon code
- *       - in: query
- *         name: active
- *         schema:
- *           type: boolean
- *         description: Filter by active status
  *     responses:
  *       200:
  *         description: List of coupons
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 coupons:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Coupon'
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     total:
- *                       type: number
- *                     page:
- *                       type: number
- *                     limit:
- *                       type: number
- *       500:
- *         description: Server error
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Coupon'
+ *       401:
+ *         description: Unauthorized
  */
 
 /**
  * @swagger
- * /coupon/admin/update/{id}:
+ * /admin/coupons/{id}:
  *   put:
  *     summary: Update a coupon
  *     tags: [Admin Coupons]
@@ -164,21 +156,43 @@
  *     responses:
  *       200:
  *         description: Coupon updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Coupon'
  *       400:
  *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: Coupon not found
  *       409:
  *         description: Coupon code already exists
- *       422:
- *         description: Validation error
- *       500:
- *         description: Server error
+ * 
+ *   delete:
+ *     summary: Delete a coupon
+ *     tags: [Admin Coupons]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Coupon ID
+ *     responses:
+ *       200:
+ *         description: Coupon deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Coupon not found
  */
 
 /**
  * @swagger
- * /coupon/admin/toggle/{id}:
+ * /admin/coupons/toggle/{id}:
  *   patch:
  *     summary: Toggle coupon active status
  *     tags: [Admin Coupons]
@@ -204,40 +218,17 @@
  *     responses:
  *       200:
  *         description: Status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Coupon'
  *       400:
  *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: Coupon not found
- *       500:
- *         description: Server error
  */
-
-/**
- * @swagger
- * /coupon/admin/delete/{id}:
- *   delete:
- *     summary: Delete a coupon
- *     tags: [Admin Coupons]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Coupon ID
- *     responses:
- *       200:
- *         description: Coupon deleted successfully
- *       400:
- *         description: Invalid coupon ID
- *       404:
- *         description: Coupon not found or already deleted
- *       500:
- *         description: Server error
- */
-
 
 /**
  * @swagger
@@ -248,90 +239,33 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     ValidateCouponRequest:
- *       type: object
- *       required:
- *         - code
- *         - cartValue
- *         - userId
- *       properties:
- *         code:
- *           type: string
- *           description: Coupon code to validate
- *         cartValue:
- *           type: number
- *           description: Current cart value
- *         userId:
- *           type: string
- *           description: User ID
- *         isFirstOrder:
- *           type: boolean
- *           default: false
- *           description: Is this user's first order
- * 
- *     ValidateCouponResponse:
- *       type: object
- *       properties:
- *         discountAmount:
- *           type: number
- *           description: Calculated discount amount
- *         finalPrice:
- *           type: number
- *           description: Final price after discount
- */
-
-/**
- * @swagger
- * /coupon/getallcoupons:
+ * /coupons:
  *   get:
  *     summary: Get all available coupons for user
  *     tags: [User Coupons]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: number
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *         description: Items per page
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of available coupons
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 coupons:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Coupon'
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     total:
- *                       type: number
- *                     page:
- *                       type: number
- *                     limit:
- *                       type: number
- *       500:
- *         description: Server error
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Coupon'
+ *       401:
+ *         description: Unauthorized
  */
 
 /**
  * @swagger
- * /coupon/validate:
+ * /coupons/validate:
  *   post:
  *     summary: Validate a coupon code
  *     tags: [User Coupons]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -347,42 +281,6 @@
  *               $ref: '#/components/schemas/ValidateCouponResponse'
  *       400:
  *         description: Invalid coupon or validation error
- *       500:
- *         description: Server error
- */
-
-/**
- * @swagger
- * /coupon/apply:
- *   post:
- *     summary: Apply coupon to order (Deprecated - use validate instead)
- *     tags: [User Coupons]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               code:
- *                 type: string
- *               cartValue:
- *                 type: number
- *               userId:
- *                 type: string
- *               orderId:
- *                 type: string
- *               isFirstOrder:
- *                 type: boolean
- *     responses:
- *       200:
- *         description: Coupon applied successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ValidateCouponResponse'
- *       400:
- *         description: Invalid coupon or validation error
- *       500:
- *         description: Server error
+ *       401:
+ *         description: Unauthorized
  */

@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /product/admin/products:
+ * /admin/products:
  *   post:
  *     summary: Create a new product
  *     tags: [Admin Products]
@@ -31,7 +31,7 @@
  *       401:
  *         description: Unauthorized
  * 
- * /product/admin/products/{id}:
+ * /admin/products/{id}:
  *   put:
  *     summary: Update a product
  *     tags: [Admin Products]
@@ -87,7 +87,7 @@
 
 /**
  * @swagger
- * /product/admin/products/{id}/convert:
+ * /admin/products/{id}/convert:
  *   post:
  *     summary: Convert product collection type
  *     tags: [Admin Products]
@@ -121,7 +121,7 @@
  *       401:
  *         description: Unauthorized
  * 
- * /product/admin/products/{id}/suggest-rules:
+ *     /admin/products/{id}/suggest-rules:
  *   get:
  *     summary: Suggest smart collection rules
  *     tags: [Admin Products]
@@ -143,6 +143,121 @@
  *         description: Unauthorized
  */
 
+/**
+ * @swagger
+ * /admin/products/deal-of-the-day:
+ *   patch:
+ *     summary: Set/unset deal of the day status for products (single or bulk)
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productIds
+ *               - isDealOfTheDay
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of product IDs to update
+ *               isDealOfTheDay:
+ *                 type: boolean
+ *                 description: Whether to set as deal of the day
+ *               dealDurationHours:
+ *                 type: number
+ *                 minimum: 1
+ *                 maximum: 744
+ *                 description: Optional duration in hours (max 31 days)
+ *     responses:
+ *       200:
+ *         description: Deal status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     updatedCount:
+ *                       type: number
+ *                     products:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Product not found
+ */
+
+
+/**
+ * @swagger
+ * /admin/products/featured:
+ *   patch:
+ *     summary: Set/unset featured status for products (single or bulk)
+ *     tags: [Admin Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productIds
+ *               - isFeatured
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of product IDs to update
+ *               isFeatured:
+ *                 type: boolean
+ *                 description: Whether to set as featured
+ *               featuredExpiresAt:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Optional expiration date/time
+ *     responses:
+ *       200:
+ *         description: Featured status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     updatedCount:
+ *                       type: number
+ *                     products:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Product not found
+ */
 
 /**
  * @swagger
@@ -153,7 +268,7 @@
 
 /**
  * @swagger
- * /product/products:
+ * /products:
  *   get:
  *     summary: List all products
  *     tags: [User Products]
@@ -209,7 +324,7 @@
  *             schema:
  *               $ref: '#/components/schemas/ProductListResponse'
  * 
- * /product/products/search:
+ * /products/search:
  *   get:
  *     summary: Search products
  *     tags: [User Products]
@@ -250,7 +365,7 @@
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  * 
- * /product/products/{id}:
+ * /products/{id}:
  *   get:
  *     summary: Get product by ID or slug
  *     tags: [User Products]
@@ -271,7 +386,7 @@
  *       404:
  *         description: Product not found
  * 
- * /product/products/category/{categoryId}:
+ * /products/category/{categoryId}:
  *   get:
  *     summary: Get products by category
  *     tags: [User Products]
@@ -315,7 +430,7 @@
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  * 
- * /product/products/brand/{brandId}:
+ * /products/brand/{brandId}:
  *   get:
  *     summary: Get products by brand
  *     tags: [User Products]
@@ -359,7 +474,7 @@
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  * 
- * /product/products/{productId}/recommended:
+ * /products/{productId}/recommended:
  *   get:
  *     summary: Get recommended products
  *     tags: [User Products]
@@ -391,7 +506,7 @@
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  * 
- * /product/products/{productId}/similar:
+ * /products/{productId}/similar:
  *   get:
  *     summary: Get similar products
  *     tags: [User Products]
@@ -423,7 +538,7 @@
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  * 
- * /product/products/featured:
+ * /products/featured:
  *   get:
  *     summary: Get featured products
  *     tags: [User Products]
@@ -450,6 +565,46 @@
  *                     $ref: '#/components/schemas/Product'
  */
 
+/**
+ * @swagger
+ * /products/deal-of-the-day:
+ *   get:
+ *     summary: Get current deal of the day products
+ *     tags: [User Products]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Maximum number of deals to return
+ *       - in: query
+ *         name: includeExpired
+ *         schema:
+ *           type: boolean
+ *           default: false
+ *         description: Whether to include expired deals
+ *     responses:
+ *       200:
+ *         description: List of deal of the day products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: number
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: No current deals found
+ */
+
+
 
 /**
  * @swagger
@@ -460,7 +615,7 @@
 
 /**
  * @swagger
- * /product/admin/products/{id}/variants:
+ * /admin/products/{id}/variants:
  *   put:
  *     summary: Add variants to product
  *     tags: [Admin Variants]
@@ -541,7 +696,7 @@
  *       401:
  *         description: Unauthorized
  * 
- * /product/admin/products/{productId}/variants/{variantId}:
+ * /admin/products/{productId}/variants/{variantId}:
  *   put:
  *     summary: Update a specific variant
  *     tags: [Admin Variants]
@@ -580,7 +735,7 @@
  *       401:
  *         description: Unauthorized
  * 
- * /product/admin/products/{productId}/variant-groups/{groupValue}:
+ * /admin/products/{productId}/variant-groups/{groupValue}:
  *   put:
  *     summary: Update variant group
  *     tags: [Admin Variants]
@@ -657,7 +812,7 @@
 
 /**
  * @swagger
- * /product/products/{id}/variants:
+ * /products/{id}/variants:
  *   get:
  *     summary: Get all variants for a product
  *     tags: [User Variants]
@@ -685,7 +840,7 @@
  *       404:
  *         description: Product not found
  * 
- * /product/products/{productId}/variants/{variantId}:
+ * /products/{productId}/variants/{variantId}:
  *   get:
  *     summary: Get specific variant details
  *     tags: [User Variants]
@@ -712,3 +867,4 @@
  *       404:
  *         description: Variant not found
  */
+

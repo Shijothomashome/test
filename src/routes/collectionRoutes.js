@@ -14,20 +14,54 @@ import { updateCollection } from "../controllers/collection/updateCollection.js"
 import { updateCollectionProducts } from "../controllers/collection/updateCollectionProducts.js";
 import { updateProductCollections } from "../controllers/collection/updateProductCollections.js";
 import { deleteCollection } from "../controllers/collection/deleteCollection.js";
-// import { authenticate, authorize } from "../middlewares/authMiddleware.js";
+import authenticate from "../middlewares/authenticate.js";
 
 const router = express.Router();
 
-// ADMIN routes
-router.get("/admin/collections/:id", getCollectionById);
-router.post("/admin/collections",  validate(createCollectionSchema),createCollection);
-router.put("/admin/collections/:id", validate(updateCollectionSchema), updateCollection);
-router.put("/admin/collections/:id/products", validate(updateCollectionProductsSchema), updateCollectionProducts);
-router.put("/admin/products/:productId/collections", updateProductCollections);
-router.delete("/admin/collections/:id", deleteCollection);
+// ADMIN routes - Require admin privileges
+router.get("/admin/collections/:id", 
+  authenticate(['admin']),
+  getCollectionById
+);
 
-// USER routes
-router.get("/collections", validate(collectionListSchema, { query: true }), getCollections);
-router.get("/collections/:id/products", getCollectionProducts);
+router.post("/admin/collections", 
+  authenticate(['admin']),
+  validate(createCollectionSchema),
+  createCollection
+);
+
+router.put("/admin/collections/:id", 
+  authenticate(['admin']),
+  validate(updateCollectionSchema), 
+  updateCollection
+);
+
+router.put("/admin/collections/:id/products", 
+  authenticate(['admin']),
+  validate(updateCollectionProductsSchema), 
+  updateCollectionProducts
+);
+
+router.put("/admin/products/:productId/collections", 
+  authenticate(['admin']),
+  updateProductCollections
+);
+
+router.delete("/admin/collections/:id", 
+  authenticate(['admin']),
+  deleteCollection
+);
+
+// USER routes - Accessible to all authenticated users
+router.get("/collections", 
+  authenticate(),
+  validate(collectionListSchema, { query: true }), 
+  getCollections
+);
+
+router.get("/collections/:id/products", 
+  authenticate(),
+  getCollectionProducts
+);
 
 export default router;

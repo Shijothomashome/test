@@ -1,10 +1,8 @@
 import Joi from "joi";
-
 import express from "express";
 import {
   createProduct,
   deleteProduct,
-  // getBestSellingProducts,
   getFeaturedProducts,
   getProductById,
   getProducts,
@@ -31,47 +29,128 @@ import {
   variantGroupUpdateSchema,
   productSearchSchema,
   productListSchema,
+  toggleDealOfTheDaySchema,
+  getDealsOfTheDaySchema,
+  toggleFeaturedSchema,
 } from "../validators/productValidation.js";
 import variantSchema from "../models/productVariantModel.js";
 import { getProductVariant } from "../controllers/variants/getProductVariant.js";
-// import { getCollectionProductsWithCache } from "../controllers/collection/smartCollections.js";
+import authenticate from "../middlewares/authenticate.js";
+import { toggleDealOfTheDay } from "../controllers/products/toggleDealOfTheDay.js";
+import { getDealsOfTheDay } from "../controllers/products/getDealsOfTheDay.js";
+import validatorMiddleware from "../middlewares/validatorMiddleware.js";
+import { toggleFeatured } from "../controllers/products/toggleFeatured.js";
 
 const router = express.Router();
 
-// Product CRUD routes
+// Admin Product Routes - Require admin privileges
+router.post("/admin/products", 
+  authenticate(['admin']),
+  validate(createProductSchema), 
+  createProduct
+);
 
+router.put("/admin/products/:id/variants", 
+  authenticate(['admin']),
+  validate(variantSchema), 
+  addVariants
+);
 
-// router.get("/user/orders", getUserOrdersByUser);
+router.put("/admin/products/:id/variants", 
+  authenticate(['admin']),
+  validate(Joi.array().items(variantUpdateSchema)), 
+  updateVariants
+);
 
-// Admin Routes
-router.post("/admin/products", validate(createProductSchema), createProduct);
-router.put("/admin/products/:id/variants", validate(variantSchema), addVariants);
-router.put("/admin/products/:id/variants", validate(Joi.array().items(variantUpdateSchema)), updateVariants);
-router.put("/admin/products/:productId/variants/:variantId", validate(variantUpdateSchema), updateVariant);
-router.put("/admin/products/:productId/variant-groups/:groupValue", validate(variantGroupUpdateSchema), updateVariantGroup);
-router.put("/admin/products/:id", validate(updateProductSchema), updateProduct);
-router.delete("/admin/products/:id", deleteProduct);
+router.put("/admin/products/:productId/variants/:variantId", 
+  authenticate(['admin']),
+  validate(variantUpdateSchema), 
+  updateVariant
+);
 
+router.put("/admin/products/:productId/variant-groups/:groupValue", 
+  authenticate(['admin']),
+  validate(variantGroupUpdateSchema), 
+  updateVariantGroup
+);
 
-// User Routes
-router.get("/products", validate(productListSchema, { query: true }), getProducts);
-router.get("/products/search", validate(productSearchSchema, { query: true }), searchProducts);
-router.get("/products/:id/variants", getProductVariants);
-router.get("/products/:productId/variants/:variantId", getProductVariant);
-router.get("/products/category/:categoryId", getProductsByCategory);
-router.get("/products/brand/:brandId", getProductsByBrand);
-router.get("/products/:productId/recommended", getRecommendedProducts);
-router.get("/products/:productId/similar", getProductVariant);
-// router.get("/products/best-selling", getBestSellingProducts);
-router.get("/products/featured", getFeaturedProducts);
-router.get("/products/:id", getProductById);
+router.put("/admin/products/:id", 
+  authenticate(['admin']),
+  validate(updateProductSchema), 
+  updateProduct
+);
 
-// router.route('/:id/products/cached')
-//   .get(getCollectionProductsWithCache);
+router.delete("/admin/products/:id", 
+  authenticate(['admin']),
+  deleteProduct
+);
 
-//Admin Product Collection Routes
-router.route('/admin/products/:id/convert')
-  .post(async (req, res) => {
+router.patch(
+  "/admin/products/deal-of-the-day",
+  authenticate(["admin"]),
+  validatorMiddleware(toggleDealOfTheDaySchema),
+  toggleDealOfTheDay
+);
+
+router.patch(
+  "/admin/products/featured",
+  authenticate(["admin"]),
+  validatorMiddleware(toggleFeaturedSchema),
+  toggleFeatured
+);
+
+// User Product Routes - Public access (some may require authentication if needed)
+router.get("/products", 
+  validate(productListSchema, { query: true }), 
+  getProducts
+);
+
+router.get("/products/search", 
+  validate(productSearchSchema, { query: true }), 
+  searchProducts
+);
+
+router.get("/products/:id/variants", 
+  getProductVariants
+);
+
+router.get("/products/:productId/variants/:variantId", 
+  getProductVariant
+);
+
+router.get("/products/category/:categoryId", 
+  getProductsByCategory
+);
+
+router.get("/products/brand/:brandId", 
+  getProductsByBrand
+);
+
+router.get("/products/:productId/recommended", 
+  getRecommendedProducts
+);
+
+router.get("/products/:productId/similar", 
+  getSimilarProducts
+);
+
+router.get("/products/featured", 
+  getFeaturedProducts
+);
+router.get(
+  "/products/deal-of-the-day",
+  validatorMiddleware(getDealsOfTheDaySchema),
+  getDealsOfTheDay
+);
+
+router.get("/products/:id", 
+  getProductById
+);
+
+// Admin Product Collection Routes
+router.post('/admin/products/:id/convert',
+  authenticate(['admin']),
+  async (req, res) => {
     try {
       const collection = await convertCollectionType(
         req.params.id,
@@ -82,17 +161,19 @@ router.route('/admin/products/:id/convert')
     } catch (error) {
       handleError(res, error);
     }
-  });
+  }
+);
 
-router.route('/admin/products/:id/suggest-rules')
-  .get(async (req, res) => {
+router.get('/admin/products/:id/suggest-rules',
+  authenticate(['admin']),
+  async (req, res) => {
     try {
       const rules = await suggestSmartCollectionRules(req.params.id);
       res.json({ success: true, data: rules });
     } catch (error) {
       handleError(res, error);
     }
-  });
-
+  }
+);
 
 export default router;
