@@ -9,3 +9,5 @@ router.post('/upload', upload.single('image'), uploadImage);
 router.delete('/delete', deleteImage);
 
 export default router;
+
+// 

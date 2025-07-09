@@ -7,7 +7,8 @@ import {
     getAllOrdersByAdmin,
     updateOrderStatusByAdmin,
     getOrderAnalyticsByAdmin,
-    returnOrderByUser
+    returnOrderByUser,
+    getUserOrdersByUserIdForAdmin
 } from "../controllers/orders/index.js";
 import authenticate from "../middlewares/authenticate.js";
 
@@ -43,6 +44,10 @@ router.post("/user/orders/:orderId/return",
 router.get("/admin/orders", 
     // authenticate(['admin']),
     getAllOrdersByAdmin
+);
+router.get("/admin/orders/user/:userId", 
+    // authenticate(['admin']),
+    getUserOrdersByUserIdForAdmin
 );
 
 router.put("/admin/orders/:orderId/status", 

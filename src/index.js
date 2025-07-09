@@ -46,6 +46,7 @@ import { JWT_SECRET } from "./config/index.js";
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  'http://localhost:5000',
   'https://medico.oxiumev.com',
 ];
 

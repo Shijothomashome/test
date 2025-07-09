@@ -40,10 +40,12 @@ const getAllBrandsForAdminQuerySchema = Joi.object({
 });
 
 const getBrandByIdSchema = Joi.object({
-    id: Joi.string().custom(isValidObjectId, "valid ObjectId").required().messages({
-        "any.required": "Brand ID is required",
-        "string.empty": "Brand ID cannot be empty",
-        "any.invalid": "Invalid Brand ID format"
+    params: Joi.object({
+        id: Joi.string().custom(isValidObjectId, "valid ObjectId").required().messages({
+            "any.required": "Brand ID is required",
+            "string.empty": "Brand ID cannot be empty",
+            "any.invalid": "Invalid Brand ID format"
+        })
     })
 });
 

@@ -1,8 +1,10 @@
 import Joi from "joi";
 import express from "express";
 import {
+  bulkDeleteProducts,
   createProduct,
   deleteProduct,
+  getBestSellingProducts,
   getFeaturedProducts,
   getProductById,
   getProducts,
@@ -80,6 +82,13 @@ router.put("/admin/products/:id",
   updateProduct
 );
 
+router.delete(
+  "/admin/products/bulk-delete",
+  // authenticate(["admin"]),
+  bulkDeleteProducts
+);
+
+
 router.delete("/admin/products/:id", 
   // authenticate(['admin']),
   deleteProduct
@@ -98,6 +107,9 @@ router.patch(
   validatorMiddleware(toggleFeaturedSchema),
   toggleFeatured
 );
+
+
+
 
 // User Product Routes - Public access (some may require authentication if needed)
 router.get("/products", 
@@ -132,6 +144,10 @@ router.get("/products/:productId/recommended",
 
 router.get("/products/:productId/similar", 
   getSimilarProducts
+);
+
+router.get("/products/best-seller", 
+  getBestSellingProducts
 );
 
 router.get("/products/featured", 

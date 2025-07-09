@@ -344,6 +344,15 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+productSchema.pre('save', function(next) {
+  if (this.isModified('variants') && this.variants?.length > 0) {
+    const totalStock = calculateTotalVariantStock(this.variants);
+    this.baseInventory = this.baseInventory || {};
+    this.baseInventory.stock = totalStock;
+  }
+  next();
+});
+
 productSchema.index({ name: "text", description: "text", tags: "text" });
 productSchema.plugin(mongoosePaginate);
 
