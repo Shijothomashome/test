@@ -182,6 +182,8 @@
 //     handleError(res, error);
 //   }
 // };
+
+
 import Product from "../../models/productModel.js";
 import Collection from "../../models/collectionModel.js";
 import { generateSlug } from "../../helpers/generateSlug.js";

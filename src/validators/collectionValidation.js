@@ -112,6 +112,119 @@
 // });
 
 
+// import Joi from "joi";
+
+// export const createCollectionSchema = Joi.object({
+//   title: Joi.string().required(),
+//   handle: Joi.string().optional(),
+//   description: Joi.string().optional(),
+//   description_html: Joi.string().optional(),
+//   image: Joi.object({
+//     src: Joi.string().uri(),
+//     alt: Joi.string()
+//   }).optional(),
+//   collection_type: Joi.string().valid("smart", "custom").default("custom"),
+//   rules: Joi.when('collection_type', {
+//     is: 'smart',
+//     then: Joi.array().items(
+//       Joi.object({
+//         column: Joi.string().required(),
+//         relation: Joi.string().required(),
+//         condition: Joi.string().required()
+//       })
+//     ).min(1).required(),
+//     otherwise: Joi.array().optional()
+//   }),
+//   disjunctive: Joi.boolean().default(false),
+//   sort_order: Joi.string().valid(
+//     "manual",
+//     "best-selling",
+//     "title-ascending",
+//     "title-descending",
+//     "price-ascending",
+//     "price-descending",
+//     "created-descending",
+//     "created-ascending"
+//   ).default("manual"),
+//   template_suffix: Joi.string().optional(),
+//   seo: Joi.object({
+//     title: Joi.string(),
+//     description: Joi.string(),
+//     keywords: Joi.array().items(Joi.string())
+//   }).optional(),
+//   metafields: Joi.array().items(
+//     Joi.object({
+//       key: Joi.string(),
+//       value: Joi.any(),
+//       type: Joi.string().valid("string", "number", "boolean", "json"),
+//       namespace: Joi.string()
+//     })
+//   ).optional(),
+//   status: Joi.string().valid("active", "archived").default("active"),
+//   visibility: Joi.string().valid("visible", "hidden").default("visible"),
+//   shop_id: Joi.string().optional()
+// });
+
+// export const updateCollectionSchema = Joi.object({
+//   title: Joi.string().optional(),
+//   handle: Joi.string().optional(),
+//   description: Joi.string().optional(),
+//   description_html: Joi.string().optional(),
+//   image: Joi.object({
+//     src: Joi.string().uri(),
+//     alt: Joi.string()
+//   }).optional(),
+//   rules: Joi.array().items(
+//     Joi.object({
+//       column: Joi.string().required(),
+//       relation: Joi.string().required(),
+//       condition: Joi.string().required()
+//     })
+//   ).optional(),
+//   disjunctive: Joi.boolean().optional(),
+//   sort_order: Joi.string().valid(
+//     "manual",
+//     "best-selling",
+//     "title-ascending",
+//     "title-descending",
+//     "price-ascending",
+//     "price-descending",
+//     "created-descending",
+//     "created-ascending"
+//   ).optional(),
+//   template_suffix: Joi.string().optional(),
+//   seo: Joi.object({
+//     title: Joi.string(),
+//     description: Joi.string(),
+//     keywords: Joi.array().items(Joi.string())
+//   }).optional(),
+//   metafields: Joi.array().items(
+//     Joi.object({
+//       key: Joi.string(),
+//       value: Joi.any(),
+//       type: Joi.string().valid("string", "number", "boolean", "json"),
+//       namespace: Joi.string()
+//     })
+//   ).optional(),
+//   status: Joi.string().valid("active", "archived").optional(),
+//   visibility: Joi.string().valid("visible", "hidden").optional(),
+//   shop_id: Joi.string().optional()
+// });
+
+// export const updateCollectionProductsSchema = Joi.object({
+//   products: Joi.array().items(Joi.string()).required(),
+//   action: Joi.string().valid("replace", "add", "remove").default("replace")
+// });
+
+// export const collectionListSchema = Joi.object({
+//   type: Joi.string().valid("smart", "custom").optional(),
+//   status: Joi.string().valid("active", "archived").optional(),
+//   search: Joi.string().optional(),
+//   page: Joi.number().min(1).default(1),
+//   limit: Joi.number().min(1).max(100).default(10),
+//   sort: Joi.string().default("-createdAt")
+// });
+
 import Joi from "joi";
 
 export const createCollectionSchema = Joi.object({
@@ -174,13 +287,18 @@ export const updateCollectionSchema = Joi.object({
     src: Joi.string().uri(),
     alt: Joi.string()
   }).optional(),
-  rules: Joi.array().items(
-    Joi.object({
-      column: Joi.string().required(),
-      relation: Joi.string().required(),
-      condition: Joi.string().required()
-    })
-  ).optional(),
+  collection_type: Joi.string().valid("smart", "custom").optional(),
+  rules: Joi.when('collection_type', {
+    is: 'smart',
+    then: Joi.array().items(
+      Joi.object({
+        column: Joi.string().required(),
+        relation: Joi.string().required(),
+        condition: Joi.string().required()
+      })
+    ).min(1).optional(),
+    otherwise: Joi.array().optional()
+  }),
   disjunctive: Joi.boolean().optional(),
   sort_order: Joi.string().valid(
     "manual",
