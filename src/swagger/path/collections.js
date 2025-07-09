@@ -52,6 +52,16 @@
  *           type: string
  *           enum: [active, draft, archived]
  *           example: active
+ *         isDeleted:
+ *           type: boolean
+ *           example: false
+ *         deletedAt:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *         deletionReason:
+ *           type: string
+ *           nullable: true
  *         seo:
  *           type: object
  *           properties:
@@ -85,7 +95,18 @@
  *           type: string
  *           enum: [replace, add, remove]
  *           default: replace
+ * 
+ *     CollectionDeleteRequest:
+ *       type: object
+ *       properties:
+ *         deletionReason:
+ *           type: string
+ *           description: Reason for deleting the collection
+ *           example: "Seasonal collection no longer needed"
+ *       required:
+ *         - deletionReason
  */
+
 
 /**
  * @swagger
@@ -173,8 +194,15 @@
  *       401:
  *         description: Unauthorized
  * 
+ */
+
+
+/**
+ * @swagger
+ * /admin/collections/{id}:
  *   delete:
- *     summary: Delete a collection
+ *     summary: Soft delete a collection
+ *     description: Marks a collection as deleted while preserving it in the database
  *     tags: [Admin Collections]
  *     security:
  *       - bearerAuth: []
@@ -185,9 +213,38 @@
  *         schema:
  *           type: string
  *         description: Collection ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CollectionDeleteRequest'
  *     responses:
  *       200:
- *         description: Collection deleted successfully
+ *         description: Collection soft deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Collection soft deleted successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     title:
+ *                       type: string
+ *                     deletedAt:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Invalid input or missing deletion reason
  *       404:
  *         description: Collection not found
  *       401:
@@ -264,6 +321,8 @@
  *       401:
  *         description: Unauthorized
  */
+
+
 
 
 /**
