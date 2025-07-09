@@ -129,6 +129,16 @@ const collectionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Shop",
     },
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date
+    },
+    deletionReason: {
+      type: String
+    }
   },
   {
     timestamps: true,

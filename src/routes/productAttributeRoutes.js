@@ -27,7 +27,7 @@ router.put("/admin/product/attributes/:id",
 
 router.delete("/admin/product/attributes/:id",
 //   authenticate(['admin']),
-  validatorMiddleware(attributeValidation.getAttributesSchema),
+//   validatorMiddleware(attributeValidation.getAttributesSchema),
   attributeControllers.deleteAttribute
 );
 
