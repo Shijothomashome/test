@@ -32,7 +32,7 @@ router.patch("/admin/coupons/toggle/:id",
 
 router.delete("/admin/coupons/:id",
 //   authenticate(['admin']),
-  validatorMiddleware(couponValidatorSchemas.deleteCouponSchema),
+//   validatorMiddleware(couponValidatorSchemas.deleteCouponSchema),
   couponController.deleteCoupon
 );
 
