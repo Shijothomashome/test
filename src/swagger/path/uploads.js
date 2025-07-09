@@ -51,14 +51,17 @@
  *   post:
  *     summary: Upload an image
  *     tags: [Image Uploads]
- *     consumes:
- *       - multipart/form-data
- *     parameters:
- *       - in: formData
- *         name: image
- *         type: file
- *         required: true
- *         description: The image file to upload
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The image file to upload
  *     responses:
  *       200:
  *         description: Image uploaded successfully

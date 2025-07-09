@@ -1,3 +1,4 @@
+
 // swagger/swaggerConfig.js
 import swaggerJSDoc from 'swagger-jsdoc';
 
@@ -30,7 +31,7 @@ const options = {
         cookieAuth: {
           type: 'apiKey',
           in: 'cookie',
-          name: 'token', // replace with your actual cookie name
+          name: 'token',
           description: 'JWT token stored in cookie for authentication'
         }
       }
