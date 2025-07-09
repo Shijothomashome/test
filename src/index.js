@@ -43,11 +43,25 @@ await connectDB();
 import './config/passport.js';
 import { JWT_SECRET } from "./config/index.js";
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://medico.oxiumev.com',
+];
+
 // === MIDDLEWARE ===
 app.use(cors({
-    origin: true,
-    credentials: true, // for cookies in browser
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    }
+  },
+  credentials: true, // allow cookies to be sent cross-origin
 }));
+
 app.use(helmet()); // enables all standard protections
 app.use(express.json());
 app.use(cookieParser()); // ✅ Needed for reading cookies
@@ -60,7 +74,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: false, // set to true in production with HTTPS
-        sameSite: 'lax'
+        sameSite: 'Lax'
     }
 }));
 
