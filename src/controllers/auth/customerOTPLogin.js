@@ -64,23 +64,22 @@ const customerOTPLogin = async (req, res) => {
     // Generate refresh + access tokens
     const { accessToken, refreshToken } = tokenGeneratorUtils.tokenGenerator(user._id, user.role);
 
-    // Set cookies
-    res.cookie('access_token', accessToken, {
+    const isSecureRequest = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
+    res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: false, // change to true in production
-      sameSite: 'lax',
-      maxAge: 10 * 60 * 1000 // 10 mins
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
+      maxAge: 10 * 60 * 1000,  // 10 mins
     });
 
-    res.cookie('refresh_token', refreshToken, {
+    res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: false, // change to true in production
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,// 7 days
-      path: REGENERATE_ACCESS_TOKEN_PATH
-
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
+      path: REGENERATE_ACCESS_TOKEN_PATH,
+      maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
     });
-
 
 
     return res.status(200).json({

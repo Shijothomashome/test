@@ -68,16 +68,18 @@ app.use(express.json());
 app.use(cookieParser()); // ✅ Needed for reading cookies
 app.use(morgan("dev"));
 
+app.set('trust proxy', 1);
 app.use(session({
-    secret: JWT_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: false, // set to true in production with HTTPS
-        sameSite: 'Lax'
-    }
+  secret: JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session()); // only needed if using persistent login
