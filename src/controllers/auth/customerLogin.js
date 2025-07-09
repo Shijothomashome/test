@@ -101,14 +101,14 @@ const customerLogin = async (req, res) => {
 
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: false, // change to true in production
+      secure: req.protocol === 'https', // change to true in production
       sameSite: 'lax',
       maxAge: 10 * 60 * 1000 // 10 mins
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: false, // change to true in production
+      secure: req.protocol === 'https', // change to true in production
       sameSite: 'lax',
       path: REGENERATE_ACCESS_TOKEN_PATH,
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
