@@ -6,6 +6,8 @@ import {getUserOrdersByUser} from "./getUserOrdersByUser.js";
 import {trackOrderByUser} from "./trackOrderByUser.js";
 import {updateOrderStatusByAdmin} from "./updateOrderStatusByAdmin.js";
 import {returnOrderByUser} from "./returnOrderByUser.js";
+import {getUserOrdersByUserIdForAdmin} from "./getUserOrdersByUserIdForAdmin.js";
+
 
 export {
     getOrderByUser,
@@ -15,5 +17,6 @@ export {
     getAllOrdersByAdmin,
     updateOrderStatusByAdmin,
     getOrderAnalyticsByAdmin,
-    returnOrderByUser
+    returnOrderByUser,
+    getUserOrdersByUserIdForAdmin
 }

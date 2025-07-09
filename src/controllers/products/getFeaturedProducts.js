@@ -1,36 +1,63 @@
 import Product from "../../models/productModel.js";
-// import CollectionProduct from "../../models/collectionProductModel";
-// import { generateSlug } from "../../helpers/generateSlug";
-// import { generateSKU } from "../../helpers/generateSKU";
 import { handleError } from "../../helpers/handleError.js";
 
-//! Get featured products
-//* @desc    Get featured products
-//* @route   GET /api/products/featured
-//* @access  Public
-
-// This controller fetches featured products that are active and not deleted.
-// It allows for pagination by accepting a limit parameter in the query string.
-// It populates the category and brand fields for each product.
-
+/**
+ * @desc    Get featured products
+ * @route   GET /api/products/featured
+ * @access  Public
+ * 
+ * Fetches featured products that are active and not deleted.
+ * Supports pagination via query parameters.
+ * Excludes variants and populates minimal category/brand info.
+ */
 export const getFeaturedProducts = async (req, res) => {
-  console.log("Fetching featured products...");
   try {
-    const { limit = 10 } = req.query;
+    const { 
+      page = 1, 
+      limit = 10,
+      sort = '-createdAt'
+    } = req.query;
 
-    const featuredProducts = await Product.find({
+    // Base query
+    const query = {
       isFeatured: true,
       isActive: true,
       isDeleted: false
-    })
-    .limit(parseInt(limit))
-    .populate('category')
-    .populate('brand');
+    };
 
-    res.status(200).json({ 
-      success: true, 
-      data: featuredProducts 
-    });
+    // Options for pagination
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort,
+      populate: [
+        { path: 'category', select: 'name slug' },
+        { path: 'brand', select: 'name slug' }
+      ],
+      select: '-variants -richDescription', // Exclude heavy fields
+      lean: true
+    };
+
+    // Execute query with pagination
+    const featuredProducts = await Product.paginate(query, options);
+
+    // Format response
+    const response = {
+      success: true,
+      data: {
+        products: featuredProducts.docs,
+        pagination: {
+          total: featuredProducts.totalDocs,
+          limit: featuredProducts.limit,
+          page: featuredProducts.page,
+          pages: featuredProducts.totalPages,
+          hasNextPage: featuredProducts.hasNextPage,
+          hasPrevPage: featuredProducts.hasPrevPage
+        }
+      }
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     handleError(res, error);
   }

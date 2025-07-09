@@ -182,7 +182,6 @@
 //     handleError(res, error);
 //   }
 // };
-
 import Product from "../../models/productModel.js";
 import Collection from "../../models/collectionModel.js";
 import { generateSlug } from "../../helpers/generateSlug.js";
@@ -263,7 +262,19 @@ const processRichDescription = (richDescription) => {
   }).sort((a, b) => a.order - b.order);
 };
 
+/**
+ * Calculates total stock from all variants
+ */
+const calculateTotalVariantStock = (variants = []) => {
+  return variants.reduce((total, variant) => {
+    return total + (variant.inventory?.stock || 0);
+  }, 0);
+};
+
 export const createProduct = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
     const productData = req.body;
 
@@ -287,11 +298,13 @@ export const createProduct = async (req, res) => {
       productData.richDescription = processRichDescription(productData.richDescription);
     }
 
-    // Calculate min/max prices if not provided
-    if (!productData.minPrice || !productData.maxPrice) {
-      productData.minPrice = productData.basePrice?.sellingPrice || 0;
-      productData.maxPrice = productData.basePrice?.sellingPrice || 0;
-    }
+    // Initialize base inventory if not provided
+    productData.baseInventory = productData.baseInventory || {
+      stock: 0,
+      lowStockThreshold: 5,
+      backorder: false,
+      trackInventory: true
+    };
 
     // Handle variant generation if needed
     if (productData.variantAttributes?.length > 0) {
@@ -301,7 +314,8 @@ export const createProduct = async (req, res) => {
           _id: { $in: productData.variantAttributes },
           isVariantAttribute: true,
         })
-        .lean();
+        .lean()
+        .session(session);
 
       if (attributes.length > 0) {
         if (productData.selectedAttributeValues) {
@@ -313,6 +327,7 @@ export const createProduct = async (req, res) => {
           );
         }
 
+        // Validate selected attribute values
         if (productData.selectedAttributeValues) {
           for (const selectedAttr of productData.selectedAttributeValues) {
             const attribute = attributes.find(
@@ -399,12 +414,16 @@ export const createProduct = async (req, res) => {
             })
           );
 
+          // Update pricing and stock information
           if (productData.variants.length > 0) {
             const prices = productData.variants.map(
               (v) => v.price.sellingPrice
             );
             productData.minPrice = Math.min(...prices);
             productData.maxPrice = Math.max(...prices);
+            
+            // Update base inventory with total variant stock
+            productData.baseInventory.stock = calculateTotalVariantStock(productData.variants);
           }
 
           productData.hasVariants = true;
@@ -412,58 +431,44 @@ export const createProduct = async (req, res) => {
       }
     }
 
+    // For non-variant products or manually added variants
     if (!productData.hasVariants && productData.variants?.length > 0) {
       productData.hasVariants = true;
       const prices = productData.variants.map((v) => v.price.sellingPrice);
       productData.minPrice = Math.min(...prices);
       productData.maxPrice = Math.max(...prices);
+      
+      // Update base inventory with total variant stock
+      productData.baseInventory.stock = calculateTotalVariantStock(productData.variants);
+    }
+
+    // Set default values if not provided
+    if (!productData.minPrice) {
+      productData.minPrice = productData.basePrice?.sellingPrice || 0;
+    }
+    if (!productData.maxPrice) {
+      productData.maxPrice = productData.basePrice?.sellingPrice || 0;
     }
 
     // Create the product
     const product = new Product(productData);
-    await product.save();
+    await product.save({ session });
 
     // Update collections with this product
     if (productData.collection_ids) {
       await updateProductCollections(productData.collection_ids, product._id);
     }
 
+    await session.commitTransaction();
+    
     res.status(201).json({
       success: true,
       data: product,
     });
   } catch (error) {
+    await session.abortTransaction();
     handleError(res, error);
-  }
-};
-
-/**
- * Updates product collections
- */
-export const syncProductCollections = async (productId, newCollectionIds = [], oldCollectionIds = []) => {
-  const newIds = newCollectionIds.map(id => id.toString());
-  const oldIds = oldCollectionIds.map(id => id.toString());
-  
-  const collectionsToAdd = newIds.filter(id => !oldIds.includes(id));
-  const collectionsToRemove = oldIds.filter(id => !newIds.includes(id));
-  
-  if (collectionsToAdd.length > 0) {
-    await Collection.updateMany(
-      { _id: { $in: collectionsToAdd } },
-      { $addToSet: { products: productId } }
-    );
-  }
-  
-  if (collectionsToRemove.length > 0) {
-    await Collection.updateMany(
-      { _id: { $in: collectionsToRemove } },
-      { $pull: { products: productId } }
-    );
-  }
-  
-  const affectedCollections = [...collectionsToAdd, ...collectionsToRemove];
-  if (affectedCollections.length > 0) {
-    const collections = await Collection.find({ _id: { $in: affectedCollections } });
-    await Promise.all(collections.map(collection => collection.updateProductsCount()));
+  } finally {
+    session.endSession();
   }
 };

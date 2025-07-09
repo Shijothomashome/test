@@ -2,7 +2,8 @@
 // import CollectionProduct from "../../models/collectionProductModel";
 // import { generateSlug } from "../../helpers/generateSlug";
 // import { generateSKU } from "../../helpers/generateSKU";
-import { handleError } from "../../helpers/handleError";
+import { handleError } from "../../helpers/handleError.js";
+import orderModel from "../../models/orderModel.js";
 
 //! Get best-selling products
 //* @desc    Get best-selling products in the last X days
@@ -22,7 +23,7 @@ export const getBestSellingProducts = async (req, res) => {
     startDate.setDate(startDate.getDate() - parseInt(days));
 
     // Aggregate to get best-selling products
-    const bestSellers = await Order.aggregate([
+    const bestSellers = await orderModel.aggregate([
       {
         $match: {
           createdAt: { $gte: startDate },
