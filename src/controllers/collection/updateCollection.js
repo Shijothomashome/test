@@ -1,3 +1,7 @@
+import Collection from "../../models/collectionModel.js";
+import { handleError } from "../../helpers/handleError.js";
+import { generateSlug } from "../../helpers/generateSlug.js";
+//
 // @desc    Update collection
 // @route   PUT /api/collections/:id
 export const updateCollection = async (req, res) => {
