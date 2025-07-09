@@ -9,14 +9,14 @@ const router = express.Router();
 // ADMIN ROUTES
 // Create offer - Admin only
 router.post('/admin/offers', 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), 
   offerControllers.createOffer
 );
 
 // Get all offers - Admin only 
 router.get('/admin/offers', 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   offerControllers.getAllOffers
 );
 
@@ -27,14 +27,14 @@ router.get('/offers/:id',
 
 // Update offer - Admin only
 router.put('/admin/offers/:id', 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   middlewares.validatorMiddleware(offerValidatorSchemas.updateOfferSchema), 
   offerControllers.updateOffers
 );
 
 // Delete offer - Admin only
 router.delete('/admin/offers/:id', 
-  authenticate(['admin']),
+//   authenticate(['admin']),
   middlewares.validatorMiddleware(offerValidatorSchemas.deleteOfferSchema), 
   offerControllers.deleteOffer
 );

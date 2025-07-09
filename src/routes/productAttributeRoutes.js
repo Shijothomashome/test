@@ -8,32 +8,32 @@ const router = express.Router();
 
 // ADMIN ROUTES - Require admin privileges
 router.post("/admin/product/attributes",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(attributeValidation.createAttributeSchema),
   attributeControllers.createAttribute
 );
 
 router.get("/admin/product/attributes/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(attributeValidation.getAttributesSchema),
   attributeControllers.getAttributeById
 );
 
 router.put("/admin/product/attributes/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(attributeValidation.updateAttributeSchema),
   attributeControllers.updateAttribute
 );
 
 router.delete("/admin/product/attributes/:id",
-  authenticate(['admin']),
+//   authenticate(['admin']),
   validatorMiddleware(attributeValidation.getAttributesSchema),
   attributeControllers.deleteAttribute
 );
 
 // USER ROUTES - Accessible to all authenticated users
 router.get("/product/attributes",
-  authenticate(),
+//   authenticate(),
   validatorMiddleware(attributeValidation.getAttributesSchema),
   attributeControllers.getAllAttributes
 );

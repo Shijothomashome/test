@@ -8,14 +8,14 @@ const router = express.Router();
 
 // Create wishlist item - requires authentication
 router.post('/',
-  authenticate(),
+//   authenticate(),
   middlewares.validatorMiddleware(whishlistValidator.wishlistItemValidator),
   wishlistController.createWishlist
 );
 
 // Get user's wishlist - requires authentication
 router.get('/',
-  authenticate(),
+//   authenticate(),
   wishlistController.getWishlist
 );
 

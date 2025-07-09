@@ -1,4 +1,4 @@
-name: Deploy to Server with PM2
+name: Deploy to Server with AWS PM2
 
 on:
   push:
