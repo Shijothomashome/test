@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import clc from "cli-color";
 import apiRouter from "./routes/index.js";
+import { initSmartCollections } from './utils/collectionQueue.js';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
@@ -42,26 +43,43 @@ await connectDB();
 import './config/passport.js';
 import { JWT_SECRET } from "./config/index.js";
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5000',
+  'https://medico.oxiumev.com',
+];
+
 // === MIDDLEWARE ===
 app.use(cors({
-    origin: true,
-    credentials: true, // for cookies in browser
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    }
+  },
+  credentials: true, // allow cookies to be sent cross-origin
 }));
+
 app.use(helmet()); // enables all standard protections
 app.use(express.json());
 app.use(cookieParser()); // ✅ Needed for reading cookies
 app.use(morgan("dev"));
 
+app.set('trust proxy', 1);
 app.use(session({
-    secret: JWT_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        secure: false, // set to true in production with HTTPS
-        sameSite: 'lax'
-    }
+  secret: JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session()); // only needed if using persistent login
@@ -72,6 +90,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // === STATIC ===
 app.use(express.static(path.join(__dirname, "public")));
 
+
+
+// Root path => show the static homepage
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index.html"));
 });
@@ -86,6 +107,13 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ success: false, message: "Something went wrong" });
 });
+
+await initSmartCollections().catch(err => {
+  console.error('Failed to initialize smart collections:', err);
+});
+
+// Connect DB and start server
+await connectDB();
 
 
 // === START SERVER ===

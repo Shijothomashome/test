@@ -97,21 +97,21 @@ const customerLogin = async (req, res) => {
       user.role
     );
 
-    const isProduction = process.env.NODE_ENV === "production";
+    const isSecureRequest = req.secure || req.headers['x-forwarded-proto'] === 'https';
 
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
-      maxAge: 10 * 60 * 1000, // 10 minutes
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
+      maxAge: 10 * 60 * 1000, // 10 mins
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
       path: REGENERATE_ACCESS_TOKEN_PATH,
+      maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
     });
 
     const { password: _, ...userData } = user.toObject();
@@ -119,6 +119,7 @@ const customerLogin = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
+      tocken: accessToken,
       user: userData,
     });
   } catch (err) {

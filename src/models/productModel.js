@@ -1,176 +1,359 @@
+// import mongoose from "mongoose";
+// import mongoosePaginate from "mongoose-paginate-v2";
+// import variantSchema from "./productVariantModel.js";
+
+// const priceRuleSchema = new mongoose.Schema({
+//   condition: { type: String, required: true },
+//   adjustment: { type: String, required: true },
+//   adjustmentType: {
+//     type: String,
+//     enum: ["fixed", "percentage"],
+//     required: true
+//   }
+// }, { _id: false });
+
+// const variantGenerationSchema = new mongoose.Schema({
+//   autoGenerate: { type: Boolean, default: true },
+//   priceStrategy: {
+//     type: String,
+//     enum: ["uniform", "tiered", "custom", "matrix"],
+//     default: "uniform",
+//   },
+//   basePrice: { type: Number },
+//   priceIncrement: { type: Number },
+//   priceRules: [priceRuleSchema],
+//   priceMatrix: { type: mongoose.Schema.Types.Mixed },
+//   initialStock: { type: Number, default: 0 },
+//   stockRules: [{
+//     condition: { type: String },
+//     stock: { type: Number }
+//   }]
+// }, { _id: false });
+
+// // Schema for selected attribute values
+// const selectedAttributeValueSchema = new mongoose.Schema({
+//   attribute: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: "Attribute",
+//     required: true
+//   },
+//   values: [{
+//     type: String,
+//     required: true
+//   }]
+// }, { _id: false });
+
+// const productSchema = new mongoose.Schema(
+//   {
+//     name: { type: String, required: true, trim: true },
+//     slug: { type: String, unique: true },
+//     description: { type: String },
+//     shortDescription: { type: String },
+
+//     category: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "Category",
+//       required: true,
+//     },
+//     brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
+
+//     tags: [{ type: String }],
+//     thumbnail: { type: String },
+//     images: [{ type: String }],
+
+//     collection_ids: [{
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "Collection",
+//     }],
+
+//     variantAttributes: [
+//       {
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: "Attribute",
+//       },
+//     ],
+//     // Add selectedAttributeValues to the schema
+//     selectedAttributeValues: [selectedAttributeValueSchema],
+//     variantGroupBy: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "Attribute",
+//     },
+
+//     variantGeneration: variantGenerationSchema,
+
+//     hasVariants: { type: Boolean, default: false },
+//     variants: [variantSchema],
+
+//     basePrice: {
+//       mrp: { type: Number },
+//       sellingPrice: { type: Number },
+//       costPrice: { type: Number },
+//     },
+//     baseInventory: {
+//       stock: { type: Number },
+//       lowStockThreshold: { type: Number, default: 5 },
+//       backorder: { type: Boolean, default: false },
+//       trackInventory: { type: Boolean, default: true },
+//     },
+
+//     minPrice: { type: Number },
+//     maxPrice: { type: Number },
+
+//     isFreeShipping: { type: Boolean, default: false },
+//     shippingClass: {
+//       type: String,
+//       enum: [
+//         "Standard",
+//         "Fragile",
+//         "Oversized",
+//         "Heavy",
+//         "Express",
+//         "Cold Storage",
+//         "Digital",
+//         "Custom",
+//       ],
+//       default: "Standard",
+//     },
+
+//     taxable: { type: Boolean, default: true },
+//     taxCode: { type: String },
+
+//     seo: {
+//       title: { type: String },
+//       description: { type: String },
+//       keywords: [{ type: String }],
+//     },
+
+//     isActive: { type: Boolean, default: false },
+//     isFeatured: { type: Boolean, default: false },
+//     publishedAt: { type: Date, default: null },
+
+//     isDeleted: { type: Boolean, default: false },
+//     deletedAt: { type: Date },
+//     deletionReason: { type: String },
+//   },
+//   {
+//     timestamps: true,
+//   }
+// );
+
+// productSchema.index({ name: "text", description: "text", tags: "text" });
+// productSchema.plugin(mongoosePaginate);
+
+// export default mongoose.model("Product", productSchema);
+
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+import variantSchema from "./productVariantModel.js";
 
-// Variant sub-schema for products with variants like size, color, etc.
-const variantSchema = new mongoose.Schema({
-    sku: { type: String, required: true, unique: true },
-    barcode: { type: String },
-
-    // Attribute-value pairs, e.g., { size: "M", color: "Red" }
-    attributes: {
-        type: Map,
-        of: String,
-        required: true
+const priceRuleSchema = new mongoose.Schema(
+  {
+    condition: { type: String, required: true },
+    adjustment: { type: String, required: true },
+    adjustmentType: {
+      type: String,
+      enum: ["fixed", "percentage"],
+      required: true,
     },
+  },
+  { _id: false }
+);
 
-    // Pricing structure for each variant
-    price: {
-        mrp: {
-            type: Number,
-            required: true,
-            validate: {
-                validator: function (v) {
-                    return v >= this.price.sellingPrice;
-                },
-                message: 'MRP must be greater than or equal to selling price'
-            }
-        },
-        sellingPrice: { type: Number, required: true },
-        costPrice: { type: Number } // Optional internal cost for margin calc
+const variantGenerationSchema = new mongoose.Schema(
+  {
+    autoGenerate: { type: Boolean, default: true },
+    priceStrategy: {
+      type: String,
+      enum: ["uniform", "tiered", "custom", "matrix"],
+      default: "uniform",
     },
+    basePrice: { type: Number },
+    priceIncrement: { type: Number },
+    priceRules: [priceRuleSchema],
+    priceMatrix: { type: mongoose.Schema.Types.Mixed },
+    initialStock: { type: Number, default: 0 },
+    stockRules: [
+      {
+        condition: { type: String },
+        stock: { type: Number },
+      },
+    ],
+  },
+  { _id: false }
+);
 
-    // Inventory tracking per variant
-    inventory: {
-        stock: { type: Number, required: true }, // Current available quantity for this variant
-        lowStockThreshold: { type: Number, default: 5 }, // Optional alert trigger: when stock ≤ this value, it's considered "low"
-        backorder: { type: Boolean, default: false }, // Allow purchase even if stock is 0 (i.e., accept backorders)
-        trackInventory: { type: Boolean, default: true } // If false, system ignores stock count notifications (unlimited / not tracked)
+// Schema for selected attribute values
+const selectedAttributeValueSchema = new mongoose.Schema(
+  {
+    attribute: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Attribute",
+      required: true,
     },
+    values: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+  },
+  { _id: false }
+);
 
-    images: [{ type: String }], // Variant-level images
-
-    // Physical attributes (optional; useful for shipping calculators)
-    weight: { type: Number }, // grams
-    dimensions: {
-        length: { type: Number }, // cm
-        width: { type: Number },
-        height: { type: Number }
+// Schema for rich content blocks
+const contentBlockSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: [
+        "paragraph",
+        "heading",
+        "list",
+        "image",
+        "table",
+        "divider",
+        "warning",
+        "info",
+      ],
+      required: true,
     },
+    content: { type: mongoose.Schema.Types.Mixed },
+    order: { type: Number, required: true },
+    styleClass: { type: String },
+    styles: {
+      type: Map,
+      of: String,
+      default: {},
+    },
+    textStyles: {
+      // For text-specific formatting
+      bold: { type: Boolean, default: false },
+      italic: { type: Boolean, default: false },
+      underline: { type: Boolean, default: false },
+      color: { type: String },
+      backgroundColor: { type: String },
+    },
+  },
+  { _id: false, timestamps: false }
+);
 
-    isActive: { type: Boolean, default: true }
-}, { _id: true, timestamps: true });
-
-const productSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true, trim: true },
-    slug: { type: String, unique: true }, // SEO-friendly URL, auto-generated
+    slug: { type: String, unique: true },
     description: { type: String },
-    shortDescription: { type: String }, // Optional short preview for listings
+    richDescription: [contentBlockSchema],
+    shortDescription: { type: String },
 
-    // Hierarchical classification
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
-    brand: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Brand"
-    },
+    brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
 
-    tags: [{ type: String }], // Useful for filters or search boosting
+    tags: [{ type: String }],
     thumbnail: { type: String },
     images: [{ type: String }],
 
-    // Variant and pricing structure
+    collection_ids: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Collection",
+      },
+    ],
+
+    variantAttributes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Attribute",
+      },
+    ],
+    selectedAttributeValues: [selectedAttributeValueSchema],
+    variantGroupBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Attribute",
+    },
+
+    variantGeneration: variantGenerationSchema,
+
     hasVariants: { type: Boolean, default: false },
     variants: [variantSchema],
 
-    // For simple products without variants
     basePrice: {
-        mrp: {
-            type: Number,
-            validate: {
-                validator: function (v) {
-                    return !this.basePrice?.sellingPrice || v >= this.basePrice.sellingPrice;
-                },
-                message: 'Base MRP must be ≥ base selling price'
-            }
-        },
-        sellingPrice: { type: Number },
-        costPrice: { type: Number }
+      mrp: { type: Number },
+      sellingPrice: { type: Number },
+      costPrice: { type: Number },
     },
     baseInventory: {
-        stock: { type: Number }, // Current available quantity for this variant
-        lowStockThreshold: { type: Number, default: 5 }, // Optional alert trigger: when stock ≤ this value, it's considered "low"
-        backorder: { type: Boolean, default: false },  // Allow purchase even if stock is 0 (i.e., accept backorders)
-        trackInventory: { type: Boolean, default: true } // If false, system ignores stock count notifications (unlimited / not tracked)
+      stock: { type: Number },
+      lowStockThreshold: { type: Number, default: 5 },
+      backorder: { type: Boolean, default: false },
+      trackInventory: { type: Boolean, default: true },
     },
 
-    // Price bounds for frontend filters/sorting
     minPrice: { type: Number },
     maxPrice: { type: Number },
 
-    // Shipping settings
     isFreeShipping: { type: Boolean, default: false },
-
-    // Predefined shipping classifications
     shippingClass: {
-        type: String,
-        enum: [
-            "Standard",       // Regular shipping
-            "Fragile",        // Breakable items
-            "Oversized",      // Furniture, large appliances
-            "Heavy",          // High-weight items
-            "Express",        // Fast-track delivery
-            "Cold Storage",   // Perishable or frozen items
-            "Digital",        // No shipping required
-            "Custom"          // Admin-defined rule
-        ],
-        default: "Standard"
+      type: String,
+      enum: [
+        "Standard",
+        "Fragile",
+        "Oversized",
+        "Heavy",
+        "Express",
+        "Cold Storage",
+        "Digital",
+        "Custom",
+      ],
+      default: "Standard",
     },
 
-    // Tax-related flags
-    taxable: { type: Boolean, default: true }, // Include in tax calculations
-    taxCode: { type: String }, // Optional mapping for GST/VAT/HSC integration
+    taxable: { type: Boolean, default: true },
+    taxCode: { type: String },
 
-    // SEO metadata - can be used on product detail pages
     seo: {
-        title: { type: String }, // Override page title
-        description: { type: String }, // Meta description
-        keywords: [{ type: String }] // Optional keyword list
+      title: { type: String },
+      description: { type: String },
+      keywords: [{ type: String }],
     },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+    },
+    isDealOfTheDay : { type: Boolean, default: false },
+    dealExpiresAt : {type : Date , default : null},
+    isActive: { type: Boolean, default: false },
+    isFeatured: { type: Boolean, default: false },
+    publishedAt: { type: Date, default: null },
 
-    // Status & publishing
-    isActive: { type: Boolean, default: false }, // Only shown if true
-    isFeatured: { type: Boolean, default: false }, // Highlight on homepage
-    publishedAt: { type: Date, default: null }, // Optional publish control
-
-    // Soft delete mechanism
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
-    deletionReason: { type: String }
-
-}, {
+    deletionReason: { type: String },
+  },
+  {
     timestamps: true,
+  }
+);
+
+productSchema.pre('save', function(next) {
+  if (this.isModified('variants') && this.variants?.length > 0) {
+    const totalStock = calculateTotalVariantStock(this.variants);
+    this.baseInventory = this.baseInventory || {};
+    this.baseInventory.stock = totalStock;
+  }
+  next();
 });
 
-// Full-text search index for smart filtering/searching
-productSchema.index({ name: 'text', description: 'text', tags: 'text' });
-
-// Auto-generate SEO-friendly slug
-productSchema.pre('save', function (next) {
-    if (!this.slug) {
-        this.slug = this.name.toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
-    }
-    next();
-});
-
-// Set price bounds and cleanup on save
-productSchema.pre('save', function (next) {
-    if (this.variants && this.variants.length > 0) {
-        const prices = this.variants.map(v => v.price.sellingPrice);
-        this.minPrice = Math.min(...prices);
-        this.maxPrice = Math.max(...prices);
-        this.hasVariants = true;
-        this.basePrice = undefined;
-        this.baseInventory = undefined;
-    } else {
-        this.minPrice = this.maxPrice = this.basePrice?.sellingPrice || 0;
-        this.hasVariants = false;
-        this.variants = [];
-    }
-    next();
-});
+productSchema.index({ name: "text", description: "text", tags: "text" });
+productSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("Product", productSchema);

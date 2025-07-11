@@ -39,6 +39,16 @@ const getAllBrandsForAdminQuerySchema = Joi.object({
   }),
 });
 
+const getBrandByIdSchema = Joi.object({
+    params: Joi.object({
+        id: Joi.string().custom(isValidObjectId, "valid ObjectId").required().messages({
+            "any.required": "Brand ID is required",
+            "string.empty": "Brand ID cannot be empty",
+            "any.invalid": "Invalid Brand ID format"
+        })
+    })
+});
+
 const updateBrandSchemaByAdmin = Joi.object({
   name: Joi.string().trim().min(1).optional().messages({
     "string.empty": `"name" cannot be an empty field`,
@@ -96,4 +106,5 @@ export default {
   toggleBrandStatusByAdminSchema,
   deleteBrandByAdminSchema,
   getAllBrandsForUserQuerySchema,
+  getBrandByIdSchema
 };

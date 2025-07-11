@@ -28,11 +28,13 @@ const regenerateAccessToken = async (req, res) => {
         // ✅ Step 3: Generate new access token based refreshToken
         const newAccessToken = tokenGeneratorUtils.accessTokenGenerator(refreshToken);
 
+        const isSecureRequest = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
         // ✅ Step 4: Set cookie
         res.cookie("access_token", newAccessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            secure: isSecureRequest,
+            sameSite: isSecureRequest ? "none" : "lax",
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 

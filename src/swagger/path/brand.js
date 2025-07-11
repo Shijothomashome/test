@@ -127,6 +127,46 @@
  */
 
 //
+// ─── ADMIN - GET BRAND BY ID ─────────────────────────────────────
+//
+/**
+ * @swagger
+ * /admin/brands/{id}:
+ *   get:
+ *     summary: Get a single brand by ID (Admin)
+ *     tags: [Admin - Brand]
+ *     security:
+ *       - apiKey: []
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Brand ID
+ *     responses:
+ *       200:
+ *         description: Brand fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Brand'
+ *       400:
+ *         description: Invalid brand ID
+ *       404:
+ *         description: Brand not found
+ *       500:
+ *         description: Internal server error
+ */
+
+
+//
 // ─── ADMIN UPDATE BRAND ─────────────────────────────────────
 //
 /**

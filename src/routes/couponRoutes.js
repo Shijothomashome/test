@@ -1,28 +1,57 @@
-import express from "express"
+import express from "express";
 import validatorMiddleware from "../middlewares/validatorMiddleware.js";
-import couponController from "../controllers/coupon/index.js"
+import couponController from "../controllers/coupon/index.js";
 import couponValidatorSchemas from "../validators/couponValidatorSchemas.js";
+import authenticate from "../middlewares/authenticate.js";
 
 const router = express.Router();
 
-//Admin Section
-router.post("/admin/create-coupon",validatorMiddleware(couponValidatorSchemas.createCouponSchema), couponController.createCoupon); 
+// Admin Section - Requires admin role
+router.post("/admin/coupons",
+//   authenticate(['admin']),
+  validatorMiddleware(couponValidatorSchemas.createCouponSchema),
+  couponController.createCoupon
+);
 
- router.get("/admin/getallcoupons", couponController.getAllCoupons);
+router.get("/admin/coupons",
+//   authenticate(['admin']),
+  couponController.getAllCoupons
+);
 
- router.put("/admin/update/:id",validatorMiddleware(couponValidatorSchemas.updateCouponSchema), couponController.updateCoupon);     
+router.put("/admin/coupons/:id",
+//   authenticate(['admin']),
+  validatorMiddleware(couponValidatorSchemas.updateCouponSchema),
+  couponController.updateCoupon
+);
 
- router.patch("/admin/toggle/:id",validatorMiddleware(couponValidatorSchemas.toggleStatusSchema), couponController.toggleCouponStatus); 
+router.patch("/admin/coupons/toggle/:id",
+//   authenticate(['admin']),
+  validatorMiddleware(couponValidatorSchemas.toggleStatusSchema),
+  couponController.toggleCouponStatus
+);
 
- router.delete("/admin/delete/:id",validatorMiddleware(couponValidatorSchemas.deleteCouponSchema), couponController.deleteCoupon); 
+router.delete("/admin/coupons/:id",
+//   authenticate(['admin']),
+//   validatorMiddleware(couponValidatorSchemas.deleteCouponSchema),
+  couponController.deleteCoupon
+);
 
+// User Section - Requires authentication
+router.get("/coupons",
+//   authenticate(),
+  couponController.listAvailableCoupons
+);
 
-// //User Section
+router.post("/coupons/validate",
+//   authenticate(),
+  validatorMiddleware(couponValidatorSchemas.validateCouponCodeSchema),
+  couponController.validateCouponCode
+);
 
- router.get("/getallcoupons", couponController.listAvailableCoupons); 
-
- router.post("/validate",validatorMiddleware(couponValidatorSchemas.validateCouponCodeSchema), couponController.validateCouponCode);
-
-// router.post("/apply", couponController.applyCouponToOrder);
+// Uncomment if needed
+// router.post("/apply",
+//   authenticate(),
+//   couponController.applyCouponToOrder
+// );
 
 export default router;

@@ -4,6 +4,7 @@ import updateBrandByAdmin from "./updateBrandByAdmin.js";
 import deleteBrandByAdmin from "./deleteBrandByAdmin.js";
 import toggleBrandStatusByAdmin from "./toggleBrandStatusByAdmin.js";
 import getAllBrandsForUser from "./getAllBrandsForUser.js";
+import getBrandByIdForAdmin from "./getBrandbyId.js";
 
 export default {
     createBrandByAdmin,
@@ -12,5 +13,5 @@ export default {
     getAllBrandsForUser,
     toggleBrandStatusByAdmin,
     updateBrandByAdmin,
-
+    getBrandByIdForAdmin
 }
