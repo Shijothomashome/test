@@ -97,21 +97,21 @@ const customerLogin = async (req, res) => {
       user.role
     );
 
-    const isProduction = process.env.NODE_ENV === "production";
+    const isSecureRequest = req.secure || req.headers['x-forwarded-proto'] === 'https';
 
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: req.protocol === 'https', // change to true in production
-      sameSite: 'lax',
-      maxAge: 10 * 60 * 1000 // 10 mins
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
+      maxAge: 10 * 60 * 1000, // 10 mins
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: req.protocol === 'https', // change to true in production
-      sameSite: 'lax',
+      secure: isSecureRequest,
+      sameSite: isSecureRequest ? 'none' : 'lax',
       path: REGENERATE_ACCESS_TOKEN_PATH,
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
     });
 
     const { password: _, ...userData } = user.toObject();
