@@ -5,6 +5,7 @@ import updateCategoryStatusByAdmin from "./updateCategoryStatusByAdmin.js";
 import deleteCategoryByAdmin from "./deleteCategoryByAdmin.js";
 import getAllCategoriesForUser from "./getAllCategoriesForUser.js";
 import getCategoryByIdForAdmin from "./getCategoriesByIdForAdmin.js";
+import { getCategoriesForAdmin } from "./getCategoriesForAdmin.js";
 
 export default {
   createCategoryByAdmin,
@@ -13,5 +14,6 @@ export default {
   deleteCategoryByAdmin,
   getAllCategoriesForAdmin,
   getAllCategoriesForUser,
-  getCategoryByIdForAdmin
+  getCategoryByIdForAdmin,
+  getCategoriesForAdmin
 };

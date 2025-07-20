@@ -70,6 +70,8 @@ export const getProducts = async (req, res) => {
       sort = '-createdAt'
     } = req.query;
 
+    console.log
+
     // Base query
     const query = { isDeleted: false };
 

@@ -8,6 +8,7 @@ import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 const sendOTP = async (req, res) => {
     try {
         const { email, phone, purpose } = req.body;
+        console.log(req.body)
 
         const validationError = validateOtpInput({ email, phone, purpose });
         if (validationError) {

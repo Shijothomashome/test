@@ -2,7 +2,9 @@ import brandModel from "../../models/brandModel.js";
 
 const getAllBrandsForAdmin = async (req, res) => {
   try {
+    
     const { page = 1, limit = 10, search = "", isActive } = req.query;
+    
     const pageNum = Math.max(parseInt(page, 10), 1);
     const pageSize = Math.max(parseInt(limit, 10), 1);
     const trimmedSearch = search.trim();
@@ -10,7 +12,7 @@ const getAllBrandsForAdmin = async (req, res) => {
     const filter = {
       isDeleted: false,
       ...(trimmedSearch && { name: { $regex: trimmedSearch, $options: "i" } }),
-      ...(typeof isActive === "boolean" && { isActive }),
+      ...( isActive === "true"? { isActive:true }:isActive=='false'?{isActive:false}:''),
     };
 
 

@@ -42,6 +42,7 @@ await connectDB();
 // Load Passport config (must come before routes)
 import './config/passport.js';
 import { JWT_SECRET } from "./config/index.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -103,10 +104,8 @@ app.use((req, res, next) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ success: false, message: "Something went wrong" });
-});
+
+
 
 await initSmartCollections().catch(err => {
   console.error('Failed to initialize smart collections:', err);
@@ -114,7 +113,7 @@ await initSmartCollections().catch(err => {
 
 // Connect DB and start server
 await connectDB();
-
+app.use(errorHandler)
 
 // === START SERVER ===
 app.listen(PORT, HOST, () => {

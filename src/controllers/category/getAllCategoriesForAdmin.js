@@ -2,7 +2,7 @@ import categoryModel from "../../models/categoryModel.js";
 const getAllCategoriesForAdmin = async (req, res) => {
   try {
     const { search = "", isActive, parentCategoryId, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = req.query;
-
+   console.log(isActive)
     const filters = { isDeleted: false };
 
     // Search by name (case-insensitive)

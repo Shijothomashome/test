@@ -8,6 +8,7 @@ const customerLogin = async (req, res) => {
     const { credential, password } = req.body;
 
     if (!credential || !password) {
+      
       return res.status(400).json({
         success: false,
         message: "Credential and password are required",

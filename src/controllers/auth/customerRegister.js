@@ -8,7 +8,7 @@ const customerRegister = async (req, res) => {
 
   try {
     session.startTransaction();
-
+      
     const { name, email, password, phone, addressList, verification_ids = {} } = req.body;
 
     if (!name || (!email && !phone) || !password) {
