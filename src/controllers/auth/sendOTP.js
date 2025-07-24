@@ -8,7 +8,6 @@ import validateOtpInput from "../../utils/validateOtpInputUtils.js";
 const sendOTP = async (req, res) => {
     try {
         const { email, phone, purpose } = req.body;
-        console.log(req.body)
 
         const validationError = validateOtpInput({ email, phone, purpose });
         if (validationError) {
@@ -22,7 +21,7 @@ const sendOTP = async (req, res) => {
         } else if (phone?.code && phone?.number) {
             user = await userModel.findOne({ phone: { code: phone.code, number: phone.number } });
         } else {
-            return res.status(400).json({ success: false, message: 'Invalid contact details' });
+            return res.status(400).json({ success: false, message: "Invalid contact details" });
         }
 
         const otpQuery = {
@@ -36,24 +35,24 @@ const sendOTP = async (req, res) => {
         if (existingOTP) {
             return res.status(429).json({
                 success: false,
-                message: 'OTP already sent. Please wait before requesting a new one.',
+                message: "OTP already sent. Please wait before requesting a new one.",
             });
         }
 
         let otp, result;
 
         if (email) {
-            if (['reset-password', 'login-email'].includes(purpose) && !user) {
+            if (["reset-password", "login-email"].includes(purpose) && !user) {
                 return res.status(400).json({ success: false, message: `User not found for ${purpose.replace("-", " ")}` });
             }
-            if (['reset-password', 'login-email'].includes(purpose) && user && (!user.isEmailVerified && !user.isVerified)) {
-                return res.status(400).json({ success: false, message: 'Email is not verified' });
+            if (["reset-password", "login-email"].includes(purpose) && user && !user.isEmailVerified && !user.isVerified) {
+                return res.status(400).json({ success: false, message: "Email is not verified" });
             }
             if (user?.isBlocked) {
-                return res.status(403).json({ success: false, message: 'User is blocked' });
+                return res.status(403).json({ success: false, message: "User is blocked" });
             }
             if (user?.isDeleted) {
-                return res.status(410).json({ success: false, message: 'User account has been deleted' });
+                return res.status(410).json({ success: false, message: "User account has been deleted" });
             }
 
             result = await emailUtils.sendEmailOtp(email);
@@ -62,17 +61,17 @@ const sendOTP = async (req, res) => {
             }
             otp = result.otp;
         } else {
-            if (['reset-password', 'login-phone'].includes(purpose) && !user) {
+            if (["reset-password", "login-phone"].includes(purpose) && !user) {
                 return res.status(400).json({ success: false, message: `User not found for ${purpose.replace("-", " ")}` });
             }
-            if (['reset-password', 'login-phone'].includes(purpose) && user && !user.isPhoneVerified) {
-                return res.status(400).json({ success: false, message: 'Phone is not verified' });
+            if (["reset-password", "login-phone"].includes(purpose) && user && !user.isPhoneVerified) {
+                return res.status(400).json({ success: false, message: "Phone is not verified" });
             }
             if (user?.isBlocked) {
-                return res.status(403).json({ success: false, message: 'User is blocked' });
+                return res.status(403).json({ success: false, message: "User is blocked" });
             }
             if (user?.isDeleted) {
-                return res.status(410).json({ success: false, message: 'User account has been deleted' });
+                return res.status(410).json({ success: false, message: "User account has been deleted" });
             }
 
             result = await smsUtils.sendSmsOtpManually(phone);
@@ -93,20 +92,19 @@ const sendOTP = async (req, res) => {
             expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
         });
 
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== "production") {
             console.log(`[OTP DEBUG] Sent OTP: ${otp}`);
         }
 
         return res.status(200).json({
             success: true,
-            message: `OTP sent to your ${email ? 'email' : 'phone'} successfully`,
+            message: `OTP sent to your ${email ? "email" : "phone"} successfully`,
         });
-
     } catch (error) {
         console.error("sendOTP error:", error);
         return res.status(500).json({
             success: false,
-            message: 'Internal server error',
+            message: "Internal server error",
             error: error.message,
         });
     }

@@ -3,7 +3,7 @@ import z from 'zod'
 const errorHandler = (err, req, res, next) => {
   let statusCode = err.status || 500;
   let message = err.message || "Internal Server Error";
-
+console.log(err)
   // Handle Mongoose validation errors
   if (err instanceof mongoose.Error.ValidationError) {
     statusCode = 400;

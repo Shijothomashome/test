@@ -6,6 +6,7 @@ import userValidatorSchemas from '../validators/index.js';
 import authControllers from "../controllers/auth/index.js";
 import testResponse from '../utils/testResponseUtils.js';
 
+
 // TEST Protected Route
 router.get('/protected', middlewares.authenticate(['customer', 'admin']), testResponse);
 

@@ -4,7 +4,7 @@ import Attribute from "../../models/productAttributeModel.js";
 export const updateAttribute = async (req, res) => {
   try {
 
-    console.log(req.params,req.body)
+    console.log(req.body)
     // Validate ID format first
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
