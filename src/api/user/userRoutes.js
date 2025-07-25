@@ -8,6 +8,7 @@ import { updateAddress } from "./address/updateAddress.js";
 import { deleteAddress } from "./address/deleteAddress.js";
 import { getAllAddresses } from "./address/findAllAddress.js";
 import { getAddressById } from "./address/findAddressById.js";
+import { updateProfile } from "./profile/updateProfile.js";
 
 const userRoutes = express.Router();
 
@@ -24,7 +25,8 @@ userRoutes.delete("/address/:addressId",auth,deleteAddress);
 userRoutes.get("/address",auth,getAllAddresses);
 userRoutes.get("/address/:addressId",auth,getAddressById);
 
-
+// Profile
+userRoutes.put("/profile",auth,updateProfile)
 
 
 export default userRoutes;
