@@ -3,8 +3,11 @@ import caroselModel from "../../../models/caroselModel.js";
 import categoryModel from "../../../models/categoryModel.js";
 import productModel from "../../../models/productModel.js";
 
+
 export const getHomePageData = async (req, res, next) => {
     try {
+
+        
         const { carouselLimit } = req.query;
         const limit = parseInt(carouselLimit) || 5;
         const [categories, brands, carousels, featuredProducts] = await Promise.all([

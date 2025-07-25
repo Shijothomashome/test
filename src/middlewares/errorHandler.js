@@ -1,46 +1,78 @@
 import mongoose from "mongoose";
-import z from 'zod'
+import { ZodError } from "zod";
+
+/**
+ * Express error handler middleware
+ */
 const errorHandler = (err, req, res, next) => {
-  let statusCode = err.status || 500;
-  let message = err.message || "Internal Server Error";
-console.log(err)
-  // Handle Mongoose validation errors
-  if (err instanceof mongoose.Error.ValidationError) {
-    statusCode = 400;
-    message = Object.values(err.errors)
-      .map((error) => `${error.path} is required.`)
-      .join(", ");
-  }
+    let statusCode = 500;
+    let message = "Internal Server Error";
+    
+    console.log(err)
 
-  // Handle Mongoose cast errors (e.g., invalid ObjectId format)
-  else if (err instanceof mongoose.Error.CastError) {
-    statusCode = 400;
-    message = `Invalid ${err.path}: ${err.value}`;
-  }
+    // Mongoose validation error
+    if (err instanceof mongoose.Error.ValidationError) {
+        statusCode = 400;
+        message = Object.values(err.errors)
+            .map((error) => `${error.path}: Required`)
+            .join(", ");
+    }
 
-  // Handle MongoDB duplicate key errors (e.g., unique constraint violations)
-  else if (err.code === 11000) {
-    statusCode = 400;
-    const field = Object.keys(err.keyValue)[0];
-    message = `Duplicate value for '${field}': ${err.keyValue[field]}`;
-  }
+    // Mongoose cast error (e.g., invalid ObjectId)
+    else if (err instanceof mongoose.Error.CastError) {
+        statusCode = 400;
+        message = `${err.path}: Required`;
+    }
 
-  // Handle Zod validation errors
-  else if (err instanceof z.ZodError) {
-    statusCode = 400;
-    message = err.errors
-      .map((e) => `${e.path.join(" > ")}: ${e.message}`)
-      .join(", ");
-  }
+    // MongoDB duplicate key error
+    else if (isMongoDuplicateError(err)) {
+        const field = Object.keys(err.keyValue)[0];
+        statusCode = 400;
+        message = `${field}: Already exists`;
+    }
 
-  // Log the error in red
-  console.error(`\x1b[31m${message}\x1b[0m`);
+    // Zod validation error
+    else if (err instanceof ZodError) {
+        statusCode = 400;
+        message = err.issues
+            .map((issue) => {
+                return `${issue.path.join('.')}: Required`;
+            })
+            .join(", ");
+    }
 
-  // Send error response
-  res.status(statusCode).json({
-    success: false,
-    message,
-  });
+    // Custom error with status and message
+    else if (isErrorWithStatusAndMessage(err)) {
+        statusCode = err.status;
+        message = err.message;
+    }
+
+    console.error(`\x1b[31m${message}\x1b[0m`);
+
+    res.status(statusCode).json({
+        success: false,
+        message,
+    });
 };
 
-export default errorHandler
+// Type guard helpers
+function isMongoDuplicateError(error) {
+    return (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === 11000 &&
+        "keyValue" in error
+    );
+}
+
+function isErrorWithStatusAndMessage(error) {
+    return (
+        typeof error === "object" &&
+        error !== null &&
+        "status" in error &&
+        "message" in error
+    );
+}
+
+export default errorHandler;

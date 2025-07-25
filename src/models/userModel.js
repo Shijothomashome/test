@@ -1,79 +1,23 @@
 import mongoose from "mongoose";
 
-// const addressSchema = new mongoose.Schema(
-//     {
-//         emirate: { type: String, required: true }, // e.g., "Dubai"
-//         city: { type: String, required: true }, // e.g., "Al Barsha"
-//         area: { type: String, required: true },  // e.g., "Al Barsha 1"
-//         street: { type: String, required: true },
-//         building: { type: String },
-//         apartment: { type: String },
-//         landmark: { type: String },
-//         isDefault: { type: Boolean, default: false },
-//         coordinates: {
-//             lat: Number,
-//             lng: Number,
-//         },
-//     },
-//     { _id: true }
-// );
-
-const addressSchema = new mongoose.Schema(
+export const addressSchema = new mongoose.Schema(
     {
-        fullName: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        phone: {
-            type: String,
-            required: true,
-        },
-        pincode: {
-            type: String,
-            required: true,
-        },
-        house: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        street: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        landmark: {
-            type: String,
-            trim: true,
-        },
-        city: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        state: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        country: {
-            type: String,
-            default: "India",
-            trim: true,
-        },
-        isDefault: {
-            type: Boolean,
-            default: false,
-        },
-        type: {
-            type: String,
-            enum: ["Home", "Work", "Other"],
-            default: "Home",
+        emirate: { type: String, required: true }, 
+        city: { type: String, required: true }, 
+        area: { type: String, required: true }, 
+        street: { type: String, required: true },
+        building: { type: String },
+        apartment: { type: String },
+        landmark: { type: String },
+        isDefault: { type: Boolean, default: false },
+        coordinates: {
+            lat: Number,
+            lng: Number,
         },
     },
     { _id: true }
 );
+
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
