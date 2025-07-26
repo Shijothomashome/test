@@ -37,7 +37,7 @@ export const getHomePageData = async (req, res, next) => {
                     $project: {
                         name: 1,
                         description: 1,
-                        image: 1,
+                        image: "$thumbnail",
                         basePrice: 1,
                         offer: 1,
                     },
