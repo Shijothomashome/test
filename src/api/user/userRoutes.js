@@ -9,11 +9,14 @@ import { deleteAddress } from "./address/deleteAddress.js";
 import { getAllAddresses } from "./address/findAllAddress.js";
 import { getAddressById } from "./address/findAddressById.js";
 import { updateProfile } from "./profile/updateProfile.js";
+import { getCategoriesAndSubCategories } from "./category/getCategories.js";
+import { getProductsByCategoryId } from "./product/getProductByCategoryId.js";
 
 const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
+userRoutes.get("/products/category/:categoryId",getProductsByCategoryId)
 
 // Home page routes
 userRoutes.get('/home',getHomePageData)
@@ -27,6 +30,9 @@ userRoutes.get("/address/:addressId",auth,getAddressById);
 
 // Profile
 userRoutes.put("/profile",auth,updateProfile)
+
+// Categories
+userRoutes.get("/categories",getCategoriesAndSubCategories)
 
 
 export default userRoutes;
