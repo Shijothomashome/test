@@ -23,7 +23,7 @@ export const getCategoriesAndSubCategories = async (req, res, next) => {
         }
 
         if (type === "selected") {
-           subCategories = await categoryModel.aggregate([{$match:{ parentCategory: { $ne: null } }},{$project:{image:1,name:1}}]);
+           subCategories = await categoryModel.aggregate([{$match:{ parentCategory:new mongoose.Types.ObjectId(parent_id) }},{$project:{image:1,name:1}}]);
         }
 
         res.status(200).json({
