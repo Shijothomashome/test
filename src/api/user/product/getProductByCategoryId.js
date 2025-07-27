@@ -5,9 +5,15 @@ import productModel from "../../../models/productModel.js";
 export const getProductsByCategoryId = async (req, res, next) => {
     try {
         const { categoryId } = req.params;
-        const { limit } = req.query;
-        console.log(categoryId)
-        if (!mongoose.Types.ObjectId.isValid(categoryId)) throw new BadRequestError("Invalid category Id");
+        const { limit, page } = req.query;
+
+        if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+            throw new BadRequestError("Invalid category Id");
+        }
+
+        const pageNumber = parseInt(page) > 0 ? parseInt(page) : 1;
+        const limitNumber = parseInt(limit) > 0 ? parseInt(limit) : 10;
+
         const products = await productModel.aggregate([
             { $match: { category: new mongoose.Types.ObjectId(categoryId) } },
             {
@@ -17,15 +23,18 @@ export const getProductsByCategoryId = async (req, res, next) => {
                             {
                                 $multiply: [
                                     {
-                                        $divide: [{ $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] }, "$basePrice.mrp"],
+                                        $divide: [
+                                            { $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] },
+                                            "$basePrice.mrp"
+                                        ]
                                     },
-                                    100,
-                                ],
+                                    100
+                                ]
                             },
-                            0,
-                        ],
-                    },
-                },
+                            0
+                        ]
+                    }
+                }
             },
             {
                 $project: {
@@ -33,13 +42,18 @@ export const getProductsByCategoryId = async (req, res, next) => {
                     description: 1,
                     image: "$thumbnail",
                     basePrice: 1,
-                    offer: 1,
-                },
+                    offer: 1
+                }
             },
-            { $limit: limit || 5 },
+            { $skip: (pageNumber - 1) * limitNumber },
+            { $limit: limitNumber }
         ]);
 
-        res.status(200).json({success:true,message:"Product data fetched successfully",data:products})
+        res.status(200).json({
+            success: true,
+            message: "Product data fetched successfully",
+            data: products
+        });
     } catch (error) {
         next(error);
     }
