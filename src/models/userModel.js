@@ -2,14 +2,16 @@ import mongoose from "mongoose";
 
 export const addressSchema = new mongoose.Schema(
     {
-        emirate: { type: String, required: true }, 
-        city: { type: String, required: true }, 
-        area: { type: String, required: true }, 
+        emirate: { type: String, required: true },
+        city: { type: String, required: true },
+        area: { type: String, required: true },
         street: { type: String, required: true },
         building: { type: String },
         apartment: { type: String },
         landmark: { type: String },
         isDefault: { type: Boolean, default: false },
+        saveAs: { type: String, default: "home" },
+        receiversPhonenumber:{type:Number},
         coordinates: {
             lat: Number,
             lng: Number,
@@ -17,7 +19,6 @@ export const addressSchema = new mongoose.Schema(
     },
     { _id: true }
 );
-
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
