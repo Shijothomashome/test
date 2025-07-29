@@ -11,12 +11,18 @@ import { getAddressById } from "./address/findAddressById.js";
 import { updateProfile } from "./profile/updateProfile.js";
 import { getCategoriesAndSubCategories } from "./category/getCategories.js";
 import { getProductsByCategoryId } from "./product/getProductByCategoryId.js";
+import { getProductFilterList } from "./product/getFilterList.js";
+import { getFilteredProducts } from "./product/getProducts.js";
+import { getProductDetails } from "./product/getProductDetailst.js";
 
 const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
-userRoutes.get("/products/category/:categoryId",getProductsByCategoryId)
+userRoutes.get("/products/category/:categoryId",getProductsByCategoryId);
+userRoutes.get("/products/filters",getProductFilterList)
+userRoutes.get('/products',getFilteredProducts)
+userRoutes.get('/product/:slugOrId',getProductDetails)
 
 // Home page routes
 userRoutes.get('/home',getHomePageData)

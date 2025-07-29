@@ -3,6 +3,7 @@ import productModel from "../../../models/productModel.js";
 
 export const searchProduct = async (req, res, next) => {
   try {
+    
     const { search } = req.query;
 
     if (!search) {
@@ -12,7 +13,7 @@ export const searchProduct = async (req, res, next) => {
     const results = await productModel.aggregate([
       {
         $lookup: {
-          from: "categories", // actual collection name for categories
+          from: "categories", 
           localField: "category",
           foreignField: "_id",
           as: "categoryData"
