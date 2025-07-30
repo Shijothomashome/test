@@ -14,6 +14,9 @@ import { getProductsByCategoryId } from "./product/getProductByCategoryId.js";
 import { getProductFilterList } from "./product/getFilterList.js";
 import { getFilteredProducts } from "./product/getProducts.js";
 import { getProductDetails } from "./product/getProductDetailst.js";
+import { createWishlist } from "./wishlist/addToWishList.js";
+import { removeFromWishlist } from "./wishlist/removeFromWishlist.js";
+import { getWishlist } from "./wishlist/getWishlist.js";
 
 const userRoutes = express.Router();
 
@@ -38,7 +41,12 @@ userRoutes.get("/address/:addressId",auth,getAddressById);
 userRoutes.put("/profile",auth,updateProfile)
 
 // Categories
-userRoutes.get("/categories",getCategoriesAndSubCategories)
+userRoutes.get("/categories",getCategoriesAndSubCategories);
+
+// Wishlist
+userRoutes.post("/wishlist",auth,createWishlist);
+userRoutes.delete('/wishlist/:productId',auth,removeFromWishlist);
+userRoutes.get("/wishlist",auth,getWishlist)
 
 
 export default userRoutes;

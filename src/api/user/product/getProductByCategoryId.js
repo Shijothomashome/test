@@ -38,7 +38,7 @@ export const getProductsByCategoryId = async (req, res, next) => {
             { $limit: limit || 5 },
         ]);
 
-        res.status(200).json({success:true,message:"Product data fetched successfully",data:products})
+        res.status(200).json({ success: true, message: "Product data fetched successfully", data: products });
     } catch (error) {
         next(error);
     }

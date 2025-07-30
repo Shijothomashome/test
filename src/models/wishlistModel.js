@@ -6,10 +6,7 @@ const wishlistItemSchema = new mongoose.Schema({
         ref: "Product",
         required: true
     },
-    variantId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
-    },
+    
     addedAt: {
         type: Date,
         default: Date.now
@@ -23,7 +20,7 @@ const wishlistSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    items: [wishlistItemSchema],
+    products: [wishlistItemSchema],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date }
 });
