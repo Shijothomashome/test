@@ -13,8 +13,7 @@ router.post(
     "/admin/categories",
     //   authenticate(['admin']),
     upload.single("image"),
-    multerErrorHandler,
-    validatorMiddleware(categoryValidatorSchema.createCategoryByAdminSchema),
+    
     categoryControllers.createCategoryByAdmin
 );
 
@@ -35,7 +34,7 @@ router.put(
     //   authenticate(['admin']),
     upload.single("image"),
     multerErrorHandler,
-    validatorMiddleware(categoryValidatorSchema.updateCategoryByAdminSchema),
+    // validatorMiddleware(categoryValidatorSchema.updateCategoryByAdminSchema),
     categoryControllers.updateCategoryByAdmin
 );
 
@@ -49,7 +48,7 @@ router.patch(
 router.delete(
     "/admin/categories/:id",
     //   authenticate(['admin']),
-    validatorMiddleware(categoryValidatorSchema.deleteCategoryByAdminSchema),
+    // validatorMiddleware(categoryValidatorSchema.deleteCategoryByAdminSchema),
     categoryControllers.deleteCategoryByAdmin
 );
 

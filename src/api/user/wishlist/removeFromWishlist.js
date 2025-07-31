@@ -12,7 +12,6 @@ export const removeFromWishlist = async (req, res, next) => {
     }
 
     const wishlist = await wishlistModel.findOne({ userId });
-    
 
     if (!wishlist) {
       throw new NotFoundError("Wishlist not found");
@@ -26,21 +25,21 @@ export const removeFromWishlist = async (req, res, next) => {
       throw new BadRequestError("Product already removed");
     }
 
-   if(wishlist?.products?.length==1){
-    await wishlistModel.findByIdAndDelete(userId)
-   }else{
-
-       wishlist.products.splice(productIndex, 1);
-   }
-
-    await wishlist.save();
+    if (wishlist.products.length === 1) {
+      
+      await wishlistModel.deleteOne({ userId });
+    } else {
+   
+      wishlist.products.splice(productIndex, 1);
+      await wishlist.save();
+    }
 
     res.status(200).json({
       success: true,
       message: "Product successfully removed from the wishlist",
+      productId:productId
     });
   } catch (error) {
     next(error);
   }
 };
-

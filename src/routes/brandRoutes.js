@@ -43,7 +43,7 @@ router.put(
 router.delete(
     "/admin/brands/:id",
     //   authenticate(["admin"]),
-    validatorMiddleware(brandValidatorSchemas.deleteBrandByAdminSchema),
+    // validatorMiddleware(brandValidatorSchemas.deleteBrandByAdminSchema),
     brandController.deleteBrandByAdmin
 );
 
