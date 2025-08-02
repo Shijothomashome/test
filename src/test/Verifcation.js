@@ -56,7 +56,7 @@ const verification = async (req, res) => {
             .verifications.create({
                 to: `+91${phoneNumber}`,
                 channel: 'sms',
-            });
+        });
 
         res.status(200).json({ success: true, sid: verification.sid });
     } catch (error) {

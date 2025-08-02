@@ -273,7 +273,7 @@ const calculateTotalVariantStock = (variants = []) => {
   }, 0);
 };
 
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res,next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   
@@ -469,7 +469,8 @@ export const createProduct = async (req, res) => {
     });
   } catch (error) {
     await session.abortTransaction();
-    handleError(res, error);
+    // handleError(res, error);
+    next(error);
   } finally {
     session.endSession();
   }

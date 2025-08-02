@@ -47,7 +47,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
-  'http://localhost:5000',
+  'http://localhost:3000',
   'https://medico.oxiumev.com',
 ];
 

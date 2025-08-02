@@ -15,6 +15,7 @@ passport.use(
       callbackURL: GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
+      
       try {
         console.log('Google accessToken:', accessToken);
         console.log('Google refreshToken:', refreshToken);
@@ -45,6 +46,7 @@ passport.use(
 
         return done(null, user);
       } catch (err) {
+       
         return done(err);
       }
     }

@@ -10,7 +10,7 @@ import testResponse from "../utils/testResponseUtils.js";
 router.get("/protected", middlewares.authenticate(["customer", "admin"]), testResponse);
 
 // GOOGLE AUTH
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get(
     "/google/callback",
     passport.authenticate("google", { session: false, failureRedirect: "api/v1/auth/google/failure" }),

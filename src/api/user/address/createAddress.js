@@ -6,7 +6,6 @@ import { addressValidation } from "../../../validators/addressValidation.js";
 export const createAddress = async (req, res, next) => {
   try {
     const userId = req?.user?._id;
-
     
     addressValidation.parse(req.body);
 
@@ -31,7 +30,6 @@ export const createAddress = async (req, res, next) => {
       throw new BadRequestError("User not found");
     }
 
-    
     const newAddress = user.addressList[user.addressList.length - 1];
 
     res.status(201).json({

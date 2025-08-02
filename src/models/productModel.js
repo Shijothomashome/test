@@ -271,8 +271,11 @@ const productSchema = new mongoose.Schema(
     ],
     selectedAttributeValues: [selectedAttributeValueSchema],
     variantGroupBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Attribute",
+     
+      type: String,
+      // ref: "Attribute",
+      default:"",
+      
     },
 
     variantGeneration: variantGenerationSchema,

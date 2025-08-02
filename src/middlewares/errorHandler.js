@@ -7,8 +7,6 @@ import { ZodError } from "zod";
 const errorHandler = (err, req, res, next) => {
     let statusCode = 500;
     let message = "Internal Server Error";
-    
-    console.log(err)
 
     // Mongoose validation error
     if (err instanceof mongoose.Error.ValidationError) {

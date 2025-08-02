@@ -54,7 +54,7 @@ const router = express.Router();
 router.post(
     "/admin/products",
     // authenticate(['admin']),
-    validate(createProductSchema),
+    // validate(createProductSchema),
     createProduct
 );
 
