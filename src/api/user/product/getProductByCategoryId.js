@@ -5,7 +5,7 @@ import productModel from "../../../models/productModel.js";
 export const getProductsByCategoryId = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
-    console.log(categoryId)
+   
     const { limit } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {

@@ -2,7 +2,7 @@ import { APP_FRONTEND_GOOGLE_LOGIN_SUCCESS_CALL_BACK, REGENERATE_ACCESS_TOKEN_PA
 import tokenUtils from "../../utils/tokenGeneratorUtils.js"
 
 const googleCallback = (req, res) => {
-    console.log('Google login successful:', req.user, req.session)
+    
     // Generate refresh + access tokens
     const { accessToken, refreshToken } = tokenUtils.tokenGenerator(req.user._id, req.user.role);
 

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import productModel from "../../../models/productModel.js";
-import { validateBody } from "twilio/lib/webhooks/webhooks.js";
 
 export const getFilteredProducts = async (req, res, next) => {
     try {
@@ -13,7 +12,8 @@ export const getFilteredProducts = async (req, res, next) => {
             sortOrder = "desc",
         } = req.query;
 
-       
+        const userObjectId = new mongoose.Types.ObjectId(req.user._id);
+
         page = parseInt(page);
         limit = parseInt(limit);
         const skip = (page - 1) * limit;
@@ -21,14 +21,13 @@ export const getFilteredProducts = async (req, res, next) => {
         if (!Array.isArray(categories)) categories = [categories];
         if (!Array.isArray(brands)) brands = [brands];
 
-        // Convert to ObjectId
         const validCategories = categories
-            .filter(id => mongoose.Types.ObjectId.isValid(id))
-            .map(id => new mongoose.Types.ObjectId(id));
+            .filter((id) => mongoose.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose.Types.ObjectId(id));
 
         const validBrands = brands
-            .filter(id => mongoose.Types.ObjectId.isValid(id))
-            .map(id => new mongoose.Types.ObjectId(id));
+            .filter((id) => mongoose.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose.Types.ObjectId(id));
 
         const matchStage = {};
         if (validCategories.length > 0) {
@@ -38,7 +37,6 @@ export const getFilteredProducts = async (req, res, next) => {
             matchStage.brand = { $in: validBrands };
         }
 
-        
         const sortStage = {};
         if (sortBy) {
             sortStage[sortBy] = sortOrder === "asc" ? 1 : -1;
@@ -56,16 +54,46 @@ export const getFilteredProducts = async (req, res, next) => {
                                     {
                                         $divide: [
                                             { $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] },
-                                            "$basePrice.mrp"
-                                        ]
+                                            "$basePrice.mrp",
+                                        ],
                                     },
-                                    100
-                                ]
+                                    100,
+                                ],
                             },
-                            0
-                        ]
-                    }
-                }
+                            0,
+                        ],
+                    },
+                },
+            },
+
+            {
+                $lookup: {
+                    from: "wishlists",
+                    let: { productId: "$_id" },
+                    pipeline: [
+                        { $match: { userId: userObjectId } },
+                        {
+                            $project: {
+                                hasProduct: {
+                                    $in: ["$$productId", "$products.productId"],
+                                },
+                            },
+                        },
+                    ],
+                    as: "wishlistInfo",
+                },
+            },
+
+            {
+                $addFields: {
+                    wishlist: {
+                        $cond: {
+                            if: { $gt: [{ $size: "$wishlistInfo" }, 0] },
+                            then: { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
+                            else: false,
+                        },
+                    },
+                },
             },
 
             {
@@ -75,26 +103,23 @@ export const getFilteredProducts = async (req, res, next) => {
                     image: "$thumbnail",
                     basePrice: 1,
                     offer: 1,
-                    createdAt: 1 // Required for sorting
-                }
+                    createdAt: 1,
+                    wishlist: 1,
+                },
             },
 
             {
                 $facet: {
                     metadata: [{ $count: "total" }],
-                    data: [
-                        { $sort: sortStage },
-                        { $skip: skip },
-                        { $limit: limit }
-                    ]
-                }
+                    data: [{ $sort: sortStage }, { $skip: skip }, { $limit: limit }],
+                },
             },
 
             {
                 $unwind: {
                     path: "$metadata",
-                    preserveNullAndEmptyArrays: true
-                }
+                    preserveNullAndEmptyArrays: true,
+                },
             },
 
             {
@@ -103,11 +128,11 @@ export const getFilteredProducts = async (req, res, next) => {
                     currentPage: page,
                     totalPages: {
                         $ceil: {
-                            $divide: ["$metadata.total", limit]
-                        }
-                    }
-                }
-            }
+                            $divide: ["$metadata.total", limit],
+                        },
+                    },
+                },
+            },
         ];
 
         const result = await productModel.aggregate(pipeline);
@@ -115,7 +140,7 @@ export const getFilteredProducts = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: "Products fetched with filters, sorting and offer calculation",
+            message: "Products fetched with filters, sorting, offers, and wishlist flag",
             totalCount,
             currentPage: page,
             totalPages,
