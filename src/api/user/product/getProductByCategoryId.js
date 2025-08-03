@@ -5,7 +5,6 @@ import productModel from "../../../models/productModel.js";
 export const getProductsByCategoryId = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
-   
     const { limit } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
@@ -13,9 +12,11 @@ export const getProductsByCategoryId = async (req, res, next) => {
     }
 
     const limitNumber = parseInt(limit) || 5;
+    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
 
     const products = await productModel.aggregate([
       { $match: { category: new mongoose.Types.ObjectId(categoryId) } },
+
       {
         $addFields: {
           offer: {
@@ -36,6 +37,37 @@ export const getProductsByCategoryId = async (req, res, next) => {
           },
         },
       },
+
+      {
+        $lookup: {
+          from: "wishlists",
+          let: { productId: "$_id" },
+          pipeline: [
+            { $match: { userId: userObjectId } },
+            {
+              $project: {
+                hasProduct: {
+                  $in: ["$$productId", "$products.productId"],
+                },
+              },
+            },
+          ],
+          as: "wishlistInfo",
+        },
+      },
+
+      {
+        $addFields: {
+          wishlist: {
+            $cond: {
+              if: { $gt: [{ $size: "$wishlistInfo" }, 0] },
+              then: { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
+              else: false,
+            },
+          },
+        },
+      },
+
       {
         $project: {
           name: 1,
@@ -43,8 +75,10 @@ export const getProductsByCategoryId = async (req, res, next) => {
           image: "$thumbnail",
           basePrice: 1,
           offer: 1,
+          wishlist: 1,
         },
       },
+
       { $limit: limitNumber },
     ]);
 
