@@ -15,6 +15,7 @@ import passport from "passport";
 import helmet from "helmet";
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger/swaggerConfig.js';
+import './utils/cronjob.js'
 // Load .env
 dotenv.config();
 

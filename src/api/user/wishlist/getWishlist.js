@@ -72,6 +72,7 @@ export const getWishlist = async (req, res, next) => {
             data: products,
             message: "User wishlist fetched successfully",
             page: parseInt(page),
+            totalPages:products.length,
             limit: parseInt(limit),
         });
     } catch (error) {
