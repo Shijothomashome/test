@@ -4,24 +4,21 @@ import { BadRequestError } from "../../../constants/customErrors.js";
 
 export const getWishlist = async (req, res, next) => {
     try {
-        const { page = 1, limit = 15,parent_id='' } = req.query;
+        const { page = 1, limit = 15, parent_id = "" } = req.query;
         const userObjectId = new mongoose.Types.ObjectId(req.user?._id);
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        const categoryCheckMatchStage = {}
+        const categoryCheckMatchStage = {};
 
-        
-            if(parent_id&&!mongoose.Types.ObjectId.isValid(parent_id)){
-                throw new BadRequestError("Invalid parent category Id")
-            }
-            if(parent_id){
-                categoryCheckMatchStage.$match={category:new mongoose.Types.ObjectId(parent_id)}
-            }else{
-                categoryCheckMatchStage.$match={}
-            }
-        
-       
+        if (parent_id && !mongoose.Types.ObjectId.isValid(parent_id)) {
+            throw new BadRequestError("Invalid parent category Id");
+        }
+        if (parent_id) {
+            categoryCheckMatchStage.$match = { category: new mongoose.Types.ObjectId(parent_id) };
+        } else {
+            categoryCheckMatchStage.$match = {};
+        }
 
         const products = await wishlistModel.aggregate([
             { $match: { userId: userObjectId } },
@@ -37,9 +34,10 @@ export const getWishlist = async (req, res, next) => {
                     basePrice: "$productData.basePrice",
                     _id: "$productData._id",
                     image: "$productData.thumbnail",
-                    category:"$productData.category"
+                    category: "$productData.category",
                 },
-            },categoryCheckMatchStage,
+            },
+            categoryCheckMatchStage,
             {
                 $addFields: {
                     offer: {
@@ -47,10 +45,7 @@ export const getWishlist = async (req, res, next) => {
                             {
                                 $multiply: [
                                     {
-                                        $divide: [
-                                            { $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] },
-                                            "$basePrice.mrp",
-                                        ],
+                                        $divide: [{ $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] }, "$basePrice.mrp"],
                                     },
                                     100,
                                 ],
@@ -60,19 +55,17 @@ export const getWishlist = async (req, res, next) => {
                     },
                 },
             },
-            { $sort: { addedAt: -1 } },         // Optional: Most recent first
+            { $sort: { addedAt: -1 } }, // Optional: Most recent first
             { $skip: skip },
             { $limit: parseInt(limit) },
         ]);
 
-
-        
         res.status(200).json({
             success: true,
             data: products,
             message: "User wishlist fetched successfully",
             page: parseInt(page),
-            totalPages:products.length,
+            totalPages: products.length,
             limit: parseInt(limit),
         });
     } catch (error) {

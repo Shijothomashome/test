@@ -18,6 +18,11 @@ export const getProductDetails = async (req, res,next) => {
       .populate("variantGroupBy", "name")
       .lean();
 
+
+      console.log(product
+        
+      )
+
     if (!product || product.isDeleted) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -31,6 +36,7 @@ export const getProductDetails = async (req, res,next) => {
         ...product.variants.map((v) => v.price?.sellingPrice || 0)
       );
     }
+
 
     return res.status(200).json({ product });
   } catch (error) {

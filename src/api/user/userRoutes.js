@@ -17,6 +17,11 @@ import { getProductDetails } from "./product/getProductDetailst.js";
 import { createWishlist } from "./wishlist/addToWishList.js";
 import { removeFromWishlist } from "./wishlist/removeFromWishlist.js";
 import { getWishlist } from "./wishlist/getWishlist.js";
+import userModel from "../../models/userModel.js";
+import { addToCart } from "./cart/addToCart.js";
+import { getCart } from "./cart/getCart.js";
+import { removeFromCart } from "./cart/removeFromCart.js";
+import { changeQuantity } from "./cart/changeCount.js";
 
 const userRoutes = express.Router();
 
@@ -47,6 +52,12 @@ userRoutes.get("/categories",getCategoriesAndSubCategories);
 userRoutes.post("/wishlist",auth,createWishlist);
 userRoutes.delete('/wishlist/:productId',auth,removeFromWishlist);
 userRoutes.get("/wishlist",auth,getWishlist)
+
+// Cart
+userRoutes.post("/cart",auth,addToCart)
+userRoutes.get("/cart",auth,getCart);
+userRoutes.delete('/cart',auth,removeFromCart);
+userRoutes.patch("/cart/update-quantity",auth,changeQuantity)
 
 
 export default userRoutes;

@@ -5,6 +5,7 @@ export const getAllAttributes = async (req, res) => {
 
       
         const { sort,search, category, isActive, isGlobal, isVariantAttribute, isDeleted, page = 1, limit = 10 } = req.query;
+        console.log(isDeleted)
      
         const filter = {};
 
@@ -31,8 +32,8 @@ export const getAllAttributes = async (req, res) => {
         if (isVariantAttribute === "true") filter.isVariantAttribute = true;
         if (isVariantAttribute === "false") filter.isVariantAttribute = false;
 
-        if (isDeleted === "true") filter.isDeleted = true;
-        if (isDeleted === "false") filter.isDeleted = false;
+        if (isDeleted === "true") {filter.isDeleted = true} else filter.isDeleted=false
+       
 
         const options = {
             page: parseInt(page),
