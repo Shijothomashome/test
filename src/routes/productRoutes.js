@@ -47,6 +47,10 @@ import { setIsFeaturedProduct } from "../controllers/products/setIsFeaturedProdu
 import { setIsDealOfTheDay } from "../controllers/products/setDealOfTheDayProduct.js";
 import { getProductImages } from "../controllers/products/getAllImages.js";
 import { toggleProductStatus } from "../controllers/products/toggleIsActive.js";
+import { updateThumbnail } from "../api/admin/product/updateThumbnail.js";
+import uploadToS3 from "../utils/uploadToS3.js";
+import { updateSubProductImages } from "../api/admin/product/updateSubProductImages.js";
+import { deleteProductSubImage } from "../api/admin/product/deleteProductSubImage.js";
 
 const router = express.Router();
 
@@ -175,6 +179,11 @@ router.get(
 router.patch("/admin/product/featured/:id", setIsFeaturedProduct);
 router.patch("/admin/product/status/:id", toggleProductStatus);
 router.patch("/admin/product/deal-of-the-day/:id", setIsDealOfTheDay);
-router.patch("/admin/product/images/:id", getProductImages);
+router.get("/admin/product/images/:id", getProductImages);
+router.patch('/admin/product/thumbnail/:productId',uploadToS3.single('thumbnail'),updateThumbnail)
+router.patch("/admin/product/sub-images/:productId",uploadToS3.array("images"),updateSubProductImages)
+router.delete("/admin/product/sub-image/:productId",deleteProductSubImage)
+
+
 
 export default router;

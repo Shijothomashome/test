@@ -37,6 +37,9 @@ const deleteFromS3 = async (s3Url) => {
 
   const command = new DeleteObjectCommand(deleteParams);
   await s3client.send(command);
+
+  console.log("Image successfully deleted")
+  return true;
 };
 
 export default {
