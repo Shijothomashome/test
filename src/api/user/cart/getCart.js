@@ -7,8 +7,12 @@ export const getCart = async(req, res, next) => {
 
         const userId = req.user?._id;
       
+        const cartData = await cartModel.findOne({userId:userId});
+        if(!cartData){
+            throw new NotFoundError("Cart not found")
+        }
         const cart =await getLatestCart(userId)
-        console.log(cart)
+        
         if(!cart){
             throw new NotFoundError("Cart not found")
             
