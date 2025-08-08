@@ -2,6 +2,7 @@ import userModel from "../../models/userModel.js";
 import bcrypt from "bcryptjs";
 import tokenGeneratorUtils from "../../utils/tokenGeneratorUtils.js";
 import { REGENERATE_ACCESS_TOKEN_PATH } from "../../config/index.js";
+import wishlistModel from "../../models/wishlistModel.js";
 
 const customerLogin = async (req, res) => {
   try {
@@ -116,12 +117,15 @@ const customerLogin = async (req, res) => {
     });
 
     const { password: _, ...userData } = user.toObject();
+    const wishlist = await wishlistModel.findOne({userId:user?._id});
+    
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
       tocken: accessToken,
       user: userData,
+      wishlistCount:wishlist.products.length
     });
   } catch (err) {
     console.error("Login error:", err);
