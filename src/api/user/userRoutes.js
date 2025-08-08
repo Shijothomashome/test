@@ -22,41 +22,42 @@ import { addToCart } from "./cart/addToCart.js";
 import { getCart } from "./cart/getCart.js";
 import { removeFromCart } from "./cart/removeFromCart.js";
 import { changeQuantity } from "./cart/changeCount.js";
+import authenticate from "../../middlewares/authenticate.js";
 
 const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
-userRoutes.get("/products/category/:categoryId",auth,getProductsByCategoryId);
+userRoutes.get("/products/category/:categoryId",authenticate,getProductsByCategoryId);
 userRoutes.get("/products/filters",getProductFilterList)
-userRoutes.get('/products',auth,getFilteredProducts)
+userRoutes.get('/products',authenticate,getFilteredProducts)
 userRoutes.get('/product/:slugOrId',getProductDetails)
 
 // Home page routes
 userRoutes.get('/home',getHomePageData)
 
 // Address routes
-userRoutes.post("/address",auth,createAddress)
-userRoutes.put("/address/:addressId",auth,updateAddress)
-userRoutes.delete("/address/:addressId",auth,deleteAddress);
-userRoutes.get("/address",auth,getAllAddresses);
+userRoutes.post("/address",authenticate(),createAddress)
+userRoutes.put("/address/:addressId",authenticate(),updateAddress)
+userRoutes.delete("/address/:addressId",authenticate(),deleteAddress);
+userRoutes.get("/address",authenticate(),getAllAddresses);
 userRoutes.get("/address/:addressId",auth,getAddressById);
 
 // Profile
-userRoutes.put("/profile",auth,updateProfile)
+userRoutes.put("/profile",authenticate(),updateProfile)
 
 // Categories
 userRoutes.get("/categories",getCategoriesAndSubCategories);
 
 // Wishlist
-userRoutes.post("/wishlist",auth,createWishlist);
-userRoutes.delete('/wishlist/:productId',auth,removeFromWishlist);
-userRoutes.get("/wishlist",auth,getWishlist)
+userRoutes.post("/wishlist",authenticate(),createWishlist);
+userRoutes.delete('/wishlist/:productId',authenticate(),removeFromWishlist);
+userRoutes.get("/wishlist",authenticate(),getWishlist)
 
 // Cart
-userRoutes.post("/cart",auth,addToCart)
-userRoutes.get("/cart",auth,getCart);
-userRoutes.delete('/cart',auth,removeFromCart);
+userRoutes.post("/cart",authenticate(),addToCart)
+userRoutes.get("/cart",authenticate(),getCart);
+userRoutes.delete('/cart',authenticate(),removeFromCart);
 userRoutes.patch("/cart/update-quantity",auth,changeQuantity)
 
 
