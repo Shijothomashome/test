@@ -6,7 +6,7 @@ import { addressValidation } from "../../../validators/addressValidation.js";
 export const createAddress = async (req, res, next) => {
   try {
     const userId = req?.user?._id;
-    
+     
     addressValidation.parse(req.body);
 
     const { isDefault } = req.body;
@@ -24,7 +24,7 @@ export const createAddress = async (req, res, next) => {
       { $push: { addressList: req.body } }
     );
 
-    const user = await userModel.findById(userId);
+    const user = await userModel.findOne({_id:userId})
 
     if (!user) {
       throw new BadRequestError("User not found");

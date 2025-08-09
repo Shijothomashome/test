@@ -1,5 +1,28 @@
 import mongoose from "mongoose";
 
+export const shippingAddressSchema = new mongoose.Schema(
+    {
+        name:{type:String,required:true},
+        email:{type:String},
+        phone:{type:Number},
+        emirate: { type: String, required: true },
+        city: { type: String, required: true },
+        area: { type: String, required: true },
+        street: { type: String, required: true },
+        building: { type: String },
+        apartment: { type: String },
+        landmark: { type: String },
+        isDefault: { type: Boolean, default: false },
+        saveAs: { type: String, default: "home" },
+        receiversPhonenumber:{type:Number},
+        coordinates: {
+            lat: Number,
+            lng: Number,
+        },
+    },{_id:false}
+    
+);
+
 const returnItemSchema = new mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
     variantId: { type: mongoose.Schema.Types.ObjectId },
@@ -47,16 +70,16 @@ const orderItemSchema = new mongoose.Schema({
     }
 }, { _id: false });
 
-const shippingAddressSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    addressLine1: { type: String, required: true },
-    addressLine2: { type: String },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    pincode: { type: String, required: true },
-    country: { type: String, required: true, default: "India" }
-}, { _id: false });
+// const shippingAddressSchema = new mongoose.Schema({
+//     name: { type: String, required: true },
+//     phone: { type: String, required: true },
+//     addressLine1: { type: String, required: true },
+//     addressLine2: { type: String },
+//     city: { type: String, required: true },
+//     state: { type: String, required: true },
+//     pincode: { type: String, required: true },
+//     country: { type: String, required: true, default: "India" }
+// }, { _id: false });
 
 const paymentDetailsSchema = new mongoose.Schema({
     paymentMethod: {
@@ -88,7 +111,7 @@ const orderSchema = new mongoose.Schema({
         default: `TEMP-${Date.now()}`
     },
     items: [orderItemSchema],
-    shippingAddress: shippingAddressSchema,
+    shippingAddress: {type:shippingAddressSchema,required:true},
     paymentDetails: paymentDetailsSchema,
     orderStatus: {
         type: String,

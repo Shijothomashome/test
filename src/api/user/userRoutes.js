@@ -23,6 +23,9 @@ import { getCart } from "./cart/getCart.js";
 import { removeFromCart } from "./cart/removeFromCart.js";
 import { changeQuantity } from "./cart/changeCount.js";
 import authenticate from "../../middlewares/authenticate.js";
+import { getCheckoutInfo } from "./cart/getCheckoutInfo.js";
+import { checkout } from "./cart/checkout.js";
+
 
 const userRoutes = express.Router();
 
@@ -41,7 +44,7 @@ userRoutes.post("/address",authenticate(),createAddress)
 userRoutes.put("/address/:addressId",authenticate(),updateAddress)
 userRoutes.delete("/address/:addressId",authenticate(),deleteAddress);
 userRoutes.get("/address",authenticate(),getAllAddresses);
-userRoutes.get("/address/:addressId",auth,getAddressById);
+userRoutes.get("/address/:addressId",authenticate(),getAddressById);
 
 // Profile
 userRoutes.put("/profile",authenticate(),updateProfile)
@@ -58,7 +61,10 @@ userRoutes.get("/wishlist",authenticate(),getWishlist)
 userRoutes.post("/cart",authenticate(),addToCart)
 userRoutes.get("/cart",authenticate(),getCart);
 userRoutes.delete('/cart',authenticate(),removeFromCart);
-userRoutes.patch("/cart/update-quantity",auth,changeQuantity)
+userRoutes.patch("/cart/update-quantity",authenticate(),changeQuantity);
+userRoutes.get("/cart/checkout",authenticate(),getCheckoutInfo)
+userRoutes.post("/cart/checkout",checkout)
+
 
 
 export default userRoutes;

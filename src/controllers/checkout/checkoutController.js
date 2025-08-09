@@ -190,7 +190,7 @@ export const initiateCheckout = async (req, res) => {
     
     try {
         const userId = req.user?._id;
-        const { shippingAddress, paymentMethod, couponCode } = req.body;
+        const { shippingAddress, paymentMethod, couponCode} = req.body;
 
         // Validate required fields
         if (!shippingAddress?.name || !shippingAddress?.phone || 

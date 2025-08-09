@@ -120,6 +120,10 @@ export const applyApplicableOffers = async (cart) => {
       select: '_id'
     });
 
+    if(activeOffers.length==0){
+      return {...cart.toObject(),totalDiscount:0}
+    }
+
     console.log('Active offers:', activeOffers.map(o => o.title));
 
     if (!activeOffers.length) return cart;
@@ -135,7 +139,7 @@ export const applyApplicableOffers = async (cart) => {
       map[product._id.toString()] = product;
       return map;
     }, {});
-
+console.log(productMap)
     // Process each cart item to apply offers
     let totalDiscount = 0;
     const updatedItems = cart.items.map(item => {
