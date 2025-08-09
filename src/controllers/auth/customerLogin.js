@@ -104,7 +104,7 @@ const customerLogin = async (req, res) => {
       httpOnly: true,
       secure: isSecureRequest,
       sameSite: isSecureRequest ? 'none' : 'lax',
-      maxAge: 10 * 60 * 1000, // 10 mins
+      maxAge: 1000 * 60 * 1000, // 10 mins
     });
 
     res.cookie("refresh_token", refreshToken, {
