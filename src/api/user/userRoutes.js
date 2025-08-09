@@ -31,9 +31,9 @@ const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
-userRoutes.get("/products/category/:categoryId",getProductsByCategoryId);
+userRoutes.get("/products/category/:categoryId",authenticate(),getProductsByCategoryId);
 userRoutes.get("/products/filters",getProductFilterList)
-userRoutes.get('/products',getFilteredProducts)
+userRoutes.get('/products',authenticate(),getFilteredProducts)
 userRoutes.get('/product/:slugOrId',getProductDetails)
 
 // Home page routes
