@@ -12,7 +12,7 @@ export const checkout = async (req, res, next) => {
 
     try {
         const userId = req.user?._id;
-        const { addressId, paymentMethod, couponCode, name, phone } = req.body;
+        const { addressId, paymentMethod, couponCode } = req.body;
 
         // ===== 1. Validate user =====
         const user = await userModel.findOne({ _id: userId });
@@ -26,7 +26,7 @@ export const checkout = async (req, res, next) => {
             throw new NotFoundError("Address not found");
         }
 
-        const shippingAddress = { ...address.toObject(), name, phone };
+        const shippingAddress = { ...address.toObject(), name:user?.name, phone:user?.phone };
         console.log("Shipping address:", shippingAddress);
 
         // ===== 3. Get cart =====

@@ -22,7 +22,7 @@ export const changeQuantity = async (req, res, next) => {
             throw new NotFoundError("Product not found");
         }
 
-        if (product.hasVariant) {
+        if (product.hasVariants) {
             if (!variantId || !mongoose.Types.ObjectId.isValid(variantId)) {
                 throw new BadRequestError("Valid variant Id required");
             }
@@ -35,7 +35,7 @@ export const changeQuantity = async (req, res, next) => {
 
         let index = -1;
 
-        if (product.hasVariant) {
+        if (product.hasVariants) {
             index = cart.items.findIndex(
                 (i) => i.productId.toString() === productId && i.variantId?.toString() === variantId
             );
