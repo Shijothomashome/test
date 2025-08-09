@@ -63,7 +63,7 @@ userRoutes.get("/cart",authenticate(),getCart);
 userRoutes.delete('/cart',authenticate(),removeFromCart);
 userRoutes.patch("/cart/update-quantity",authenticate(),changeQuantity);
 userRoutes.get("/cart/checkout",authenticate(),getCheckoutInfo)
-userRoutes.post("/cart/checkout",checkout)
+userRoutes.post("/cart/checkout",authenticate(),checkout)
 
 
 
