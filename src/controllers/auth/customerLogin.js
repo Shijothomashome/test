@@ -107,7 +107,7 @@ const customerLogin = async (req, res) => {
       maxAge: 60 * 60 * 1000, // 10 mins
     });
 
-    res.cookie("refresh_token", accessToken, {
+    res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: isSecureRequest,
       sameSite: isSecureRequest ? 'none' : 'lax',
