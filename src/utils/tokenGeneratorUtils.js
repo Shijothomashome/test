@@ -15,7 +15,7 @@ const accessTokenGenerator = (refreshToken) => {
     return jwt.sign(
         { token: refreshToken },
         JWT_ACCESS_SECRET,
-        { expiresIn: '10m' }
+        { expiresIn: "1d" }
     );
 };
 
