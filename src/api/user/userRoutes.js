@@ -25,19 +25,20 @@ import { changeQuantity } from "./cart/changeCount.js";
 import authenticate from "../../middlewares/authenticate.js";
 import { getCheckoutInfo } from "./cart/getCheckoutInfo.js";
 import { checkout } from "./cart/checkout.js";
+import isLoggedIn from "../../middlewares/isLoggedIn.js";
 
 
 const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
-userRoutes.get("/products/category/:categoryId",authenticate(),getProductsByCategoryId); // bugfix if the user exists need to check wishlist else not 
+userRoutes.get("/products/category/:categoryId",isLoggedIn(),getProductsByCategoryId); // bugfix if the user exists need to check wishlist else not 
 userRoutes.get("/products/filters",getProductFilterList)
-userRoutes.get('/products',authenticate(),getFilteredProducts) // bugfix if the user exists need to check wishlist else not 
+userRoutes.get('/products',isLoggedIn(),getFilteredProducts) // bugfix if the user exists need to check wishlist else not 
 userRoutes.get('/product/:slugOrId',getProductDetails)
 
 // Home page routes
-userRoutes.get('/home',getHomePageData)
+userRoutes.get('/home',isLoggedIn(),getHomePageData)
 
 // Address routes
 userRoutes.post("/address",authenticate(),createAddress)

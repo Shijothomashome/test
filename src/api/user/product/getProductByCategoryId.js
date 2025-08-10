@@ -12,11 +12,14 @@ export const getProductsByCategoryId = async (req, res, next) => {
     }
 
     const limitNumber = parseInt(limit) || 5;
-    const userObjectId = new mongoose.Types.ObjectId(req.user._id);
+
+    const isUserLoggedIn = req.user && req.user._id;
+    const userObjectId = isUserLoggedIn ? new mongoose.Types.ObjectId(req.user._id) : null;
 
     const products = await productModel.aggregate([
       { $match: { category: new mongoose.Types.ObjectId(categoryId) } },
 
+      // Calculate offer percentage
       {
         $addFields: {
           offer: {
@@ -38,36 +41,47 @@ export const getProductsByCategoryId = async (req, res, next) => {
         },
       },
 
-      {
-        $lookup: {
-          from: "wishlists",
-          let: { productId: "$_id" },
-          pipeline: [
-            { $match: { userId: userObjectId } },
+      // If user is logged in, check wishlist
+      ...(isUserLoggedIn
+        ? [
             {
-              $project: {
-                hasProduct: {
-                  $in: ["$$productId", "$products.productId"],
+              $lookup: {
+                from: "wishlists",
+                let: { productId: "$_id" },
+                pipeline: [
+                  { $match: { userId: userObjectId } },
+                  {
+                    $project: {
+                      hasProduct: {
+                        $in: ["$$productId", "$products.productId"],
+                      },
+                    },
+                  },
+                ],
+                as: "wishlistInfo",
+              },
+            },
+            {
+              $addFields: {
+                wishlist: {
+                  $cond: {
+                    if: { $gt: [{ $size: "$wishlistInfo" }, 0] },
+                    then: { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
+                    else: false,
+                  },
                 },
               },
             },
-          ],
-          as: "wishlistInfo",
-        },
-      },
-
-      {
-        $addFields: {
-          wishlist: {
-            $cond: {
-              if: { $gt: [{ $size: "$wishlistInfo" }, 0] },
-              then: { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
-              else: false,
+          ]
+        : [
+            {
+              $addFields: {
+                wishlist: false,
+              },
             },
-          },
-        },
-      },
+          ]),
 
+      // Final projection
       {
         $project: {
           name: 1,
