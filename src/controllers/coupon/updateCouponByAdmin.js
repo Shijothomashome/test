@@ -5,6 +5,8 @@ import couponModel from "../../models/couponModel.js";
 
 export const updateCoupon = async (req, res) => {
   try {
+
+    
     const couponId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(couponId)) {
@@ -27,6 +29,9 @@ export const updateCoupon = async (req, res) => {
       "validTill",
       "isActive",
       "isDeleted",
+      "applicableCategories",
+      "applicableBrands",
+      "applicableProducts",
     ];
 
     const payload = updatableFields.reduce((obj, key) => {
@@ -36,6 +41,8 @@ export const updateCoupon = async (req, res) => {
       return obj;
     }, {});
 
+
+    console.log(pa)
     if (Object.keys(payload).length === 0) {
       return res.status(400).json({
         success: false,

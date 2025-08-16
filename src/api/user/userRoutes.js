@@ -26,6 +26,8 @@ import authenticate from "../../middlewares/authenticate.js";
 import { getCheckoutInfo } from "./cart/getCheckoutInfo.js";
 import { checkout } from "./cart/checkout.js";
 import isLoggedIn from "../../middlewares/isLoggedIn.js";
+import { getAllOrders } from "./order/getOrders.js";
+import { getOrderDetails } from "./order/getOrderDetails.js";
 
 
 const userRoutes = express.Router();
@@ -65,6 +67,10 @@ userRoutes.delete('/cart',authenticate(),removeFromCart);
 userRoutes.patch("/cart/update-quantity",authenticate(),changeQuantity);
 userRoutes.get("/cart/checkout",authenticate(),getCheckoutInfo)
 userRoutes.post("/cart/checkout",authenticate(),checkout)
+
+// Order
+userRoutes.get("/orders",authenticate(),getAllOrders);
+userRoutes.get("/orders/:orderId",authenticate(),getOrderDetails)
 
 
 

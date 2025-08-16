@@ -3,13 +3,14 @@ import validatorMiddleware from "../middlewares/validatorMiddleware.js";
 import couponController from "../controllers/coupon/index.js";
 import couponValidatorSchemas from "../validators/couponValidatorSchemas.js";
 import authenticate from "../middlewares/authenticate.js";
+import { getAllCategoriesBrandsProducts } from "../api/admin/coupon/getAllCategoriesBrandsProduts.js";
 
 const router = express.Router();
 
 // Admin Section - Requires admin role
 router.post("/admin/coupons",
 //   authenticate(['admin']),
-  validatorMiddleware(couponValidatorSchemas.createCouponSchema),
+  // validatorMiddleware(couponValidatorSchemas.createCouponSchema),
   couponController.createCoupon
 );
 
@@ -20,7 +21,7 @@ router.get("/admin/coupons",
 
 router.put("/admin/coupons/:id",
 //   authenticate(['admin']),
-  validatorMiddleware(couponValidatorSchemas.updateCouponSchema),
+  // validatorMiddleware(couponValidatorSchemas.updateCouponSchema),
   couponController.updateCoupon
 );
 
@@ -53,5 +54,10 @@ router.post("/coupons/validate",
 //   authenticate(),
 //   couponController.applyCouponToOrder
 // );
+
+router.get("/admin/coupons/add-data",
+//   authenticate(['admin']), 
+  getAllCategoriesBrandsProducts
+);
 
 export default router;
