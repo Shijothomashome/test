@@ -33,10 +33,17 @@ const returnItemSchema = new mongoose.Schema({
     price: Number
 }, { _id: false });
 
+
+const cancellationSchema = new mongoose.Schema({
+
+    reason:{type:String,required:true},
+    cancelledAt:{type:Date}
+
+},{_id:false})
 const returnRequestSchema = new mongoose.Schema({
     returnId: String,
     items: [returnItemSchema],
-    status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED", "COMPLETED"], default: "PENDING" },
+    status: { type: String, enum: ["PLACED","SHIPPED","DELIVERED","CANCELLED"], default: "PLACED" },
     requestedAt: Date,
     processedAt: Date,
     reason: String,
@@ -136,6 +143,8 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     deliveryDate: Date,
+    cancellation:{cancellationSchema},
+    
     trackingNumber: String,
     couponCode: String,
     notes: String,

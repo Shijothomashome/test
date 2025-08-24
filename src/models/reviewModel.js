@@ -28,12 +28,7 @@ const reviewSchema = new mongoose.Schema(
       trim: true,
       maxlength: 1000,
     },
-    images: [
-      {
-        url: String,
-        publicId: String,
-      },
-    ],
+    images: {type: [String], default: []},
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -62,8 +57,7 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+   
   }
 );
 
@@ -105,4 +99,4 @@ reviewSchema.post("remove", function () {
   this.constructor.getAverageRating(this.product);
 });
 
-export default mongoose.model("Review", reviewSchema);
+export default mongoose.model("Review", reviewSchema);     

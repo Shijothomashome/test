@@ -28,6 +28,15 @@ import { checkout } from "./cart/checkout.js";
 import isLoggedIn from "../../middlewares/isLoggedIn.js";
 import { getAllOrders } from "./order/getOrders.js";
 import { getOrderDetails } from "./order/getOrderDetails.js";
+import { createReview } from "./review/createReview.js";
+import { getAllReviews } from "./review/getAllReviews.js";
+import { likeReview } from "./review/likeReview.js";
+import { dislikeReview } from "./review/dislikeReview.js";
+import uploadToS3 from "../../utils/uploadToS3.js";
+import { updateReview } from "../../controllers/review/updateReview.js";
+import { updateReviewStatus } from "./review/updateStatus.js";
+import { cancellOrder } from "./order/cancellOrder.js";
+import { reOrder } from "./order/reorder.js";
 
 
 const userRoutes = express.Router();
@@ -70,7 +79,17 @@ userRoutes.post("/cart/checkout",authenticate(),checkout)
 
 // Order
 userRoutes.get("/orders",authenticate(),getAllOrders);
-userRoutes.get("/orders/:orderId",authenticate(),getOrderDetails)
+userRoutes.get("/orders/:orderId",authenticate(),getOrderDetails)       
+userRoutes.patch("/orders/cancel/:orderId",authenticate(),cancellOrder);
+userRoutes.post('/orders/reorder/:orderId',authenticate(),reOrder)
+     
+// review
+userRoutes.post("/reviews", authenticate(["customer", "admin"]),uploadToS3.array("images"), createReview);
+userRoutes.get("/reviews", authenticate(["customer", "admin"]), getAllReviews);
+userRoutes.patch("/reviews/like/:reviewId", authenticate(["customer", "admin"]), likeReview);
+userRoutes.patch("/reviews/dislike/:reviewId", authenticate(["customer", "admin"]), dislikeReview)   
+
+
 
 
 

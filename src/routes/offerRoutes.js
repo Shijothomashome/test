@@ -8,9 +8,9 @@ const router = express.Router();
 
 // ADMIN ROUTES
 // Create offer - Admin only
-router.post('/admin/offers', 
+router.post('/admin/offers',
 //   authenticate(['admin']),
-  middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), 
+  // middlewares.validatorMiddleware(offerValidatorSchemas.createOfferSchema), 
   offerControllers.createOffer
 );
 

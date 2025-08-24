@@ -5,7 +5,7 @@ import Attribute from "../../models/productAttributeModel.js";
 // @route   DELETE /api/v1/attributes/:id
 // @access  Private/Admin
 export const deleteAttribute = async (req, res) => {
-  try {
+  try { 
     const { deletionReason } = req.body;
     const attribute = await Attribute.findById(req.params.id);
 

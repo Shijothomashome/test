@@ -34,7 +34,7 @@ const otpQueueSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      default: () => new Date(Date.now() + 5 * 60 * 1000), // default 5 minutes from now
+      default: () => new Date(Date.now() + 5 * 60 * 1000), 
     },
   },
   {

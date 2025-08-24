@@ -6,6 +6,7 @@ import { applyApplicableOffers } from "../../../utils/offerService.js";
 import { validateAndApplyCoupon } from "../../../utils/couponService.js";
 import paymentModel from "../../../models/paymentModel.js";
 import orderModel from "../../../models/orderModel.js";
+import productModel from "../../../models/productModel.js";
 export const checkout = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -33,6 +34,29 @@ export const checkout = async (req, res, next) => {
         let cart = await cartModel.findOne({ userId: new mongoose.Types.ObjectId(userId) });
         if (!cart || cart.items.length === 0) {
             throw new NotFoundError("Cart is empty");
+        }
+
+        // check product availability
+        for (const item of cart.items) {
+            const product = await productModel.findById(item.productId);
+           
+            if (!product) {
+                throw new NotFoundError(`Product with ID ${item.productId} not found`);
+            }
+
+            
+
+            if (product.hasVariants) {
+                const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
+
+               
+                
+                if (!variant || variant.inventory.stock < item.quantity) {
+                    throw new NotFoundError(`Variant with ID ${item.variantId} not available in sufficient quantity`);
+                }
+            } else if (product.inventory.stock < item.quantity) {
+                throw new NotFoundError(`Product ${product.name} not available in sufficient quantity`);
+            }
         }
 
         // ===== 4. Apply offers =====
@@ -106,6 +130,23 @@ export const checkout = async (req, res, next) => {
         // ===== 9. Clear cart =====
         await cartModel.findOneAndDelete({ userId }).session(session);
 
+        // Update product inventory
+        for (const item of orderData.items) {
+            const product = await productModel.findById(item.productId);
+            if (product.hasVariants) {
+                const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
+                if (variant) {
+                    variant.inventory.stock -= item.quantity;
+                    product.baseInventory.stock -=item.quantity;
+                    await product.save({ session });
+                }
+            } else {
+                
+                product.baseInventory.stock -=item.quantity;
+                await product.save({ session });
+            }   
+        }
+
         // ===== 10. Commit transaction =====
         await session.commitTransaction();
         session.endSession();
@@ -133,11 +174,8 @@ export const checkout = async (req, res, next) => {
             });
         }
 
-        return res.status(500).json({
-            success: false,
-            message: "Checkout failed",
-            error: error.message,
-        });
+           next(error)
+       
     }
 };
 

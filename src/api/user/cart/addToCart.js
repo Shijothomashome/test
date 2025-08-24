@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import { NotFoundError } from "../../../constants/customErrors.js";
 import cartModel from "../../../models/cartModel.js";
 import productModel from "../../../models/productModel.js";
-import { getCart } from "./getCart.js";
 import { getLatestCart } from "../../../services/user/getCart.js";
 
 export const addToCart = async (req, res, next) => {
@@ -25,12 +24,17 @@ export const addToCart = async (req, res, next) => {
 
         let cart = await cartModel.findOne({ userId });
 
-        // If product has variants
+        // === CASE 1: Product has Variants ===
         if (product.hasVariants) {
             if (!variantId) throw new NotFoundError("Variant ID is required for this product");
 
             const variant = product.variants.find((v) => v._id.toString() === variantId);
             if (!variant) throw new NotFoundError("Variant not found");
+
+            // ✅ Check stock
+            if (variant.inventory.stock < QUANTITY) {
+                throw new NotFoundError(`Only ${variant.inventory.stock} items left in stock`);
+            }
 
             const { mrp, sellingPrice } = variant.price;
             const subTotal = sellingPrice * QUANTITY;
@@ -55,10 +59,20 @@ export const addToCart = async (req, res, next) => {
                     savedAmount: subMRPTotal - subTotal,
                 });
             } else {
-                const index = cart.items.findIndex((item) => item.productId.toString() === productId && item.variantId?.toString() === variantId);
+                const index = cart.items.findIndex(
+                    (item) =>
+                        item.productId.toString() === productId &&
+                        item.variantId?.toString() === variantId
+                );
 
                 if (index > -1) {
                     const newQuantity = cart.items[index].quantity + QUANTITY;
+
+                    // ✅ Check stock against new quantity
+                    if (variant.inventory.stock < newQuantity) {
+                        throw new NotFoundError(`Only ${variant.inventory.stock} items left in stock`);
+                    }
+
                     cart.items[index].quantity = newQuantity;
                     cart.items[index].subTotal = sellingPrice * newQuantity;
                     cart.items[index].subMRPTotal = mrp * newQuantity;
@@ -83,6 +97,12 @@ export const addToCart = async (req, res, next) => {
         // === CASE 2: Product has NO Variants ===
         else {
             const { mrp, sellingPrice } = product.basePrice;
+
+            // ✅ Check stock
+            if (product.baseInventory.stock < QUANTITY) {
+                throw new NotFoundError(`Only ${product.baseInventory.stock} items left in stock`);
+            }
+
             const subTotal = sellingPrice * QUANTITY;
             const subMRPTotal = mrp * QUANTITY;
 
@@ -92,7 +112,7 @@ export const addToCart = async (req, res, next) => {
                     items: [
                         {
                             productId,
-                            variantId: null, // optional
+                            variantId: null,
                             quantity: QUANTITY,
                             mrp,
                             sellingPrice,
@@ -105,10 +125,20 @@ export const addToCart = async (req, res, next) => {
                     savedAmount: subMRPTotal - subTotal,
                 });
             } else {
-                const index = cart.items.findIndex((item) => item.productId.toString() === productId && (!item.variantId || item.variantId === null));
+                const index = cart.items.findIndex(
+                    (item) =>
+                        item.productId.toString() === productId &&
+                        (!item.variantId || item.variantId === null)
+                );
 
                 if (index > -1) {
                     const newQuantity = cart.items[index].quantity + QUANTITY;
+
+                    // ✅ Check stock against new quantity
+                    if (product.baseInventory.stock < newQuantity) {
+                        throw new NotFoundError(`Only ${product.baseInventory.stock} items left in stock`);
+                    }
+
                     cart.items[index].quantity = newQuantity;
                     cart.items[index].subTotal = sellingPrice * newQuantity;
                     cart.items[index].subMRPTotal = mrp * newQuantity;
@@ -131,12 +161,12 @@ export const addToCart = async (req, res, next) => {
         }
 
         await cart.save();
-        const newCart = await getLatestCart(userId)
+        const newCart = await getLatestCart(userId);
 
         return res.status(200).json({
             success: true,
             message: "Cart updated successfully",
-            cart:newCart,
+            cart: newCart,
         });
     } catch (error) {
         console.error("Add to cart error:", error);

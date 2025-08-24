@@ -14,8 +14,8 @@ export const getAllReviews = async (req, res) => {
     if (status) query.status = status;
 
     const reviews = await Review.find(query)
-      .populate("user", "name email")
-      .populate("product", "name")
+      .populate("user", "name email profilePic")
+      .populate("product", "name",)
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);

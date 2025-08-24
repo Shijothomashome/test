@@ -7,9 +7,10 @@ import { handleError } from "../../helpers/handleError.js";
 // @access  Private/Admin
 export const updateReviewStatus = async (req, res) => {
   try {
+    const { id } = req.params;
     const { status } = req.body;
-
-    const review = await Review.findById(req.params.id);
+   console.log(status)
+    const review = await Review.findById(id);
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
@@ -18,8 +19,8 @@ export const updateReviewStatus = async (req, res) => {
     review.status = status;
     await review.save();
 
-    res.json(review);
+    res.status(200).json({success:true,message:"Review status successfully updated",review});
   } catch (error) {
-    handleError(res, error);
+    next(error)
   }
 };

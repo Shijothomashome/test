@@ -24,7 +24,7 @@ router.get(
 router.put(
   "/admin/reviews/:id/status",
 //   authenticate(["admin"]),
-  validatorMiddleware(reviewValidatorSchemas.updateReviewStatusSchema),
+  // validatorMiddleware(reviewValidatorSchemas.updateReviewStatusSchema),
   updateReviewStatus
 );
 

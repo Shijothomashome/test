@@ -45,6 +45,7 @@ const errorHandler = (err, req, res, next) => {
         message = err.message;
     }
 
+    console.log(err)
     console.error(`\x1b[31m${message}\x1b[0m`);
     if(message=="Internal Server Error")console.log(err)
     res.status(statusCode).json({
