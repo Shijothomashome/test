@@ -143,7 +143,7 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     deliveryDate: Date,
-    cancellation:{cancellationSchema},
+    cancellation:cancellationSchema,
     
     trackingNumber: String,
     couponCode: String,
