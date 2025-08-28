@@ -37,12 +37,15 @@ import { updateReview } from "../../controllers/review/updateReview.js";
 import { updateReviewStatus } from "./review/updateStatus.js";
 import { cancellOrder } from "./order/cancellOrder.js";
 import { reOrder } from "./order/reorder.js";
+import { getAllProductsFromCollection } from "./collection/getAllProductsFromCollection.js";
+import { getAllBrands } from "./brands/getAllBrands.js";
 
 
 const userRoutes = express.Router();
 
 // Product routes
 userRoutes.get("/product/search",searchProduct);
+userRoutes.get("/products/collections/:collectionHandle",getAllProductsFromCollection)
 userRoutes.get("/products/category/:categoryId",isLoggedIn(),getProductsByCategoryId); // bugfix if the user exists need to check wishlist else not 
 userRoutes.get("/products/filters",getProductFilterList)
 userRoutes.get('/products',isLoggedIn(),getFilteredProducts) // bugfix if the user exists need to check wishlist else not 
@@ -87,7 +90,13 @@ userRoutes.post('/orders/reorder/:orderId',authenticate(),reOrder)
 userRoutes.post("/reviews", authenticate(["customer", "admin"]),uploadToS3.array("images"), createReview);
 userRoutes.get("/reviews", authenticate(["customer", "admin"]), getAllReviews);
 userRoutes.patch("/reviews/like/:reviewId", authenticate(["customer", "admin"]), likeReview);
-userRoutes.patch("/reviews/dislike/:reviewId", authenticate(["customer", "admin"]), dislikeReview)   
+userRoutes.patch("/reviews/dislike/:reviewId", authenticate(["customer", "admin"]), dislikeReview);
+
+// Collection
+userRoutes.get("/collections/:collectionId",authenticate(),getAllProductsFromCollection)
+
+// Brands
+userRoutes.get("/brands",getAllBrands)
 
 
 

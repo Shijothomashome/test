@@ -64,4 +64,6 @@ router.get("/collections/:id/products",
   getCollectionProducts
 );
 
+
+
 export default router;

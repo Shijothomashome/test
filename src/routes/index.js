@@ -24,6 +24,7 @@ router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);
 
 router.use("/admin/carousel", carouselRoutes);
+
 router.use("/user",allUserRoutes);
 
 
