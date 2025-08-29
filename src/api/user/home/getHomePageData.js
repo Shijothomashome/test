@@ -27,7 +27,7 @@ export const getHomePageData = async (req, res, next) => {
       // Carousels
       caroselModel.aggregate([
         { $match: { isActive: true } },
-        { $project: { _id: 0, image: 1 } },
+        
         { $limit: limit },
       ]),
 
