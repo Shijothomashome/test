@@ -7,6 +7,8 @@ export const getWishlist = async (req, res, next) => {
         const { page = 1, limit = 15, category = "" } = req.query;
         const userObjectId = new mongoose.Types.ObjectId(req.user?._id);
 
+        
+
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
         const categoryCheckMatchStage = {};
@@ -37,7 +39,8 @@ export const getWishlist = async (req, res, next) => {
                     category: "$productData.category",
                 },
             },
-            categoryCheckMatchStage,
+            
+             categoryCheckMatchStage,
             {
                 $addFields: {
                     offer: {
@@ -59,6 +62,9 @@ export const getWishlist = async (req, res, next) => {
             { $skip: skip },
             { $limit: parseInt(limit) },
         ]);
+
+
+        console.log(products)
 
         res.status(200).json({
             success: true,
