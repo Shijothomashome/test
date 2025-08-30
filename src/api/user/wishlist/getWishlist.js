@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import wishlistModel from "../../../models/wishlistModel.js";
 import { BadRequestError } from "../../../constants/customErrors.js";
+import categoryModel from "../../../models/categoryModel.js";
 
 export const getWishlist = async (req, res, next) => {
     try {
@@ -17,7 +18,10 @@ export const getWishlist = async (req, res, next) => {
             throw new BadRequestError("Invalid parent category Id");
         }
         if (category) {
-            categoryCheckMatchStage.$match = { category: new mongoose.Types.ObjectId(category) };
+            const childCategories = await categoryModel.find({parentCategory:new mongoose.Types.ObjectId(category)});
+            const categoryObjectIds =  childCategories.map((i)=>i?._id);
+            console.log(categoryObjectIds)
+            categoryCheckMatchStage.$match = { category:{$in:categoryObjectIds} };
         } else {
             categoryCheckMatchStage.$match = {};
         }
