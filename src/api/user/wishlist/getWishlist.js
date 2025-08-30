@@ -21,7 +21,7 @@ export const getWishlist = async (req, res, next) => {
         }
 
         const products = await wishlistModel.aggregate([
-            {match:{categoryCheckMatchStage}},
+            {$match:categoryCheckMatchStage},
             { $match: { userId: userObjectId } },
             { $unwind: "$products" },
             { $project: { productId: "$products.productId", addedAt: "$products.addedAt" } },

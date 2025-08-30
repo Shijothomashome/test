@@ -4,6 +4,8 @@ import userModel from "../../models/userModel.js";
 
 const regenerateAccessToken = async (req, res) => {
     try {
+
+        console.log('regenerate access token called')
         const refreshToken = req.cookies?.refresh_token;
 
         if (!refreshToken) {
