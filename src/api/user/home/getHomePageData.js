@@ -3,6 +3,7 @@ import caroselModel from "../../../models/caroselModel.js";
 import categoryModel from "../../../models/categoryModel.js";
 import productModel from "../../../models/productModel.js";
 import mongoose from "mongoose";
+import reviewModel from "../../../models/reviewModel.js";
 
 export const getHomePageData = async (req, res, next) => {
   try {
@@ -14,7 +15,7 @@ export const getHomePageData = async (req, res, next) => {
       ? new mongoose.Types.ObjectId(req.user._id)
       : null;
 
-    const [categories, brands, carousels, featuredProducts] = await Promise.all([
+    const [categories, brands, carousels, featuredProducts,reviews] = await Promise.all([
       // Categories
       categoryModel.aggregate([
         { $match: { parentCategory: null } },
@@ -108,7 +109,7 @@ export const getHomePageData = async (req, res, next) => {
             wishlist: 1,
           },
         },
-      ]),
+      ]),reviewModel.find({}).populate({path:"user",select:"name"}).limit(4)
     ]);
 
     return res.status(200).json({
@@ -119,6 +120,7 @@ export const getHomePageData = async (req, res, next) => {
         brands,
         carousels,
         featuredProducts,
+        reviews
       },
     });
   } catch (error) {
