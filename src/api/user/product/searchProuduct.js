@@ -10,7 +10,7 @@ export const searchProduct = async (req, res, next) => {
       throw new NotFoundError("Search query not found");
     }
 
-    const results = await productModel.aggregate([
+    const results = await productModel.aggregate([{$match:{isActive:true,isDeleted:false}},
       {
         $lookup: {
           from: "categories", 

@@ -6,20 +6,20 @@ export const getProductDetails = async (req, res, next) => {
     try {
         const { slugOrId } = req.params;
 
-        const query = mongoose.Types.ObjectId.isValid(slugOrId) ? { _id: slugOrId } : { slug: slugOrId };
+        const query = mongoose.Types.ObjectId.isValid(slugOrId) 
+            ? { _id: slugOrId, isDeleted: false, isActive: true }
+            : { slug: slugOrId, isDeleted: false, isActive: true };
 
         const product = await productModel
             .findOne(query)
             .populate("category", "name slug") // Only include name & slug
             .populate("brand", "name")
-            .populate("variantAttributes") // populate variant-defining attributes
+            .populate("variantAttributes") 
             .populate("selectedAttributeValues.attribute", "name values")
             .populate("variantGroupBy", "name")
             .lean();
 
-        
-
-        if (!product || product.isDeleted) {
+        if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
 
@@ -28,9 +28,10 @@ export const getProductDetails = async (req, res, next) => {
             product.minPrice = Math.min(...product.variants.map((v) => v.price?.sellingPrice || 0));
             product.maxPrice = Math.max(...product.variants.map((v) => v.price?.sellingPrice || 0));
         }
-        const reviews = await reviewModel.find({ product: product._id })
 
-        return res.status(200).json({ product,reviews });
+        const reviews = await reviewModel.find({ product: product._id, isDeleted: false });
+
+        return res.status(200).json({ product, reviews });
     } catch (error) {
         next(error);
     }

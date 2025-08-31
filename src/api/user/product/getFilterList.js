@@ -7,11 +7,19 @@ export const getProductFilterList = async (req, res, next) => {
 
         const [brands, categories] = await Promise.all([
             brandModel
-                .find({ name: { $regex: brand_search, $options: "i" } })
+                .find({ 
+                    name: { $regex: brand_search, $options: "i" },
+                    isActive: true,
+                    isDeleted: false
+                })
                 .select("name"),
 
             categoryModel
-                .find({ name: { $regex: category_search, $options: "i" } })
+                .find({ 
+                    name: { $regex: category_search, $options: "i" },
+                    isActive: true,
+                    isDeleted: false
+                })
                 .select("name"),
         ]);
 

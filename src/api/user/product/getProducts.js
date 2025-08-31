@@ -32,7 +32,12 @@ export const getFilteredProducts = async (req, res, next) => {
       .filter((id) => mongoose.Types.ObjectId.isValid(id))
       .map((id) => new mongoose.Types.ObjectId(id));
 
-    const matchStage = {};
+    // ✅ Base filters: only active and not deleted
+    const matchStage = {
+      isActive: true,
+      isDeleted: false,
+    };
+
     if (validCategories.length > 0) {
       matchStage.category = { $in: validCategories };
     }
