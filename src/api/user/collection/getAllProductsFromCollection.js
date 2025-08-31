@@ -49,10 +49,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                                     {
                                         $multiply: [
                                             {
-                                                $divide: [
-                                                    { $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] },
-                                                    "$basePrice.mrp",
-                                                ],
+                                                $divide: [{ $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] }, "$basePrice.mrp"],
                                             },
                                             100,
                                         ],
@@ -93,11 +90,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                       {
                           $addFields: {
                               wishlist: {
-                                  $cond: [
-                                      { $gt: [{ $size: "$wishlistInfo" }, 0] },
-                                      { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
-                                      false,
-                                  ],
+                                  $cond: [{ $gt: [{ $size: "$wishlistInfo" }, 0] }, { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] }, false],
                               },
                           },
                       },
@@ -127,11 +120,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
             {
                 $facet: {
                     metadata: [{ $count: "total" }],
-                    data: [
-                        { $sort: sortStage },
-                        { $skip: skip },
-                        { $limit: limit },
-                    ],
+                    data: [{ $sort: sortStage }, { $skip: skip }, { $limit: limit }],
                 },
             },
             {

@@ -29,7 +29,7 @@ router.post(
     middlewares.validatorMiddleware(userValidatorSchemas.passwordResetSchema),
     authControllers.customerPasswordReset
 );
-router.get("/regenerate-accessToken", authControllers.regenerateAccessToken);
+router.get("/regenerate-accesstoken", authControllers.regenerateAccessToken);
 router.get("/logout", middlewares.authenticate(["customer", "admin"]), authControllers.logout);
 router.get("/me", middlewares.authenticate(["customer", "admin"]), authControllers.me);
 
