@@ -39,6 +39,7 @@ import { cancellOrder } from "./order/cancellOrder.js";
 import { reOrder } from "./order/reorder.js";
 import { getAllProductsFromCollection } from "./collection/getAllProductsFromCollection.js";
 import { getAllBrands } from "./brands/getAllBrands.js";
+import { getReviewsByProductId } from "./review/getReviewsByProductId.js";
 
 
 const userRoutes = express.Router();
@@ -49,7 +50,8 @@ userRoutes.get("/products/collections/:collectionHandle",getAllProductsFromColle
 userRoutes.get("/products/category/:categoryId",isLoggedIn(),getProductsByCategoryId); // bugfix if the user exists need to check wishlist else not 
 userRoutes.get("/products/filters",getProductFilterList)
 userRoutes.get('/products',isLoggedIn(),getFilteredProducts) // bugfix if the user exists need to check wishlist else not 
-userRoutes.get('/product/:slugOrId',getProductDetails)
+userRoutes.get('/product/:slugOrId',getProductDetails);
+userRoutes.get("/product/reviews/:productId",getReviewsByProductId)
 
 // Home page routes
 userRoutes.get('/home',isLoggedIn(),getHomePageData)
