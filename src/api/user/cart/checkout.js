@@ -13,7 +13,7 @@ export const checkout = async (req, res, next) => {
 
     try {
         const userId = req.user?._id;
-        const { addressId, paymentMethod, couponCode,name,phone } = req.body;
+        const { addressId, paymentMethod, couponCode, name, phone } = req.body;
 
         // ===== 1. Validate user =====
         const user = await userModel.findOne({ _id: userId });
@@ -27,8 +27,7 @@ export const checkout = async (req, res, next) => {
             throw new NotFoundError("Address not found");
         }
 
-        const shippingAddress = { ...address.toObject(), name:phone, phone:parseInt(phone) };
-        console.log("Shipping address:", shippingAddress);
+        const shippingAddress = { ...address.toObject(), name: phone, phone: parseInt(phone) };
 
         // ===== 3. Get cart =====
         let cart = await cartModel.findOne({ userId: new mongoose.Types.ObjectId(userId) });
@@ -39,18 +38,14 @@ export const checkout = async (req, res, next) => {
         // check product availability
         for (const item of cart.items) {
             const product = await productModel.findById(item.productId);
-           
+
             if (!product) {
                 throw new NotFoundError(`Product with ID ${item.productId} not found`);
             }
 
-            
-
             if (product.hasVariants) {
                 const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
 
-               
-                
                 if (!variant || variant.inventory.stock < item.quantity) {
                     throw new NotFoundError(`Variant with ID ${item.variantId} not available in sufficient quantity`);
                 }
@@ -87,7 +82,7 @@ export const checkout = async (req, res, next) => {
             shippingFee: 0,
             totalDiscount: cart.totalDiscount || 0,
             totalAmount: cart.totalPrice,
-            orderStatus: "PENDING",
+            orderStatus: "PLACED",
         };
 
         // ===== 6. Apply coupon if given =====
@@ -133,18 +128,32 @@ export const checkout = async (req, res, next) => {
         // Update product inventory
         for (const item of orderData.items) {
             const product = await productModel.findById(item.productId);
+            // if (product.hasVariants) {
+            //     const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
+            //     if (variant) {
+            //         variant.inventory.stock -= item.quantity;
+            //         product.baseInventory.stock -=item.quantity;
+            //         await product.save({ session });
+            //     }
+            // } else {
+
+            //     product.baseInventory.stock -=item.quantity;
+            //     await product.save({ session });
+            // }
             if (product.hasVariants) {
-                const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
-                if (variant) {
-                    variant.inventory.stock -= item.quantity;
-                    product.baseInventory.stock -=item.quantity;
-                    await product.save({ session });
-                }
+                await productModel.updateOne(
+                    { _id: item.productId, "variants._id": item.variantId },
+                    {
+                        $inc: {
+                            "variants.$.inventory.stock": -item.quantity,
+                            "baseInventory.stock": -item.quantity,
+                        },
+                    },
+                    { session }
+                );
             } else {
-                
-                product.baseInventory.stock -=item.quantity;
-                await product.save({ session });
-            }   
+                await productModel.updateOne({ _id: item.productId }, { $inc: { "baseInventory.stock": -item.quantity } }, { session });
+            }
         }
 
         // ===== 10. Commit transaction =====
@@ -162,7 +171,6 @@ export const checkout = async (req, res, next) => {
             },
             payment: paymentMethod === "ONLINE" ? {} : null, // Placeholder for Razorpay
         });
-
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
@@ -174,8 +182,7 @@ export const checkout = async (req, res, next) => {
             });
         }
 
-           next(error)
-       
+        next(error);
     }
 };
 
