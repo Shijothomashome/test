@@ -46,12 +46,20 @@ export const getWishlist = async (req, res, next) => {
       },
       { $unwind: "$productData" },
 
-      // Lookup reviews for each product
+      // ⭐ Lookup reviews (only approved)
       {
         $lookup: {
           from: "reviews",
-          localField: "productData._id",
-          foreignField: "productId",
+          let: { productId: "$productData._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$product", "$$productId"] },
+                status: "approved",
+              },
+            },
+            { $project: { rating: 1 } },
+          ],
           as: "reviews",
         },
       },
@@ -64,7 +72,15 @@ export const getWishlist = async (req, res, next) => {
               0,
             ],
           },
-          reviewCount: { $size: "$reviews" },
+          ratingCount: {
+            $size: {
+              $filter: {
+                input: "$reviews",
+                as: "r",
+                cond: { $ifNull: ["$$r.rating", false] }, // count only reviews with rating
+              },
+            },
+          },
         },
       },
       { $project: { reviews: 0 } },
@@ -79,7 +95,7 @@ export const getWishlist = async (req, res, next) => {
           image: "$productData.thumbnail",
           category: "$productData.category",
           averageRating: 1,
-          reviewCount: 1,
+          ratingCount: 1, // ✅ include rating count
         },
       },
 

@@ -287,13 +287,18 @@ export const getFilteredProducts = async (req, res, next) => {
             },
           ]),
 
-      // ⭐ Lookup reviews (only approved) & calculate rating
+      // ⭐ Lookup reviews (only approved) & calculate rating + ratingCount
       {
         $lookup: {
           from: "reviews",
           let: { productId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $eq: ["$product", "$$productId"] }, status: "approved" } },
+            {
+              $match: {
+                $expr: { $eq: ["$product", "$$productId"] },
+                status: "approved",
+              },
+            },
             { $project: { rating: 1 } },
           ],
           as: "reviews",
@@ -308,7 +313,15 @@ export const getFilteredProducts = async (req, res, next) => {
               0,
             ],
           },
-          reviewCount: { $size: "$reviews" },
+          ratingCount: {
+            $size: {
+              $filter: {
+                input: "$reviews",
+                as: "r",
+                cond: { $ifNull: ["$$r.rating", false] }, // count only docs with rating
+              },
+            },
+          },
         },
       },
 
@@ -323,7 +336,7 @@ export const getFilteredProducts = async (req, res, next) => {
           createdAt: 1,
           wishlist: 1,
           averageRating: { $round: ["$averageRating", 1] }, // round to 1 decimal
-          reviewCount: 1,
+          ratingCount: 1, // ✅ only approved ratings count
         },
       },
 
@@ -358,7 +371,8 @@ export const getFilteredProducts = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Products fetched with filters, sorting, offers, wishlist, and ratings",
+      message:
+        "Products fetched with filters, sorting, offers, wishlist, and ratings",
       totalCount,
       currentPage: page,
       totalPages,

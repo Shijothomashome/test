@@ -27,7 +27,12 @@ export const getProductsByCategoryId = async (req, res, next) => {
           from: "reviews",
           let: { productId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $eq: ["$product", "$$productId"] }, status: "approved" } },
+            {
+              $match: {
+                $expr: { $eq: ["$product", "$$productId"] },
+                status: "approved",
+              },
+            },
             { $project: { rating: 1 } },
           ],
           as: "reviews",
@@ -42,7 +47,7 @@ export const getProductsByCategoryId = async (req, res, next) => {
               0,
             ],
           },
-          reviewCount: { $size: "$reviews" },
+          ratingCount: { $size: "$reviews" }, // ✅ only approved reviews
         },
       },
 
@@ -118,7 +123,7 @@ export const getProductsByCategoryId = async (req, res, next) => {
           offer: 1,
           wishlist: 1,
           averageRating: { $round: ["$averageRating", 1] }, // round to 1 decimal
-          reviewCount: 1,
+          ratingCount: 1, // ✅ number of approved reviews
         },
       },
 
