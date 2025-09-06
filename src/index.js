@@ -32,7 +32,7 @@ const ENV = process.env.NODE_ENV || "development";
 const API_VERSION = process.env.API_VERSION || "v1";
 const API_PREFIX = `/api/${API_VERSION}`;
 
-const getBaseUrl = () => `${PROTOCOL}://${HOST}${[80, 443].includes(Number(PORT)) ? "" : `:${PORT}`}`;
+const getBaseUrl = () => `${PROTOCOL}://${req.get("host")}${[80, 443].includes(Number(PORT)) ? "" : `:${PORT}`}`;
 const BASE_URL = getBaseUrl();
 
 // Connect to DB
@@ -43,7 +43,7 @@ import "./config/passport.js";
 import { JWT_SECRET } from "./config/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://medico.oxiumev.com"];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://medico.oxiumev.com", "https://ecom-web-xvv4.vercel.app/", "https://ecom-dashboard-beta.vercel.app/"];
 
 // === MIDDLEWARE ===
 app.use(
@@ -109,7 +109,7 @@ await connectDB();
 app.use(errorHandler);
 
 // === START SERVER ===
-app.listen(PORT, HOST, () => {
+app.listen(PORT, () => {
     console.log(clc.blueBright("────────────────────────────────────────────"));
     console.log(`${clc.green("🚀 Server Started Successfully")}`);
     console.log(`${clc.cyan("🌐 Environment")} : ${clc.whiteBright(ENV)}`);
