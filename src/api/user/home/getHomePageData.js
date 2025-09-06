@@ -17,49 +17,58 @@ export const getHomePageData = async (req, res, next) => {
 
     const [categories, brands, carousels, featuredProducts, reviews] =
       await Promise.all([
-        // Categories
+        // ⭐ Categories
         categoryModel.aggregate([
           { $match: { parentCategory: null } },
           { $project: { name: 1, image: 1 } },
         ]),
 
-        // Brands
+        // ⭐ Brands
         brandModel.aggregate([{ $project: { name: 1, logo: 1 } }]),
 
-        // Carousels
+        // ⭐ Carousels
         caroselModel.aggregate([
           { $match: { isActive: true } },
           { $limit: limit },
         ]),
 
-        // Featured Products
+        // ⭐ Featured Products
         productModel.aggregate([
           { $match: { isFeatured: true } },
 
-          // Lookup reviews and calculate average rating
+          // Lookup only approved reviews
           {
             $lookup: {
               from: "reviews",
-              localField: "_id",
-              foreignField: "productId",
+              let: { productId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$product", "$$productId"] },
+                    status: "approved",
+                  },
+                },
+                { $project: { rating: 1 } },
+              ],
               as: "reviews",
             },
           },
+
+          // Add average rating & ratingCount
           {
             $addFields: {
               averageRating: {
                 $cond: [
                   { $gt: [{ $size: "$reviews" }, 0] },
-                  { $round: [{ $avg: "$reviews.rating" }, 1] },
+                  { $avg: "$reviews.rating" },
                   0,
                 ],
               },
-              reviewCount: { $size: "$reviews" },
+              ratingCount: { $size: "$reviews" }, // only approved reviews
             },
           },
-          { $project: { reviews: 0 } },
 
-          // Offer calculation
+          // ⭐ Offer calculation
           {
             $addFields: {
               offer: {
@@ -86,7 +95,7 @@ export const getHomePageData = async (req, res, next) => {
             },
           },
 
-          // Wishlist logic
+          // ⭐ Wishlist logic
           ...(isUserLoggedIn
             ? [
                 {
@@ -120,13 +129,11 @@ export const getHomePageData = async (req, res, next) => {
               ]
             : [
                 {
-                  $addFields: {
-                    wishlist: false,
-                  },
+                  $addFields: { wishlist: false },
                 },
               ]),
 
-          // Final projection
+          // ⭐ Final projection
           {
             $project: {
               name: 1,
@@ -135,15 +142,15 @@ export const getHomePageData = async (req, res, next) => {
               basePrice: 1,
               offer: 1,
               wishlist: 1,
-              averageRating: 1,
-              reviewCount: 1,
+              averageRating: { $round: ["$averageRating", 1] },
+              ratingCount: 1, // only approved reviews count
             },
           },
         ]),
 
-        // Recent reviews (with user info)
+        // ⭐ Recent approved reviews
         reviewModel
-          .find({})
+          .find({ status: "approved" })
           .populate({ path: "user", select: "name" })
           .limit(4),
       ]);
