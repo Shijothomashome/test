@@ -14,12 +14,39 @@ export const getProductsByCategoryId = async (req, res, next) => {
     const limitNumber = parseInt(limit) || 5;
 
     const isUserLoggedIn = req.user && req.user._id;
-    const userObjectId = isUserLoggedIn ? new mongoose.Types.ObjectId(req.user._id) : null;
+    const userObjectId = isUserLoggedIn
+      ? new mongoose.Types.ObjectId(req.user._id)
+      : null;
 
     const products = await productModel.aggregate([
       { $match: { category: new mongoose.Types.ObjectId(categoryId) } },
 
-      // Calculate offer percentage
+      // ⭐ Lookup reviews (only approved) & calculate rating
+      {
+        $lookup: {
+          from: "reviews",
+          let: { productId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$product", "$$productId"] }, status: "approved" } },
+            { $project: { rating: 1 } },
+          ],
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $size: "$reviews" }, 0] },
+              { $avg: "$reviews.rating" },
+              0,
+            ],
+          },
+          reviewCount: { $size: "$reviews" },
+        },
+      },
+
+      // ⭐ Calculate offer percentage
       {
         $addFields: {
           offer: {
@@ -41,7 +68,7 @@ export const getProductsByCategoryId = async (req, res, next) => {
         },
       },
 
-      // If user is logged in, check wishlist
+      // ⭐ Wishlist logic
       ...(isUserLoggedIn
         ? [
             {
@@ -81,7 +108,7 @@ export const getProductsByCategoryId = async (req, res, next) => {
             },
           ]),
 
-      // Final projection
+      // ⭐ Final projection
       {
         $project: {
           name: 1,
@@ -90,6 +117,8 @@ export const getProductsByCategoryId = async (req, res, next) => {
           basePrice: 1,
           offer: 1,
           wishlist: 1,
+          averageRating: { $round: ["$averageRating", 1] }, // round to 1 decimal
+          reviewCount: 1,
         },
       },
 

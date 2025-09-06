@@ -18,8 +18,9 @@ export const createReview = async (req, res, next) => {
         createReviewSchema.parse(req);
         const productData = await productModel.findById(product);
         if (!productData) throw new NotFoundError("Product not found");
-
+        
         const alreadyReviewed = await reviewModel.findOne({ user, product });
+       
         if (alreadyReviewed) {
             throw new ConflictError("You have already reviewed this product");
         }

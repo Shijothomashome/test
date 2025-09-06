@@ -7,34 +7,55 @@ export const getAllProductsFromCollection = async (req, res, next) => {
     try {
         const { collectionHandle } = req.params;
 
-        // Validate handle (must be string, not ObjectId)
         if (!collectionHandle || mongoose.Types.ObjectId.isValid(collectionHandle)) {
             throw new BadRequestError("Invalid collection handle");
         }
 
-        // Query params
         let { page = 1, limit = 12, sortBy = "createdAt", sortOrder = "desc" } = req.query;
         page = parseInt(page, 10);
         limit = parseInt(limit, 10);
 
-        // Validate sort order
         const order = sortOrder === "asc" ? 1 : -1;
         const sortStage = { [sortBy]: order };
         const skip = (page - 1) * limit;
 
-        // Find collection
         const collection = await Collection.findOne({ handle: collectionHandle });
         if (!collection) throw new NotFoundError("Collection not found");
 
-        // Wishlist logic (check if user logged in)
         const isUserLoggedIn = req.user && req.user?._id;
         const userObjectId = isUserLoggedIn ? new mongoose.Types.ObjectId(req.user._id) : null;
 
-        // Aggregation pipeline
         const pipeline = [
             {
                 $match: {
-                    collection_ids: { $in: [collection._id] }, // must match collection id
+                    collection_ids: { $in: [collection._id] },
+                },
+            },
+
+            // Lookup reviews and calculate average rating
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "_id",
+                    foreignField: "productId",
+                    as: "reviews",
+                },
+            },
+            {
+                $addFields: {
+                    averageRating: {
+                        $cond: [
+                            { $gt: [{ $size: "$reviews" }, 0] },
+                            { $round: [{ $avg: "$reviews.rating" }, 1] },
+                            0,
+                        ],
+                    },
+                    reviewCount: { $size: "$reviews" },
+                },
+            },
+            {
+                $project: {
+                    reviews: 0, // don’t return full reviews array
                 },
             },
 
@@ -49,7 +70,10 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                                     {
                                         $multiply: [
                                             {
-                                                $divide: [{ $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] }, "$basePrice.mrp"],
+                                                $divide: [
+                                                    { $subtract: ["$basePrice.mrp", "$basePrice.sellingPrice"] },
+                                                    "$basePrice.mrp",
+                                                ],
                                             },
                                             100,
                                         ],
@@ -63,7 +87,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                 },
             },
 
-            // Wishlist enrichment if logged in
+            // Wishlist enrichment
             ...(isUserLoggedIn
                 ? [
                       {
@@ -72,9 +96,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                               let: { productId: "$_id" },
                               pipeline: [
                                   {
-                                      $match: {
-                                          userId: userObjectId,
-                                      },
+                                      $match: { userId: userObjectId },
                                   },
                                   {
                                       $project: {
@@ -90,16 +112,18 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                       {
                           $addFields: {
                               wishlist: {
-                                  $cond: [{ $gt: [{ $size: "$wishlistInfo" }, 0] }, { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] }, false],
+                                  $cond: [
+                                      { $gt: [{ $size: "$wishlistInfo" }, 0] },
+                                      { $arrayElemAt: ["$wishlistInfo.hasProduct", 0] },
+                                      false,
+                                  ],
                               },
                           },
                       },
                   ]
                 : [
                       {
-                          $addFields: {
-                              wishlist: false,
-                          },
+                          $addFields: { wishlist: false },
                       },
                   ]),
 
@@ -113,10 +137,12 @@ export const getAllProductsFromCollection = async (req, res, next) => {
                     offer: 1,
                     createdAt: 1,
                     wishlist: 1,
+                    averageRating: 1,
+                    reviewCount: 1,
                 },
             },
 
-            // Pagination + metadata
+            // Pagination
             {
                 $facet: {
                     metadata: [{ $count: "total" }],
@@ -145,7 +171,7 @@ export const getAllProductsFromCollection = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: "Products fetched successfully",
-            ...result[0], // contains { data, metadata, totalCount, currentPage, totalPages }
+            ...result[0],
         });
     } catch (error) {
         next(error);

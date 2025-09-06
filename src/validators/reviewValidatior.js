@@ -15,7 +15,7 @@ export const createReviewSchema = z.object({
     rating: z.number().min(1).max(5),
     title: z.string().trim().max(100).optional(),
     comment: z.string().trim().max(1000).optional(),
-    images: z.array(z.string().url("Invalid image URL")).max(6).optional(),
+   
   }).strict(), // reject unknown fields
 });
 

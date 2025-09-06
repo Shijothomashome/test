@@ -18,7 +18,7 @@ const googleCallback = (req, res) => {
         httpOnly: true,
         secure: isSecureRequest,
         sameSite: isSecureRequest ? "none" : "lax",
-        path: REGENERATE_ACCESS_TOKEN_PATH,
+        // path: REGENERATE_ACCESS_TOKEN_PATH,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
     res.cookie("user", req.user, {

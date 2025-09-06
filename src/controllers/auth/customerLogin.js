@@ -95,7 +95,7 @@ const customerLogin = async (req, res) => {
         const { accessToken, refreshToken } = tokenGeneratorUtils.tokenGenerator(user._id, user.role);
 
         const isSecureRequest = req.secure || req.headers["x-forwarded-proto"] === "https";
-
+  const { password: _, ...userData } = user.toObject();
         res.cookie("access_token", accessToken, {
             httpOnly: true,
             secure: isSecureRequest,
@@ -111,7 +111,7 @@ const customerLogin = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
-        const { password: _, ...userData } = user.toObject();
+      
 
         return res.status(200).json({
             success: true,
