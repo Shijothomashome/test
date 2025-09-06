@@ -32,7 +32,7 @@ const ENV = process.env.NODE_ENV || "development";
 const API_VERSION = process.env.API_VERSION || "v1";
 const API_PREFIX = `/api/${API_VERSION}`;
 
-const getBaseUrl = () => `${PROTOCOL}://${req.get("host")}${[80, 443].includes(Number(PORT)) ? "" : `:${PORT}`}`;
+const getBaseUrl = () => `${PROTOCOL}://${HOST}${[80, 443].includes(Number(PORT)) ? "" : `:${PORT}`}`;
 const BASE_URL = getBaseUrl();
 
 // Connect to DB
